@@ -1,8 +1,60 @@
-# mappingtools
+# MappingTools
 
-This library provides utility functions for manipulating and transforming data structures,
-including inverting dictionaries, converting objects to dictionaries, creating nested defaultdicts,
-and unwrapping complex objects.
+> This library provides utility functions for manipulating and transforming data structures which have or include
+> Mapping-like characteristics.
+> Including inverting dictionaries, converting class like objects to dictionaries, creating nested defaultdicts,
+> and unwrapping complex objects.
+
+<table>
+  <tr style="vertical-align: middle;">
+    <td>Package</td>
+    <td>
+      <img alt="PyPI - version" src="https://img.shields.io/pypi/v/mappingtools">
+      <img alt="PyPI - Status" src="https://img.shields.io/pypi/status/mappingtools">
+      <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/mappingtools">
+      <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dd/mappingtools">
+      <br>
+      <img alt="GitHub" src="https://img.shields.io/github/license/erivlis/mappingtools">
+      <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/erivlis/mappingtools">
+      <img alt="GitHub last commit (by committer)" src="https://img.shields.io/github/last-commit/erivlis/mappingtools">
+      <a href="https://github.com/erivlis/mappingtools/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/erivlis/mappingtools.svg"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>Tools</td>
+    <td>
+      <a href="https://www.jetbrains.com/pycharm/"><img alt="PyCharm" src="https://img.shields.io/badge/PyCharm-FCF84A.svg?logo=PyCharm&logoColor=black&labelColor=21D789&color=FCF84A"></a>
+      <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff" style="max-width:100%;"></a>
+      <a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv" style="max-width:100%;"></a>
+      <a href="https://squidfunk.github.io/mkdocs-material/"><img src="https://img.shields.io/badge/Material_for_MkDocs-526CFE?&logo=MaterialForMkDocs&logoColor=white&labelColor=grey"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>CI/CD</td>
+    <td>
+      <a href="https://github.com/erivlis/mappingtools/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/erivlis/mappingtools/actions/workflows/test.yml/badge.svg?branch=main"></a>
+      <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml"><img alt="Publish" src="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml/badge.svg"></a>
+      <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml"><img alt="Publish Docs" src="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml/badge.svg"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>Scans</td>
+    <td>
+      <a href="https://codecov.io/gh/erivlis/mappingtools"><img alt="Coverage" src="https://codecov.io/gh/erivlis/mappingtools/graph/badge.svg?token=POODT8M9NV"/></a>
+      <br>
+      <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=alert_status"></a>
+      <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Security Rating" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=security_rating"></a>
+      <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Maintainability Rating" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=sqale_rating"></a>
+      <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Reliability Rating" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=reliability_rating"></a>
+      <br>
+      <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Lines of Code" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=ncloc"></a>
+      <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Vulnerabilities" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=vulnerabilities"></a>
+      <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Bugs" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=bugs"></a>
+      <br>
+      <a href="https://app.codacy.com/gh/erivlis/mappingtools/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"><img alt="Codacy Badge" src="https://app.codacy.com/project/badge/Grade/8b83a99f939b4883ae2f37d7ec3419d1"></a>
+    </td>
+  </tr>
+</table>
 
 ## Usage
 
