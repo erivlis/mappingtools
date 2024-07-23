@@ -11,7 +11,7 @@ and unwrapping complex objects.
 Converts objects to dictionaries using handlers for mappings, iterables, and classes.
 
 ```python
-from src.mappingtools import dictify
+from mappingtools import dictify
 
 data = {'key1': 'value1', 'key2': ['item1', 'item2']}
 dictified_data = dictify(data)
@@ -24,7 +24,7 @@ print(dictified_data)
 Yields distinct values for a specified key across multiple mappings.
 
 ```python
-from src.mappingtools import distinct
+from mappingtools import distinct
 
 mappings = [
     {'a': 1, 'b': 2},
@@ -41,7 +41,7 @@ print(distinct_values)
 Yields subsets of mappings by retaining only the specified keys.
 
 ```python
-from src.mappingtools import keep
+from mappingtools import keep
 
 mappings = [
     {'a': 1, 'b': 2, 'c': 3},
@@ -57,7 +57,7 @@ result = list(keep(keys_to_keep, *mappings))
 Swaps keys and values in a dictionary.
 
 ```python
-from src.mappingtools import inverse
+from mappingtools import inverse
 
 original_mapping = {'a': {1, 2}, 'b': {3}}
 inverted_mapping = inverse(original_mapping)
@@ -70,7 +70,7 @@ print(inverted_mapping)
 Creates a nested defaultdict with specified depth and factory.
 
 ```python
-from src.mappingtools import nested_defaultdict
+from mappingtools import nested_defaultdict
 
 nested_dd = nested_defaultdict(2, list)
 nested_dd[0][1].append('value')
@@ -84,7 +84,7 @@ Yields mappings with specified keys removed. It takes an iterable of keys and mu
 of mappings with those keys excluded.
 
 ```python
-from src.mappingtools import remove
+from mappingtools import remove
 
 mappings = [
     {'a': 1, 'b': 2, 'c': 3},
@@ -101,7 +101,7 @@ result = list(remove(keys_to_remove, *mappings))
 Transforms complex objects into a list of dictionaries with key and value pairs.
 
 ```python
-from src.mappingtools import unwrap
+from mappingtools import unwrap
 
 wrapped_data = {'key1': {'subkey': 'value'}, 'key2': ['item1', 'item2']}
 unwrapped_data = unwrap(wrapped_data)
