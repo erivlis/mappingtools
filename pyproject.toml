@@ -1,17 +1,19 @@
 [project]
 name = "mappingtools"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
     { name = "Eran Rivlis", email = "eran@rivlis.info" },
 ]
-description = "mappingtools. Do stuff with Mappings"
+description = "MappingTools. Do stuff with Mappings"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",

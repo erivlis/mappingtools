@@ -1,9 +1,8 @@
 # MappingTools
 
-> This library provides utility functions for manipulating and transforming data structures which have or include
-> Mapping-like characteristics.
-> Including inverting dictionaries, converting class like objects to dictionaries, creating nested defaultdicts,
-> and unwrapping complex objects.
+This library provides utility functions for manipulating and transforming data structures which have or include
+Mapping-like characteristics. Including inverting dictionaries, converting class like objects to dictionaries, creating
+nested defaultdicts, and unwrapping complex objects.
 
 <table>
   <tr style="vertical-align: middle;">
@@ -26,7 +25,7 @@
       <a href="https://www.jetbrains.com/pycharm/"><img alt="PyCharm" src="https://img.shields.io/badge/PyCharm-FCF84A.svg?logo=PyCharm&logoColor=black&labelColor=21D789&color=FCF84A"></a>
       <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff" style="max-width:100%;"></a>
       <a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv" style="max-width:100%;"></a>
-      <a href="https://squidfunk.github.io/mkdocs-material/"><img src="https://img.shields.io/badge/Material_for_MkDocs-526CFE?&logo=MaterialForMkDocs&logoColor=white&labelColor=grey"></a>
+      <!-- a href="https://squidfunk.github.io/mkdocs-material/"><img src="https://img.shields.io/badge/Material_for_MkDocs-526CFE?&logo=MaterialForMkDocs&logoColor=white&labelColor=grey"></a -->
     </td>
   </tr>
   <tr>
@@ -34,7 +33,7 @@
     <td>
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/erivlis/mappingtools/actions/workflows/test.yml/badge.svg?branch=main"></a>
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml"><img alt="Publish" src="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml/badge.svg"></a>
-      <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml"><img alt="Publish Docs" src="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml/badge.svg"></a>
+      <!--a href="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml"><img alt="Publish Docs" src="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml/badge.svg"></a-->
     </td>
   </tr>
   <tr>
