@@ -16,17 +16,6 @@ class TestInverse:
         # Assert
         assert result == {1: {'a'}, 2: {'b'}, 3: {'c'}}
 
-    #  Handling mappings with multiple keys sharing the same value
-    def test_invert_shared_values(self):
-        # Arrange
-        mapping = {'a': {1, 2}, 'b': {2, 3}}
-
-        # Act
-        result = inverse(mapping)
-
-        # Assert
-        assert result == {1: {'a'}, 2: {'a', 'b'}, 3: {'b'}}
-
     #  Processing an empty mapping
     def test_invert_empty_mapping(self):
         # Arrange

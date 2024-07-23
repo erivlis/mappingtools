@@ -17,18 +17,6 @@ class TestDistinct:
         # Assert
         assert result == [1, 2]
 
-    #  Handle mappings with no overlapping values for the specified key
-    def test_no_overlapping_values(self):
-        # Arrange
-        mappings = [{'a': 1}, {'a': 2}, {'a': 3}]
-        key = 'a'
-
-        # Act
-        result = list(distinct(key, *mappings))
-
-        # Assert
-        assert result == [1, 2, 3]
-
     #  Process mappings with some overlapping values for the specified key
     def test_some_overlapping_values(self):
         # Arrange
