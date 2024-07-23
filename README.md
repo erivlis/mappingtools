@@ -173,7 +173,7 @@ ruff check src
 #### Standard (cobertura) XML Coverage Report
 
 ```shell
- python -m pytest tests -n auto --cov=src --cov-branch --doctest-modules --cov-report=xml --junitxml=test_results.xml
+python -m pytest tests -n auto --cov=src --cov-branch --doctest-modules --cov-report=xml --junitxml=test_results.xml
 ```
 
 #### HTML Coverage Report
