@@ -1,0 +1,149 @@
+[project]
+name = "mappingtools"
+version = "0.0.1"
+authors = [
+    { name = "Eran Rivlis", email = "eran@rivlis.info" },
+]
+description = "mappingtools. Do stuff with Mappings"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries",
+    "Typing :: Typed"
+]
+keywords = ['Mapping', 'manipulate', 'mutate', 'transform']
+dependencies = []
+
+
+[project.urls]
+"Homepage" = "https://erivlis.github.io/mappingtools"
+"Documentation" = "https://erivlis.github.io/mappingtools"
+"Bug Tracker" = "https://github.com/erivlis/mappingtools/issues"
+"Source" = "https://github.com/erivlis/mappingtools"
+
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+]
+docs = [
+    "mkdocs-material",
+    "mkdocstrings-python",
+    "mkdocs-git-revision-date-localized-plugin",
+    "mkdocs-gen-files",
+    "mkdocs-glightbox",
+    "mkdocs-literate-nav",
+    "mkdocs-section-index",
+]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-randomly",
+    "pytest-xdist"
+]
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+
+[tool.coverage.report]
+exclude_also = [
+    "...",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod"
+]
+
+
+[tool.black]
+line-length = 120
+#extend-exclude = ''
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "W",
+    "C90",
+    "I",
+    "N",
+    "U",
+    "C4",
+    "PIE",
+    "PT",
+    "SIM",
+    # "ERA",
+    "TRY",
+    "RUF",
+]
+ignore = ["F401", "TRY003"]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".idea",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "venv",
+]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "single"
+multiline-quotes = "single"
+
+
+[tool.ruff.lint.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 15
