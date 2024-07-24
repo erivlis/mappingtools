@@ -151,7 +151,7 @@ from mappingtools import inverse
 original_mapping = {'a': {1, 2}, 'b': {3}}
 inverted_mapping = inverse(original_mapping)
 print(inverted_mapping)
-# Output: {1: 'a', 2: 'a', 3: 'b'}
+# Output: defaultdict(<class 'set'>, {1: {'a'}, 2: {'a'}, 3: {'b'}})
 ```
 
 ### `nested_defaultdict`
@@ -161,7 +161,7 @@ Creates a nested defaultdict with specified depth and factory.
 ```python
 from mappingtools import nested_defaultdict
 
-nested_dd = nested_defaultdict(2, list)
+nested_dd = nested_defaultdict(1, list)
 nested_dd[0][1].append('value')
 print(nested_dd)
 # Output: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {0: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {1: ['value']})})
@@ -182,7 +182,6 @@ mappings = [
 keys_to_remove = ['a', 'b']
 result = list(remove(keys_to_remove, *mappings))
 # result: [{'c': 3}, {'d': 6}]
-
 ```
 
 ### `unwrap`
