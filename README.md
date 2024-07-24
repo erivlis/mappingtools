@@ -63,12 +63,49 @@ nested defaultdicts, and unwrapping complex objects.
 Converts objects to dictionaries using handlers for mappings, iterables, and classes.
 
 ```python
+from collections import Counter
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Mapping
+
 from mappingtools import dictify
 
 data = {'key1': 'value1', 'key2': ['item1', 'item2']}
 dictified_data = dictify(data)
 print(dictified_data)
 # Output: {'key1': 'value1', 'key2': ['item1', 'item2']}
+
+counter = Counter({'a': 1, 'b': 2})
+print(counter)
+# Output: Counter({'b': 2, 'a': 1})
+
+dictified_counter = dictify(counter)
+print(dictified_counter)
+
+
+# Output: {'a': 1, 'b': 2}
+
+
+@dataclass
+class SampleDataClass:
+    a: int
+    b: int
+    aa: str
+    bb: str
+    c: list[int]
+    d: Mapping
+    e: datetime
+
+
+sample_datetime = datetime(2024, 7, 22, 21, 42, 17, 314159)
+sample_dataclass = SampleDataClass(1, 2, '11', '22', [1, 2], {'aaa': 111, 'bbb': '222'}, sample_datetime)
+
+print(sample_dataclass)
+# Output: SampleDataClass(a=1, b=2, aa='11', bb='22', c=[1, 2], d={'aaa': 111, 'bbb': '222'}, e=datetime.datetime(2024, 7, 22, 21, 42, 17, 314159))
+
+dictified_sample_dataclas = dictify(sample_dataclass)
+print(dictified_sample_dataclas)
+# Output: {'a': 1, 'aa': '11', 'b': 2, 'bb': '22', 'c': [1, 2], 'd': {'aaa': 111, 'bbb': '222'}, 'e': datetime.datetime(2024, 7, 22, 21, 42, 17, 314159)}
 ```
 
 ### `distinct`
