@@ -160,10 +160,8 @@ def nested_defaultdict(nesting_depth: int = 0, default_factory: Callable | None 
 
     def factory():
         if nesting_depth > 0:
-            print(1)
             return nested_defaultdict(nesting_depth=nesting_depth - 1, default_factory=default_factory, **kwargs)
         else:
-            print(2)
             return default_factory() if default_factory else None
 
     return defaultdict(factory, **kwargs)
