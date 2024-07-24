@@ -197,7 +197,7 @@ print(unwrapped_data)
 # Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
 ```
 
-### 'MappingCollector'
+### `MappingCollector`
 
 A class designed to collect key-value pairs into an internal mapping,
 with two modes of operation: one_to_one and one_to_many.
