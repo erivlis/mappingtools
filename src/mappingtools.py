@@ -2,13 +2,104 @@ import dataclasses
 import inspect
 from collections import defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping
+from enum import Enum, auto
 from itertools import chain
 from typing import Any, TypeVar
 
-K = TypeVar("K")
+K = TypeVar('K')
+KT = TypeVar('KT')
+VT = TypeVar('VT')
+VT_co = TypeVar('VT_co')
+
+
+class MappingCollectorMode(Enum):
+    """
+    Define an enumeration class for mapping collector modes with two options: one_to_one and one_to_many.
+    """
+    one_to_one = auto()
+    one_to_many = auto()
+
+
+class MappingCollector:
+
+    def __init__(self, mode: MappingCollectorMode = MappingCollectorMode.one_to_one, *args, **kwargs):
+        """
+        Initialize the MappingCollector with the specified mode.
+
+        Args:
+            mode (MappingCollectorMode): The mode for collecting mappings.
+            *args: Variable positional arguments used to initialize the internal mapping.
+            **kwargs: Variable keyword arguments used to initialize the internal mapping.
+        """
+
+        self.mode = mode
+
+        match self.mode:
+            case MappingCollectorMode.one_to_one:
+                self._mapping = dict(*args, **kwargs)
+            case MappingCollectorMode.one_to_many:
+                self._mapping = defaultdict(list, *args, **kwargs)
+            case _:
+                raise ValueError("Invalid mode")
+
+    def __repr__(self):
+        return f'MappingCollector(mode={self.mode}, mapping={self.mapping})'
+
+    @property
+    def mapping(self) -> Mapping[KT, VT_co]:
+        """
+        Return a shallow copy of the internal mapping.
+
+        Returns:
+            Mapping[KT, VT_co]: A shallow copy of the internal mapping.
+        """
+        return dict(self._mapping)
+
+    def add(self, key: KT, value: VT):
+        """
+        Add a key-value pair to the internal mapping based on the specified mode.
+
+        Args:
+            key: The key to be added to the mapping.
+            value: The value corresponding to the key.
+
+        Returns:
+            None
+        """
+        match self.mode:
+            case MappingCollectorMode.one_to_one:
+                self._mapping[key] = value
+            case MappingCollectorMode.one_to_many:
+                self._mapping[key].append(value)
+
+    def collect(self, iterable: Iterable[tuple[KT, VT]]):
+        """
+        Collect key-value pairs from the given iterable and add them to the internal mapping
+        based on the specified mode.
+
+        Args:
+            iterable (Iterable[tuple[KT, VT]]): An iterable containing key-value pairs to collect.
+
+        Returns:
+            None
+        """
+        for k, v in iterable:
+            self.add(k, v)
 
 
 def _take(keys: Iterable[K], mapping: Mapping[K, Any], exclude: bool = False) -> dict[K, Any]:
+    """
+    Return a dictionary pertaining to the specified keys and their corresponding values from the mapping.
+
+    Args:
+        keys (Iterable[K]): The keys to include in the resulting dictionary.
+        mapping (Mapping[K, Any]): The mapping to extract key-value pairs from.
+        exclude (bool, optional): If True, exclude the specified keys from the mapping. Defaults to False.
+
+    Returns:
+        dict[K, Any]: A dictionary with the selected keys and their values from the mapping.
+    """
+
     if not isinstance(mapping, Mapping):
         raise TypeError(f"Parameter 'mapping' should be of type 'Mapping', but instead is type '{type(mapping)}'")
 
@@ -109,7 +200,7 @@ def _process_obj(obj: Any,
         return obj
 
 
-def dictify(obj, key_converter: Callable[[Any], str] | None = None):
+def dictify(obj: Any, key_converter: Callable[[Any], str] | None = None) -> Any:
     """Dictify an object using a specified key converter.
 
     Args:
@@ -192,4 +283,5 @@ def _unwrap_class(obj):
     return [{'key': k, 'value': unwrap(v)} for k, v in inspect.getmembers(obj) if not k.startswith('_')]
 
 
-__all__ = ('dictify', 'distinct', 'keep', 'inverse', 'nested_defaultdict', 'remove', 'unwrap')
+__all__ = ('dictify', 'distinct', 'keep', 'inverse', 'nested_defaultdict', 'remove', 'unwrap', 'MappingCollector',
+           'MappingCollectorMode')

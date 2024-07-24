@@ -197,6 +197,23 @@ print(unwrapped_data)
 # Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
 ```
 
+### 'MappingCollector'
+
+A class designed to collect key-value pairs into an internal mapping,
+with two modes of operation: one_to_one and one_to_many.
+The mode determines whether each key maps to a single value or multiple values.
+
+```python
+from mappingtools import MappingCollector, MappingCollectorMode
+
+collector = MappingCollector(MappingCollectorMode.one_to_many)
+collector.add('a', 1)
+collector.add('a', 2)
+collector.collect([('b', 3), ('b', 4)])
+print(collector.mapping)
+# Output: {'a': [1, 2], 'b': [3, 4]}
+```
+
 ## Development
 
 ### Ruff
