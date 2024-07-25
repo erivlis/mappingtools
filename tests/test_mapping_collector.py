@@ -166,7 +166,6 @@ def test_collect_duplicate_keys_one_to_many():
 
 # Returns a string representation with correct mode and mapping
 def test_repr_correct_mode_and_mapping():
-    from mappingtools import MappingCollector, MappingCollectorMode
     # Arrange
     mc = MappingCollector(mode=MappingCollectorMode.one_to_one, a=1, b=2)
     expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'a': 1, 'b': 2})"
@@ -178,7 +177,6 @@ def test_repr_correct_mode_and_mapping():
 
 # Handles empty mapping correctly
 def test_repr_empty_mapping():
-    from mappingtools import MappingCollector, MappingCollectorMode
     # Arrange
     mc = MappingCollector(mode=MappingCollectorMode.one_to_one)
     expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={})"
@@ -190,7 +188,6 @@ def test_repr_empty_mapping():
 
 # Works with both one_to_one and one_to_many modes
 def test_repr_modes():
-    from mappingtools import MappingCollector, MappingCollectorMode
     # Arrange
     mc_one_to_one = MappingCollector(mode=MappingCollectorMode.one_to_one, a=1)
     mc_one_to_many = MappingCollector(mode=MappingCollectorMode.one_to_many, a=[1])
@@ -206,7 +203,6 @@ def test_repr_modes():
 
 # Reflects changes in the mapping accurately
 def test_repr_reflects_changes():
-    from mappingtools import MappingCollector, MappingCollectorMode
     # Arrange
     mc = MappingCollector(mode=MappingCollectorMode.one_to_one, a=1)
     mc.add('b', 2)
@@ -219,7 +215,6 @@ def test_repr_reflects_changes():
 
 # Properly formats the string output
 def test_repr_formatting():
-    from mappingtools import MappingCollector, MappingCollectorMode
     # Arrange
     mc = MappingCollector(mode=MappingCollectorMode.one_to_one, a=1)
     expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'a': 1})"
@@ -234,21 +229,22 @@ def test_repr_formatting():
 def test_repr_large_mapping_performance():
     import time
 
-    from mappingtools import MappingCollector, MappingCollectorMode
     # Arrange
     large_mapping = {f'key{i}': i for i in range(10000)}
     mc = MappingCollector(mode=MappingCollectorMode.one_to_one, **large_mapping)
-    start_time = time.time()
+
     # Act
-    repr(mc)
+    start_time = time.time()
+    result = repr(mc)
     end_time = time.time()
+
     # Assert
+    assert result is not None
     assert (end_time - start_time) < 1  # Ensure it completes within 1 second
 
 
 # Manages special characters in keys and values
 def test_repr_special_characters():
-    from mappingtools import MappingCollector, MappingCollectorMode
     # Arrange
     mc = MappingCollector(mode=MappingCollectorMode.one_to_one, special_key='@#$%^&*()')
     expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'special_key': '@#$%^&*()'})"
@@ -260,7 +256,6 @@ def test_repr_special_characters():
 
 # Works when mode is not explicitly provided (default mode)
 def test_repr_default_mode():
-    from mappingtools import MappingCollector
     # Arrange
     mc = MappingCollector(a=1)
     expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'a': 1})"
@@ -272,7 +267,6 @@ def test_repr_default_mode():
 
 # Handles nested mappings correctly
 def test_repr_nested_mappings():
-    from mappingtools import MappingCollector, MappingCollectorMode
     # Arrange
     nested_mapping = {'nested': {'key': 'value'}}
     mc = MappingCollector(mode=MappingCollectorMode.one_to_one, **nested_mapping)
