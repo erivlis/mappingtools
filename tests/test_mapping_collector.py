@@ -3,153 +3,162 @@ import pytest
 from mappingtools import MappingCollector, MappingCollectorMode
 
 
-class TestMappingCollector:
+#  Initialize MappingCollector with default mode and verify internal mapping is a dictionary
+def test_initialize_default_mode():
+    # Arrange
+    collector = MappingCollector()
 
-    #  Initialize MappingCollector with default mode and verify internal mapping is a dictionary
-    def test_initialize_default_mode(self):
-        # Arrange
-        collector = MappingCollector()
+    # Act
+    collector.add(1, 2)
+    collector.add(1, 3)
+    result = collector.mapping
+    item0 = result[1]
 
-        # Act
-        collector.add(1, 2)
-        collector.add(1, 3)
-        result = collector.mapping
-        item0 = result[1]
+    # Assert
+    assert isinstance(result, dict)
+    assert isinstance(item0, int)
+    assert item0 != 2
+    assert item0 == 3
 
-        # Assert
-        assert isinstance(result, dict)
-        assert isinstance(item0, int)
-        assert item0 != 2
-        assert item0 == 3
 
-    #  Initialize MappingCollector with one_to_many mode and verify internal mapping is a defaultdict
-    def test_initialize_one_to_many_mode(self):
-        # Arrange
-        collector = MappingCollector(MappingCollectorMode.one_to_many)
+#  Initialize MappingCollector with one_to_many mode and verify internal mapping is a defaultdict
+def test_initialize_one_to_many_mode():
+    # Arrange
+    collector = MappingCollector(MappingCollectorMode.one_to_many)
 
-        # Act
-        collector.add(1, 2)
-        collector.add(1, 3)
-        result = collector.mapping
-        item0 = result[1]
+    # Act
+    collector.add(1, 2)
+    collector.add(1, 3)
+    result = collector.mapping
+    item0 = result[1]
 
-        # Assert
-        assert isinstance(result, dict)
-        assert isinstance(item0, list)
-        assert item0 == [2, 3]
+    # Assert
+    assert isinstance(result, dict)
+    assert isinstance(item0, list)
+    assert item0 == [2, 3]
 
-    #  Add a single key-value pair in one_to_one mode and verify the mapping
-    def test_add_single_key_value_one_to_one(self):
-        # Arrange
-        collector = MappingCollector()
 
-        # Act
-        collector.add('key1', 'value1')
-        result = collector.mapping
+#  Add a single key-value pair in one_to_one mode and verify the mapping
+def test_add_single_key_value_one_to_one():
+    # Arrange
+    collector = MappingCollector()
 
-        # Assert
-        assert result == {'key1': 'value1'}
+    # Act
+    collector.add('key1', 'value1')
+    result = collector.mapping
 
-    #  Add multiple key-value pairs in one_to_many mode and verify the mapping
-    def test_add_multiple_key_values_one_to_many(self):
-        # Arrange
-        collector = MappingCollector(MappingCollectorMode.one_to_many)
+    # Assert
+    assert result == {'key1': 'value1'}
 
-        # Act
-        collector.add('key1', 'value1')
-        collector.add('key1', 'value2')
-        result = collector.mapping
 
-        # Assert
-        assert result == {'key1': ['value1', 'value2']}
+#  Add multiple key-value pairs in one_to_many mode and verify the mapping
+def test_add_multiple_key_values_one_to_many():
+    # Arrange
+    collector = MappingCollector(MappingCollectorMode.one_to_many)
 
-    #  Collect key-value pairs from an iterable in one_to_one mode and verify the mapping
-    def test_collect_iterable_one_to_one(self):
-        # Arrange
-        collector = MappingCollector()
-        iterable = [('key1', 'value1'), ('key2', 'value2')]
+    # Act
+    collector.add('key1', 'value1')
+    collector.add('key1', 'value2')
+    result = collector.mapping
 
-        # Act
-        collector.collect(iterable)
-        result = collector.mapping
+    # Assert
+    assert result == {'key1': ['value1', 'value2']}
 
-        # Assert
-        assert result == {'key1': 'value1', 'key2': 'value2'}
 
-    #  Collect key-value pairs from an iterable in one_to_many mode and verify the mapping
-    def test_collect_iterable_one_to_many(self):
-        # Arrange
-        collector = MappingCollector(MappingCollectorMode.one_to_many)
-        iterable = [('key1', 'value1'), ('key1', 'value2')]
+#  Collect key-value pairs from an iterable in one_to_one mode and verify the mapping
+def test_collect_iterable_one_to_one():
+    # Arrange
+    collector = MappingCollector()
+    iterable = [('key1', 'value1'), ('key2', 'value2')]
 
-        # Act
-        collector.collect(iterable)
-        result = collector.mapping
+    # Act
+    collector.collect(iterable)
+    result = collector.mapping
 
-        # Assert
-        assert result == {'key1': ['value1', 'value2']}
+    # Assert
+    assert result == {'key1': 'value1', 'key2': 'value2'}
 
-    #  Initialize MappingCollector with an invalid mode and verify it raises an error
-    def test_initialize_invalid_mode(self):
-        # Arrange / Act / Assert
-        with pytest.raises(ValueError):  # noqa: PT011
-            MappingCollector(mode="invalid_mode")
 
-    #  Add a key-value pair with a non-hashable key and verify it raises an error
-    def test_add_non_hashable_key(self):
-        # Arrange
-        collector = MappingCollector()
+#  Collect key-value pairs from an iterable in one_to_many mode and verify the mapping
+def test_collect_iterable_one_to_many():
+    # Arrange
+    collector = MappingCollector(MappingCollectorMode.one_to_many)
+    iterable = [('key1', 'value1'), ('key1', 'value2')]
 
-        # Act / Assert
-        with pytest.raises(TypeError):
-            collector.add(['non-hashable'], 'value')
+    # Act
+    collector.collect(iterable)
+    result = collector.mapping
 
-    #  Collect key-value pairs from an empty iterable and verify the internal mapping remains unchanged
-    def test_collect_empty_iterable(self):
-        # Arrange
-        collector = MappingCollector()
+    # Assert
+    assert result == {'key1': ['value1', 'value2']}
 
-        # Act
-        collector.collect([])
-        result = collector.mapping
 
-        # Assert
-        assert result == {}
+#  Initialize MappingCollector with an invalid mode and verify it raises an error
+def test_initialize_invalid_mode():
+    # Arrange / Act / Assert
+    with pytest.raises(ValueError):  # noqa: PT011
+        MappingCollector(mode="invalid_mode")
 
-    #  Add a key-value pair with None as the key and verify the mapping
-    def test_add_none_key(self):
-        # Arrange
-        collector = MappingCollector()
 
-        # Act
-        collector.add(None, 'value')
-        result = collector.mapping
+#  Add a key-value pair with a non-hashable key and verify it raises an error
+def test_add_non_hashable_key():
+    # Arrange
+    collector = MappingCollector()
 
-        # Assert
-        assert result == {None: 'value'}
+    # Act / Assert
+    with pytest.raises(TypeError):
+        collector.add(['non-hashable'], 'value')
 
-    #  Collect key-value pairs with duplicate keys in one_to_one mode and verify the last value is retained
-    def test_collect_duplicate_keys_one_to_one(self):
-        # Arrange
-        collector = MappingCollector()
-        iterable = [('key1', 'value1'), ('key1', 'value2')]
 
-        # Act
-        collector.collect(iterable)
-        result = collector.mapping
+#  Collect key-value pairs from an empty iterable and verify the internal mapping remains unchanged
+def test_collect_empty_iterable():
+    # Arrange
+    collector = MappingCollector()
 
-        # Assert
-        assert result == {'key1': 'value2'}
+    # Act
+    collector.collect([])
+    result = collector.mapping
 
-    #  Collect key-value pairs with duplicate keys in one_to_many mode and verify all values are appended
-    def test_collect_duplicate_keys_one_to_many(self):
-        # Arrange
-        collector = MappingCollector(MappingCollectorMode.one_to_many)
-        iterable = [('key1', 'value1'), ('key1', 'value2')]
+    # Assert
+    assert result == {}
 
-        # Act
-        collector.collect(iterable)
-        result = collector.mapping
 
-        # Assert
-        assert result == {'key1': ['value1', 'value2']}
+#  Add a key-value pair with None as the key and verify the mapping
+def test_add_none_key():
+    # Arrange
+    collector = MappingCollector()
+
+    # Act
+    collector.add(None, 'value')
+    result = collector.mapping
+
+    # Assert
+    assert result == {None: 'value'}
+
+
+#  Collect key-value pairs with duplicate keys in one_to_one mode and verify the last value is retained
+def test_collect_duplicate_keys_one_to_one():
+    # Arrange
+    collector = MappingCollector()
+    iterable = [('key1', 'value1'), ('key1', 'value2')]
+
+    # Act
+    collector.collect(iterable)
+    result = collector.mapping
+
+    # Assert
+    assert result == {'key1': 'value2'}
+
+
+#  Collect key-value pairs with duplicate keys in one_to_many mode and verify all values are appended
+def test_collect_duplicate_keys_one_to_many():
+    # Arrange
+    collector = MappingCollector(MappingCollectorMode.one_to_many)
+    iterable = [('key1', 'value1'), ('key1', 'value2')]
+
+    # Act
+    collector.collect(iterable)
+    result = collector.mapping
+
+    # Assert
+    assert result == {'key1': ['value1', 'value2']}

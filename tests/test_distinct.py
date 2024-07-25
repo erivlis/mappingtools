@@ -2,136 +2,144 @@
 from mappingtools import distinct
 
 
-class TestDistinct:
+#  Extract distinct values for a given key from multiple mappings
+def test_extract_distinct_values():
+    # Arrange
+    mappings = [{'a': 1}, {'a': 2}, {'a': 1}]
+    key = 'a'
 
-    #  Extract distinct values for a given key from multiple mappings
-    def test_extract_distinct_values(self):
-        # Arrange
-        mappings = [{'a': 1}, {'a': 2}, {'a': 1}]
-        key = 'a'
+    # Act
+    result = list(distinct(key, *mappings))
 
-        # Act
-        result = list(distinct(key, *mappings))
+    # Assert
+    assert result == [1, 2]
 
-        # Assert
-        assert result == [1, 2]
 
-    #  Process mappings with some overlapping values for the specified key
-    def test_some_overlapping_values(self):
-        # Arrange
-        mappings = [{'a': 1}, {'a': 2}, {'a': 1}, {'a': 3}]
-        key = 'a'
+#  Process mappings with some overlapping values for the specified key
+def test_some_overlapping_values():
+    # Arrange
+    mappings = [{'a': 1}, {'a': 2}, {'a': 1}, {'a': 3}]
+    key = 'a'
 
-        # Act
-        result = list(distinct(key, *mappings))
+    # Act
+    result = list(distinct(key, *mappings))
 
-        # Assert
-        assert result == [1, 2, 3]
+    # Assert
+    assert result == [1, 2, 3]
 
-    #  Handle mappings where the specified key is present in all mappings
-    def test_key_present_in_all_mappings(self):
-        # Arrange
-        mappings = [{'a': 1}, {'a': 2}, {'a': 3}]
-        key = 'a'
 
-        # Act
-        result = list(distinct(key, *mappings))
+#  Handle mappings where the specified key is present in all mappings
+def test_key_present_in_all_mappings():
+    # Arrange
+    mappings = [{'a': 1}, {'a': 2}, {'a': 3}]
+    key = 'a'
 
-        # Assert
-        assert result == [1, 2, 3]
+    # Act
+    result = list(distinct(key, *mappings))
 
-    #  Handle mappings where the specified key is present in some mappings
-    def test_key_present_in_some_mappings(self):
-        # Arrange
-        mappings = [{'a': 1}, {'b': 2}, {'a': 3}]
-        key = 'a'
+    # Assert
+    assert result == [1, 2, 3]
 
-        # Act
-        result = list(distinct(key, *mappings))
 
-        # Assert
-        assert result == [1, 3]
+#  Handle mappings where the specified key is present in some mappings
+def test_key_present_in_some_mappings():
+    # Arrange
+    mappings = [{'a': 1}, {'b': 2}, {'a': 3}]
+    key = 'a'
 
-    #  Handle mappings where the specified key is missing in all mappings
-    def test_key_missing_in_all_mappings(self):
-        # Arrange
-        mappings = [{'b': 1}, {'b': 2}, {'b': 3}]
-        key = 'a'
+    # Act
+    result = list(distinct(key, *mappings))
 
-        # Act
-        result = list(distinct(key, *mappings))
+    # Assert
+    assert result == [1, 3]
 
-        # Assert
-        assert result == []
 
-    #  Handle mappings with empty dictionaries
-    def test_empty_dictionaries(self):
-        # Arrange
-        mappings = [{}, {}, {}]
-        key = 'a'
+#  Handle mappings where the specified key is missing in all mappings
+def test_key_missing_in_all_mappings():
+    # Arrange
+    mappings = [{'b': 1}, {'b': 2}, {'b': 3}]
+    key = 'a'
 
-        # Act
-        result = list(distinct(key, *mappings))
+    # Act
+    result = list(distinct(key, *mappings))
 
-        # Assert
-        assert result == []
+    # Assert
+    assert result == []
 
-    #  Handle mappings with None values for the specified key
-    def test_none_values_for_key(self):
-        # Arrange
-        mappings = [{'a': None}, {'a': None}, {'a': 1}]
-        key = 'a'
 
-        # Act
-        result = list(distinct(key, *mappings))
+#  Handle mappings with empty dictionaries
+def test_empty_dictionaries():
+    # Arrange
+    mappings = [{}, {}, {}]
+    key = 'a'
 
-        # Assert
-        assert result == [None, 1]
+    # Act
+    result = list(distinct(key, *mappings))
 
-    #  Handle mappings with mixed data types for the specified key
-    def test_mixed_data_types_for_key(self):
-        # Arrange
-        mappings = [{'a': 1}, {'a': 'string'}, {'a': 1.0}]
-        key = 'a'
+    # Assert
+    assert result == []
 
-        # Act
-        result = list(distinct(key, *mappings))
 
-        # Assert
-        assert result == [1, 'string', 1.0]
+#  Handle mappings with None values for the specified key
+def test_none_values_for_key():
+    # Arrange
+    mappings = [{'a': None}, {'a': None}, {'a': 1}]
+    key = 'a'
 
-    #  Handle mappings with large number of entries
-    def test_large_number_of_entries(self):
-        # Arrange
-        mappings = [{'a': i} for i in range(1000)]
-        key = 'a'
+    # Act
+    result = list(distinct(key, *mappings))
 
-        # Act
-        result = list(distinct(key, *mappings))
+    # Assert
+    assert result == [None, 1]
 
-        # Assert
-        assert result == list(range(1000))
 
-    #  Verify the order of yielded distinct values matches the order of first occurrence
-    def test_order_of_first_occurrence(self):
-        # Arrange
-        mappings = [{'a': 3}, {'a': 2}, {'a': 3}, {'a': 1}]
-        key = 'a'
+#  Handle mappings with mixed data types for the specified key
+def test_mixed_data_types_for_key():
+    # Arrange
+    mappings = [{'a': 1}, {'a': 'string'}, {'a': 1.0}]
+    key = 'a'
 
-        # Act
-        result = list(distinct(key, *mappings))
+    # Act
+    result = list(distinct(key, *mappings))
 
-        # Assert
-        assert result == [3, 2, 1]
+    # Assert
+    assert result == [1, 'string', 1.0]
 
-    #  Ensure no duplicate values are yielded for the specified key
-    def test_no_duplicate_values_yielded(self):
-        # Arrange
-        mappings = [{'a': 1}, {'a': 1}, {'a': 2}]
-        key = 'a'
 
-        # Act
-        result = list(distinct(key, *mappings))
+#  Handle mappings with large number of entries
+def test_large_number_of_entries():
+    # Arrange
+    mappings = [{'a': i} for i in range(1000)]
+    key = 'a'
 
-        # Assert
-        assert result == [1, 2]
+    # Act
+    result = list(distinct(key, *mappings))
+
+    # Assert
+    assert result == list(range(1000))
+
+
+#  Verify the order of yielded distinct values matches the order of first occurrence
+def test_order_of_first_occurrence():
+    # Arrange
+    mappings = [{'a': 3}, {'a': 2}, {'a': 3}, {'a': 1}]
+    key = 'a'
+
+    # Act
+    result = list(distinct(key, *mappings))
+
+    # Assert
+    assert result == [3, 2, 1]
+
+
+#  Ensure no duplicate values are yielded for the specified key
+def test_no_duplicate_values_yielded():
+    # Arrange
+    mappings = [{'a': 1}, {'a': 1}, {'a': 2}]
+    key = 'a'
+
+    # Act
+    result = list(distinct(key, *mappings))
+
+    # Assert
+    assert result == [1, 2]
