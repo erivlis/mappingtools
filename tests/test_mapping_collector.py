@@ -162,3 +162,122 @@ def test_collect_duplicate_keys_one_to_many():
 
     # Assert
     assert result == {'key1': ['value1', 'value2']}
+
+
+# Returns a string representation with correct mode and mapping
+def test_repr_correct_mode_and_mapping():
+    from mappingtools import MappingCollector, MappingCollectorMode
+    # Arrange
+    mc = MappingCollector(mode=MappingCollectorMode.one_to_one, a=1, b=2)
+    expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'a': 1, 'b': 2})"
+    # Act
+    result = repr(mc)
+    # Assert
+    assert result == expected_repr
+
+
+# Handles empty mapping correctly
+def test_repr_empty_mapping():
+    from mappingtools import MappingCollector, MappingCollectorMode
+    # Arrange
+    mc = MappingCollector(mode=MappingCollectorMode.one_to_one)
+    expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={})"
+    # Act
+    result = repr(mc)
+    # Assert
+    assert result == expected_repr
+
+
+# Works with both one_to_one and one_to_many modes
+def test_repr_modes():
+    from mappingtools import MappingCollector, MappingCollectorMode
+    # Arrange
+    mc_one_to_one = MappingCollector(mode=MappingCollectorMode.one_to_one, a=1)
+    mc_one_to_many = MappingCollector(mode=MappingCollectorMode.one_to_many, a=[1])
+    expected_repr_one_to_one = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'a': 1})"
+    expected_repr_one_to_many = "MappingCollector(mode=MappingCollectorMode.one_to_many, mapping={'a': [1]})"
+    # Act
+    result_one_to_one = repr(mc_one_to_one)
+    result_one_to_many = repr(mc_one_to_many)
+    # Assert
+    assert result_one_to_one == expected_repr_one_to_one
+    assert result_one_to_many == expected_repr_one_to_many
+
+
+# Reflects changes in the mapping accurately
+def test_repr_reflects_changes():
+    from mappingtools import MappingCollector, MappingCollectorMode
+    # Arrange
+    mc = MappingCollector(mode=MappingCollectorMode.one_to_one, a=1)
+    mc.add('b', 2)
+    expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'a': 1, 'b': 2})"
+    # Act
+    result = repr(mc)
+    # Assert
+    assert result == expected_repr
+
+
+# Properly formats the string output
+def test_repr_formatting():
+    from mappingtools import MappingCollector, MappingCollectorMode
+    # Arrange
+    mc = MappingCollector(mode=MappingCollectorMode.one_to_one, a=1)
+    expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'a': 1})"
+    # Act
+    result = repr(mc)
+    # Assert
+    assert result == expected_repr
+    assert isinstance(result, str)
+
+
+# Handles large mappings without performance issues
+def test_repr_large_mapping_performance():
+    import time
+
+    from mappingtools import MappingCollector, MappingCollectorMode
+    # Arrange
+    large_mapping = {f'key{i}': i for i in range(10000)}
+    mc = MappingCollector(mode=MappingCollectorMode.one_to_one, **large_mapping)
+    start_time = time.time()
+    # Act
+    repr(mc)
+    end_time = time.time()
+    # Assert
+    assert (end_time - start_time) < 1  # Ensure it completes within 1 second
+
+
+# Manages special characters in keys and values
+def test_repr_special_characters():
+    from mappingtools import MappingCollector, MappingCollectorMode
+    # Arrange
+    mc = MappingCollector(mode=MappingCollectorMode.one_to_one, special_key='@#$%^&*()')
+    expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'special_key': '@#$%^&*()'})"
+    # Act
+    result = repr(mc)
+    # Assert
+    assert result == expected_repr
+
+
+# Works when mode is not explicitly provided (default mode)
+def test_repr_default_mode():
+    from mappingtools import MappingCollector
+    # Arrange
+    mc = MappingCollector(a=1)
+    expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'a': 1})"
+    # Act
+    result = repr(mc)
+    # Assert
+    assert result == expected_repr
+
+
+# Handles nested mappings correctly
+def test_repr_nested_mappings():
+    from mappingtools import MappingCollector, MappingCollectorMode
+    # Arrange
+    nested_mapping = {'nested': {'key': 'value'}}
+    mc = MappingCollector(mode=MappingCollectorMode.one_to_one, **nested_mapping)
+    expected_repr = "MappingCollector(mode=MappingCollectorMode.one_to_one, mapping={'nested': {'key': 'value'}})"
+    # Act
+    result = repr(mc)
+    # Assert
+    assert result == expected_repr
