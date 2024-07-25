@@ -4,6 +4,34 @@ from collections import Counter
 import pytest
 from mappingtools import CategoryCounter
 
+fruits = ['apple', 'apricot', 'banana', 'cherry', 'pear', 'pineapple', 'plum', 'banana']
+
+expected_total = Counter({
+        'banana': 2,
+        'apple': 1,
+        'apricot': 1,
+        'cherry': 1,
+        'pear': 1,
+        'pineapple': 1,
+        'plum': 1
+    })
+
+expected_counter = {
+        'char_count': {
+            4: Counter({'pear': 1, 'plum': 1}),
+            5: Counter({'apple': 1}),
+            6: Counter({'banana': 2, 'cherry': 1}),
+            7: Counter({'apricot': 1}),
+            9: Counter({'pineapple': 1})
+        },
+        'unique_char_count': {
+            3: Counter({'banana': 2}),
+            4: Counter({'apple': 1, 'pear': 1, 'plum': 1}),
+            5: Counter({'cherry': 1}),
+            6: Counter({'pineapple': 1}),
+            7: Counter({'apricot': 1})
+        }
+    }
 
 # Initialize CategoryCounter and update with a list of items
 def test_initialize_and_update_with_list():
@@ -22,45 +50,20 @@ def test_initialize_and_update_with_list():
 def test_categorize_with_direct_category_values():
     # Arrange
     counter = CategoryCounter()
-    fruits = ['apple', 'apricot', 'banana', 'cherry', 'pear', 'pineapple', 'plum', 'banana']
-
+    
     # Act
     for fruit in fruits:
         counter.update({fruit: 1}, char_count=len(fruit), unique_char_count=len(set(fruit)))
 
     # Assert
-    assert counter.total == Counter({
-        'banana': 2,
-        'apple': 1,
-        'apricot': 1,
-        'cherry': 1,
-        'pear': 1,
-        'pineapple': 1,
-        'plum': 1
-    })
-    assert counter == {
-        'char_count': {
-            4: Counter({'pear': 1, 'plum': 1}),
-            5: Counter({'apple': 1}),
-            6: Counter({'banana': 2, 'cherry': 1}),
-            7: Counter({'apricot': 1}),
-            9: Counter({'pineapple': 1})
-        },
-        'unique_char_count': {
-            3: Counter({'banana': 2}),
-            4: Counter({'apple': 1, 'pear': 1, 'plum': 1}),
-            5: Counter({'cherry': 1}),
-            6: Counter({'pineapple': 1}),
-            7: Counter({'apricot': 1})
-        }
-    }
+    assert counter.total == expected_total
+    assert counter == expected_counter
 
 
 # Categorize items using functions to determine categories
 def test_categorize_with_functions():
     # Arrange
     counter = CategoryCounter()
-    fruits = ['apple', 'apricot', 'banana', 'cherry', 'pear', 'pineapple', 'plum', 'banana']
 
     # Act
     for fruit in fruits:
@@ -69,31 +72,8 @@ def test_categorize_with_functions():
                        unique_char_count=lambda s: len(set(next(iter(s)))))
 
     # Assert
-    assert counter.total == Counter({
-        'banana': 2,
-        'apple': 1,
-        'apricot': 1,
-        'cherry': 1,
-        'pear': 1,
-        'pineapple': 1,
-        'plum': 1
-    })
-    assert counter == {
-        'char_count': {
-            4: Counter({'pear': 1, 'plum': 1}),
-            5: Counter({'apple': 1}),
-            6: Counter({'banana': 2, 'cherry': 1}),
-            7: Counter({'apricot': 1}),
-            9: Counter({'pineapple': 1})
-        },
-        'unique_char_count': {
-            3: Counter({'banana': 2}),
-            4: Counter({'apple': 1, 'pear': 1, 'plum': 1}),
-            5: Counter({'cherry': 1}),
-            6: Counter({'pineapple': 1}),
-            7: Counter({'apricot': 1})
-        }
-    }
+    assert counter.total == expected_total
+    assert counter == expected_counter
 
 
 # Retrieve counts for specific categories
