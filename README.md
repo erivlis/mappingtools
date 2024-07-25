@@ -197,6 +197,26 @@ print(unwrapped_data)
 # Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
 ```
 
+### `CategoryCounter`
+
+The CategoryCounter class extends a dictionary to count occurrences of data items categorized by multiple categories.
+It maintains a total count of all data items and allows categorization using direct values or functions.
+
+```python
+from mappingtools import CategoryCounter
+
+counter = CategoryCounter()
+
+for fruit in ['apple', 'banana', 'apple']:
+    counter.update({fruit: 1}, type='fruit', char_count=len(fruit), unique_char_count=len(set(fruit)))
+
+print(counter.total)
+# Output: Counter({'apple': 2, 'banana': 1})
+
+print(counter)
+# Output: CategoryCounter({'type': defaultdict(<class 'collections.Counter'>, {'fruit': Counter({'apple': 2, 'banana': 1})}), 'char_count': defaultdict(<class 'collections.Counter'>, {5: Counter({'apple': 2}), 6: Counter({'banana': 1})}), 'unique_char_count': defaultdict(<class 'collections.Counter'>, {4: Counter({'apple': 2}), 3: Counter({'banana': 1})})})
+```
+
 ### `MappingCollector`
 
 A class designed to collect key-value pairs into an internal mapping,

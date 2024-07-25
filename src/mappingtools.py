@@ -1,6 +1,6 @@
 import dataclasses
 import inspect
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping
 from enum import Enum, auto
 from itertools import chain
@@ -10,6 +10,37 @@ K = TypeVar('K')
 KT = TypeVar('KT')
 VT = TypeVar('VT')
 VT_co = TypeVar('VT_co')
+
+Category = TypeVar('Category', bound=str | tuple | int | float)
+
+
+class CategoryCounter(dict[str, defaultdict[Category, Counter]]):
+
+    def __init__(self):
+        super().__init__()
+        self.total = Counter()
+
+    def __repr__(self):
+        return f"CategoryCounter({super().__repr__()})"
+
+    def update(self, data, **categories: Category | Callable[[Any], Category]):
+        """
+        Updates a CategoryCounter object with data and corresponding categories.
+
+        Parameters:
+            data: Any - The data to update the counter with (see Counter update method documentation).
+            **categories: Category | Callable[[Any], Category] - categories to associate the data with.
+                The categories can be either a direct value or a function that extracts the category from the data.
+
+        Returns:
+            None
+        """
+        self.total.update(data)
+        for category_name, category_value in categories.items():
+            category_value = category_value(data) if callable(category_value) else category_value
+            if category_name not in self:
+                self[category_name] = defaultdict(Counter)
+            self[category_name][category_value].update(data)
 
 
 class MappingCollectorMode(Enum):
@@ -283,5 +314,5 @@ def _unwrap_class(obj):
     return [{'key': k, 'value': unwrap(v)} for k, v in inspect.getmembers(obj) if not k.startswith('_')]
 
 
-__all__ = ('dictify', 'distinct', 'keep', 'inverse', 'nested_defaultdict', 'remove', 'unwrap', 'MappingCollector',
-           'MappingCollectorMode')
+__all__ = ('dictify', 'distinct', 'keep', 'inverse', 'nested_defaultdict', 'remove', 'unwrap', 'Category',
+           'CategoryCounter', 'MappingCollector', 'MappingCollectorMode')
