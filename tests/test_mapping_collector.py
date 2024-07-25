@@ -239,7 +239,8 @@ def test_repr_large_mapping_performance():
     end_time = time.time()
 
     # Assert
-    assert result is not None
+    assert len(result) > 0
+    assert 'MappingCollector' in result
     assert (end_time - start_time) < 1  # Ensure it completes within 1 second
 
 
