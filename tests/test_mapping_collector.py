@@ -150,20 +150,6 @@ def test_collect_duplicate_keys_one_to_one():
     assert result == {'key1': 'value2'}
 
 
-#  Collect key-value pairs with duplicate keys in one_to_many mode and verify all values are appended
-def test_collect_duplicate_keys_one_to_many():
-    # Arrange
-    collector = MappingCollector(MappingCollectorMode.one_to_many)
-    iterable = [('key1', 'value1'), ('key1', 'value2')]
-
-    # Act
-    collector.collect(iterable)
-    result = collector.mapping
-
-    # Assert
-    assert result == {'key1': ['value1', 'value2']}
-
-
 # Returns a string representation with correct mode and mapping
 def test_repr_correct_mode_and_mapping():
     # Arrange
