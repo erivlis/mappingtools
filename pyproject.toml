@@ -73,19 +73,41 @@ testpaths = ["tests"]
 
 [tool.coverage.report]
 exclude_also = [
-    "...",
+    # Don't complain about missing debug-only code:
     "def __repr__",
     "if self.debug:",
     "if settings.DEBUG",
+    # Don't complain if tests don't hit defensive assertion code:
     "raise AssertionError",
     "raise NotImplementedError",
+    # Don't complain if non-runnable code isn't run:
     "if 0:",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
     "class .*\\bProtocol\\):",
+    # Don't complain about abstract methods, they aren't run:
     "@(abc\\.)?abstractmethod"
 ]
+omit = [
+    # omit anything in a .venv directory anywhere
+    "*/.venv/*",
+    # omit everything in /tests
+    "/tests/*",
+    # omit this single file
+    # "utils/tirefire.py",
+]
 
+[tool.coverage.run]
+branch = false
+relative_files = false
+omit = [
+    # omit anything in a .venv directory anywhere
+    "*/.venv/*",
+    # omit everything in /tests
+    "/tests/*",
+    # omit this single file
+    # "utils/tirefire.py",
+]
 
 [tool.black]
 line-length = 120
