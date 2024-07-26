@@ -7,50 +7,50 @@ from mappingtools import CategoryCounter
 fruits = ['apple', 'apricot', 'banana', 'cherry', 'pear', 'pineapple', 'plum', 'banana']
 
 expected_total = Counter({
-        'banana': 2,
-        'apple': 1,
-        'apricot': 1,
-        'cherry': 1,
-        'pear': 1,
-        'pineapple': 1,
-        'plum': 1
-    })
+    'banana': 2,
+    'apple': 1,
+    'apricot': 1,
+    'cherry': 1,
+    'pear': 1,
+    'pineapple': 1,
+    'plum': 1
+})
 
 expected_counter = {
-        'char_count': {
-            4: Counter({'pear': 1, 'plum': 1}),
-            5: Counter({'apple': 1}),
-            6: Counter({'banana': 2, 'cherry': 1}),
-            7: Counter({'apricot': 1}),
-            9: Counter({'pineapple': 1})
-        },
-        'unique_char_count': {
-            3: Counter({'banana': 2}),
-            4: Counter({'apple': 1, 'pear': 1, 'plum': 1}),
-            5: Counter({'cherry': 1}),
-            6: Counter({'pineapple': 1}),
-            7: Counter({'apricot': 1})
-        }
+    'char_count': {
+        4: Counter({'pear': 1, 'plum': 1}),
+        5: Counter({'apple': 1}),
+        6: Counter({'banana': 2, 'cherry': 1}),
+        7: Counter({'apricot': 1}),
+        9: Counter({'pineapple': 1})
+    },
+    'unique_char_count': {
+        3: Counter({'banana': 2}),
+        4: Counter({'apple': 1, 'pear': 1, 'plum': 1}),
+        5: Counter({'cherry': 1}),
+        6: Counter({'pineapple': 1}),
+        7: Counter({'apricot': 1})
     }
+}
+
 
 # Initialize CategoryCounter and update with a list of items
 def test_initialize_and_update_with_list():
     # Arrange
     counter = CategoryCounter()
-    data = ['apple', 'banana', 'apple']
 
     # Act
-    counter.update(data)
+    counter.update(fruits)
 
     # Assert
-    assert counter.total == Counter({'apple': 2, 'banana': 1})
+    assert counter.total == expected_total
 
 
 # Categorize items using direct category values
 def test_categorize_with_direct_category_values():
     # Arrange
     counter = CategoryCounter()
-    
+
     # Act
     for fruit in fruits:
         counter.update({fruit: 1}, char_count=len(fruit), unique_char_count=len(set(fruit)))
@@ -80,13 +80,13 @@ def test_categorize_with_functions():
 def test_retrieve_counts_for_specific_categories():
     # Arrange
     counter = CategoryCounter()
-    data = ['apple', 'banana', 'apple']
+    expected = expected_total
 
     # Act
-    counter.update(data, type='fruit')
+    counter.update(fruits, type='fruit')
 
     # Assert
-    assert counter['type']['fruit'] == Counter({'apple': 2, 'banana': 1})
+    assert counter['type']['fruit'] == expected
 
 
 # Update with an empty list
@@ -105,10 +105,9 @@ def test_update_with_empty_list():
 def test_categories_not_matching_any_items():
     # Arrange
     counter = CategoryCounter()
-    data = ['apple', 'banana', 'pear']
 
     # Act
-    counter.update(data, type='fruit')
+    counter.update(fruits, type='fruit')
 
     # Assert
     assert counter['type']['car'] == Counter()
@@ -150,10 +149,10 @@ def test_nested_data_structures_behavior():
 # Correctly formats the string representation of CategoryCounter
 def test_correct_formatting():
     # Arrange
-    cc = CategoryCounter()
+    counter = CategoryCounter()
 
     # Act
-    result = repr(cc)
+    result = repr(counter)
 
     # Assert
     assert result == "CategoryCounter({})"
