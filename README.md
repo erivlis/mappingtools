@@ -208,6 +208,25 @@ print(unwrapped_data)
 # Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
 ```
 
+#### `expand`
+
+The expand function modifies an object by replacing its keys or values based on provided expanders.
+
+```python
+from mappingtools import expand
+
+expanders = {'a': 'alpha', 'b': 'beta'}
+obj = {'a': 1, 'b': 2, 'c': 3}
+
+# Expanding by keys
+expanded_obj = expand(obj, **expanders)
+# Output: {'alpha': 1, 'beta': 2, 'c': 3}
+
+# Expanding by values
+expanded_obj_by_values = expand(obj, expand_values=True, **expanders)
+# Output: {'a': 'alpha', 'b': 'beta', 'c': 3}
+```
+
 ### Collectors
 
 #### `nested_defaultdict`

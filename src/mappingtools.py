@@ -348,6 +348,19 @@ def listify(obj: Any, key_name: str = 'key', value_name: str = 'value') -> Any:
                         key_name=key_name, value_name=value_name)
 
 
+def expand(obj: Any, expanders: Mapping, expand_values: bool = False):
+    def _replace(value: Any) -> Any:
+        if isinstance(value, Mapping) or _is_strict_iterable(value) or _is_class_instance(value):
+            return value
+        else:
+            return expanders.get(value, value)
+
+    if expand_values:
+        return strictify(obj, value_converter=_replace)
+    else:
+        return strictify(obj, key_converter=_replace)
+
+
 def _listify_mapping(obj: Mapping, key_name, value_name) -> list[dict]:
     return [{key_name: k, value_name: listify(v, key_name, value_name)} for k, v in obj.items()]
 
@@ -362,6 +375,6 @@ def _listify_class(obj, key_name, value_name):
 
 
 __all__ = (
-    'distinct', 'keep', 'remove', 'inverse', 'nested_defaultdict', 'listify', 'simplify', 'strictify', 'Category',
-    'CategoryCounter', 'MappingCollector', 'MappingCollectorMode'
+    'distinct', 'keep', 'remove', 'inverse', 'nested_defaultdict', 'listify', 'simplify', 'expand', 'strictify',
+    'Category', 'CategoryCounter', 'MappingCollector', 'MappingCollectorMode'
 )
