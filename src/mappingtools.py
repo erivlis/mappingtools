@@ -47,13 +47,16 @@ class MappingCollectorMode(Enum):
     """
     Define an enumeration class for mapping collector modes with two options: one_to_one and one_to_many.
     """
-    one_to_one = auto()
-    one_to_many = auto()
+    ALL = auto()
+    COUNT = auto()
+    DISTINCT = auto()
+    FIRST = auto()
+    LAST = auto()
 
 
 class MappingCollector:
 
-    def __init__(self, mode: MappingCollectorMode = MappingCollectorMode.one_to_one, *args, **kwargs):
+    def __init__(self, mode: MappingCollectorMode = MappingCollectorMode.ALL, *args, **kwargs):
         """
         Initialize the MappingCollector with the specified mode.
 
@@ -66,10 +69,14 @@ class MappingCollector:
         self.mode = mode
 
         match self.mode:
-            case MappingCollectorMode.one_to_one:
-                self._mapping = dict(*args, **kwargs)
-            case MappingCollectorMode.one_to_many:
+            case MappingCollectorMode.ALL:
                 self._mapping = defaultdict(list, *args, **kwargs)
+            case MappingCollectorMode.COUNT:
+                self._mapping = defaultdict(Counter, *args, **kwargs)
+            case MappingCollectorMode.DISTINCT:
+                self._mapping = defaultdict(set, *args, **kwargs)
+            case MappingCollectorMode.FIRST | MappingCollectorMode.LAST:
+                self._mapping = dict(*args, **kwargs)
             case _:
                 raise ValueError("Invalid mode")
 
@@ -98,10 +105,16 @@ class MappingCollector:
             None
         """
         match self.mode:
-            case MappingCollectorMode.one_to_one:
-                self._mapping[key] = value
-            case MappingCollectorMode.one_to_many:
+            case MappingCollectorMode.ALL:
                 self._mapping[key].append(value)
+            case MappingCollectorMode.COUNT:
+                self._mapping[key].update({value: 1})
+            case MappingCollectorMode.DISTINCT:
+                self._mapping[key].add(value)
+            case MappingCollectorMode.FIRST if key not in self.mapping:
+                self._mapping[key] = value
+            case MappingCollectorMode.LAST:
+                self._mapping[key] = value
 
     def collect(self, iterable: Iterable[tuple[KT, VT]]):
         """
@@ -116,6 +129,26 @@ class MappingCollector:
         """
         for k, v in iterable:
             self.add(k, v)
+
+
+def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:
+    """
+    Yield distinct values for the specified key across multiple mappings.
+
+    Args:
+        key (K): The key to extract distinct values from the mappings.
+        *mappings (Mapping[K, Any]): Variable number of mappings to search for distinct values.
+
+    Yields:
+        Generator[K, Any, None]: A generator of distinct values extracted from the mappings.
+    """
+    distinct_value_type_pairs = set()
+    for mapping in mappings:
+        value = mapping.get(key, )
+        value_type_pair = (value, type(value))
+        if key in mapping and value_type_pair not in distinct_value_type_pairs:
+            distinct_value_type_pairs.add(value_type_pair)
+            yield value
 
 
 def _take(keys: Iterable[K], mapping: Mapping[K, Any], exclude: bool = False) -> dict[K, Any]:
@@ -140,26 +173,6 @@ def _take(keys: Iterable[K], mapping: Mapping[K, Any], exclude: bool = False) ->
         keys = mapping_keys - keys
 
     return {k: mapping.get(k) for k in keys}
-
-
-def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:
-    """
-    Yield distinct values for the specified key across multiple mappings.
-
-    Args:
-        key (K): The key to extract distinct values from the mappings.
-        *mappings (Mapping[K, Any]): Variable number of mappings to search for distinct values.
-
-    Yields:
-        Generator[K, Any, None]: A generator of distinct values extracted from the mappings.
-    """
-    distinct_value_type_pairs = set()
-    for mapping in mappings:
-        value = mapping.get(key, )
-        value_type_pair = (value, type(value))
-        if key in mapping and value_type_pair not in distinct_value_type_pairs:
-            distinct_value_type_pairs.add(value_type_pair)
-            yield value
 
 
 def keep(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K, Any], Any, None]:
@@ -207,63 +220,10 @@ def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
     return dd
 
 
-def _is_strict_iterable(obj: Iterable) -> bool:
-    return isinstance(obj, Iterable) and not isinstance(obj, str | bytes | bytearray)
-
-
-def _is_class_instance(obj) -> bool:
-    return (dataclasses.is_dataclass(obj) and not isinstance(obj, type)) or hasattr(obj, '__dict__')
-
-
-def _process_obj(obj: Any,
-                 mapping_handler: Callable | None = None,
-                 iterable_handler: Callable | None = None,
-                 class_handler: Callable | None = None,
-                 *args,
-                 **kwargs):
-    if callable(mapping_handler) and isinstance(obj, Mapping):
-        return mapping_handler(obj, *args, **kwargs)
-    elif callable(iterable_handler) and _is_strict_iterable(obj):
-        return iterable_handler(obj, *args, **kwargs)
-    elif callable(class_handler) and _is_class_instance(obj):
-        return class_handler(obj, *args, **kwargs)
-    else:
-        return obj
-
-
-def dictify(obj: Any, key_converter: Callable[[Any], str] | None = None) -> Any:
-    """Dictify an object using a specified key converter.
-
-    Args:
-        obj (Any): The object to be dictified.
-        key_converter (Optional[Callable[[Any], str]], optional): A function to convert keys. Defaults to None.
-
-    Returns:
-        The dictified object.
-    """
-    return _process_obj(obj, _dictify_mapping, _dictify_iterable, _dictify_class, key_converter=key_converter)
-
-
-def _dictify_mapping(obj, key_converter: Callable[[Any], str] | None = None) -> dict:
-    return {(key_converter(k) if key_converter else k): dictify(v, key_converter) for k, v in obj.items()}
-
-
-def _dictify_iterable(obj, key_converter: Callable[[Any], str] | None = None) -> list:
-    return [dictify(v, key_converter) for v in obj]
-
-
-def _dictify_class(obj, key_converter: Callable[[Any], str] | None = None) -> dict | str:
-    return {
-        (key_converter(k) if key_converter else k): dictify(v, key_converter)
-        for k, v in inspect.getmembers(obj)
-        if not k.startswith('_')
-    }
-
-
 def nested_defaultdict(nesting_depth: int = 0, default_factory: Callable | None = None, **kwargs) -> defaultdict:
     """Return a nested defaultdict with the specified nesting depth and default factory.
     A nested_defaultdict with nesting_depth=0 is equivalent to builtin 'collections.defaultdict'.
-    Each nesting_depth increment effectively adds an additional item accessor.
+    For each increment in nesting_depth an additional item accessor is added.
 
     Args:
         nesting_depth (int): The depth of nesting for the defaultdict (default is 0);
@@ -289,30 +249,119 @@ def nested_defaultdict(nesting_depth: int = 0, default_factory: Callable | None 
     return defaultdict(factory, **kwargs)
 
 
-def unwrap(obj: Any):
+def _is_strict_iterable(obj: Iterable) -> bool:
+    return isinstance(obj, Iterable) and not isinstance(obj, str | bytes | bytearray)
+
+
+def _is_class_instance(obj) -> bool:
+    return (dataclasses.is_dataclass(obj) and not isinstance(obj, type)) or hasattr(obj, '__dict__')
+
+
+def _class_generator(obj):
+    yield from ((k, v) for k, v in inspect.getmembers(obj) if not k.startswith('_'))
+
+
+def _process_obj(obj: Any,
+                 mapping_handler: Callable | None = None,
+                 iterable_handler: Callable | None = None,
+                 class_handler: Callable | None = None,
+                 *args,
+                 **kwargs):
+    if callable(mapping_handler) and isinstance(obj, Mapping):
+        return mapping_handler(obj, *args, **kwargs)
+    elif callable(iterable_handler) and _is_strict_iterable(obj):
+        return iterable_handler(obj, *args, **kwargs)
+    elif callable(class_handler) and _is_class_instance(obj):
+        return class_handler(obj, *args, **kwargs)
+    else:
+        return obj
+
+
+def _strictify_mapping(obj, key_converter, value_converter):
+    return {
+        (key_converter(k) if key_converter else k): strictify(value_converter(v) if value_converter else v,
+                                                              key_converter=key_converter,
+                                                              value_converter=value_converter)
+        for k, v in obj.items()}
+
+
+def _strictify_iterable(obj, key_converter, value_converter):
+    return [strictify(value_converter(v) if value_converter else v,
+                      key_converter=key_converter,
+                      value_converter=value_converter)
+            for v in obj]
+
+
+def _strictify_class(obj, key_converter, value_converter):
+    return {
+        (key_converter(k) if key_converter else k): strictify(value_converter(v) if value_converter else v,
+                                                              key_converter=key_converter,
+                                                              value_converter=value_converter)
+        for k, v in _class_generator(obj)
+    }
+
+
+def strictify(obj: any,
+              key_converter: Callable[[Any], str] | None = None,
+              value_converter: Callable[[Any], Any] | None = None) -> Any:
+    """Applies strict structural conversion to the given object using optional specific converters for keys and values.
+
+       Args:
+           obj: The object to be converted.
+           key_converter: A function to convert keys (optional).
+           value_converter: A function to convert values (optional).
+
+       Returns:
+           The object content after applying the conversion.
+       """
+    return _process_obj(obj, _strictify_mapping, _strictify_iterable, _strictify_class,
+                        key_converter=key_converter,
+                        value_converter=value_converter)
+
+
+def simplify(obj: Any) -> Any:
+    """Dictify recursively the given object.
+
+    Args:
+        obj (Any): The object to be simplified.
+
+    Returns:
+        The simplified object.
     """
-    Unwraps the given object.
+    return strictify(obj, key_converter=str)
+
+
+def listify(obj: Any, key_name: str = 'key', value_name: str = 'value') -> Any:
+    """
+    listify recursively the given object.
 
     Args:
         obj (Any): The object to unwrap.
+        key_name(str): The key field name.
+        value_name(str): The value field name.
 
     Returns:
         Any: The unwrapped object.
+
     """
-    return _process_obj(obj, _unwrap_mapping, _unwrap_iterable, _unwrap_class)
+    return _process_obj(obj, _listify_mapping, _listify_iterable, _listify_class,
+                        key_name=key_name, value_name=value_name)
 
 
-def _unwrap_mapping(obj: Mapping) -> list[dict]:
-    return [{'key': k, 'value': unwrap(v)} for k, v in obj.items()]
+def _listify_mapping(obj: Mapping, key_name, value_name) -> list[dict]:
+    return [{key_name: k, value_name: listify(v, key_name, value_name)} for k, v in obj.items()]
 
 
-def _unwrap_iterable(obj: Iterable) -> list:
-    return [unwrap(v) for v in obj]
+def _listify_iterable(obj: Iterable, key_name, value_name) -> list:
+    return [listify(v, key_name, value_name) for v in obj]
 
 
-def _unwrap_class(obj):
-    return [{'key': k, 'value': unwrap(v)} for k, v in inspect.getmembers(obj) if not k.startswith('_')]
+def _listify_class(obj, key_name, value_name):
+    return [{key_name: k, value_name: listify(v, key_name, value_name)} for k, v in inspect.getmembers(obj) if
+            not k.startswith('_')]
 
 
-__all__ = ('dictify', 'distinct', 'keep', 'inverse', 'nested_defaultdict', 'remove', 'unwrap', 'Category',
-           'CategoryCounter', 'MappingCollector', 'MappingCollectorMode')
+__all__ = (
+    'distinct', 'keep', 'remove', 'inverse', 'nested_defaultdict', 'listify', 'simplify', 'strictify', 'Category',
+    'CategoryCounter', 'MappingCollector', 'MappingCollectorMode'
+)

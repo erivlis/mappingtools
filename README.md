@@ -58,9 +58,96 @@ nested defaultdicts, and unwrapping complex objects.
 
 ## Usage
 
-### `dictify`
+### Transformers
 
-Converts objects to dictionaries using handlers for mappings, iterables, and classes.
+#### `distinct`
+
+Yields distinct values for a specified key across multiple mappings.
+
+```python
+from mappingtools import distinct
+
+mappings = [
+    {'a': 1, 'b': 2},
+    {'a': 2, 'b': 3},
+    {'a': 1, 'b': 4}
+]
+distinct_values = list(distinct('a', *mappings))
+print(distinct_values)
+# Output: [1, 2]
+```
+
+#### `keep`
+
+Yields subsets of mappings by retaining only the specified keys.
+
+```python
+from mappingtools import keep
+
+mappings = [
+    {'a': 1, 'b': 2, 'c': 3},
+    {'a': 4, 'b': 5, 'd': 6}
+]
+keys_to_keep = ['a', 'b']
+result = list(keep(keys_to_keep, *mappings))
+# result: [{'a': 1, 'b': 2}, {'a': 4, 'b': 5}]
+```
+
+#### `remove`
+
+Yields mappings with specified keys removed. It takes an iterable of keys and multiple mappings, and returns a generator
+of mappings with those keys excluded.
+
+```python
+from mappingtools import remove
+
+mappings = [
+    {'a': 1, 'b': 2, 'c': 3},
+    {'a': 4, 'b': 5, 'd': 6}
+]
+keys_to_remove = ['a', 'b']
+result = list(remove(keys_to_remove, *mappings))
+# result: [{'c': 3}, {'d': 6}]
+```
+
+#### `inverse`
+
+Swaps keys and values in a dictionary.
+
+```python
+from mappingtools import inverse
+
+original_mapping = {'a': {1, 2}, 'b': {3}}
+inverted_mapping = inverse(original_mapping)
+print(inverted_mapping)
+# Output: defaultdict(<class 'set'>, {1: {'a'}, 2: {'a'}, 3: {'b'}})
+```
+
+#### `strictify`
+
+Strictify function applies a strict structural conversion to an object using optional converters for keys and values.
+
+```python
+from mappingtools import strictify
+
+
+def uppercase_key(key):
+    return key.upper()
+
+
+def double_value(value):
+    return value * 2
+
+
+data = {'a': 1, 'b': 2}
+result = strictify(data, key_converter=uppercase_key, value_converter=double_value)
+print(result)
+# Output: {'A': 2, 'B': 4}
+```
+
+#### `simplify`
+
+Converts objects to strictly structured dictionaries.
 
 ```python
 from collections import Counter
@@ -68,19 +155,19 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Mapping
 
-from mappingtools import dictify
+from mappingtools import simplify
 
 data = {'key1': 'value1', 'key2': ['item1', 'item2']}
-dictified_data = dictify(data)
-print(dictified_data)
+simplified_data = simplify(data)
+print(simplified_data)
 # Output: {'key1': 'value1', 'key2': ['item1', 'item2']}
 
 counter = Counter({'a': 1, 'b': 2})
 print(counter)
 # Output: Counter({'b': 2, 'a': 1})
 
-dictified_counter = dictify(counter)
-print(dictified_counter)
+simplified_counter = simplify(counter)
+print(simplified_counter)
 
 
 # Output: {'a': 1, 'b': 2}
@@ -103,58 +190,27 @@ sample_dataclass = SampleDataClass(1, 2, '11', '22', [1, 2], {'aaa': 111, 'bbb':
 print(sample_dataclass)
 # Output: SampleDataClass(a=1, b=2, aa='11', bb='22', c=[1, 2], d={'aaa': 111, 'bbb': '222'}, e=datetime.datetime(2024, 7, 22, 21, 42, 17, 314159))
 
-dictified_sample_dataclas = dictify(sample_dataclass)
-print(dictified_sample_dataclas)
+simplified_sample_dataclass = simplify(sample_dataclass)
+print(simplified_sample_dataclass)
 # Output: {'a': 1, 'aa': '11', 'b': 2, 'bb': '22', 'c': [1, 2], 'd': {'aaa': 111, 'bbb': '222'}, 'e': datetime.datetime(2024, 7, 22, 21, 42, 17, 314159)}
 ```
 
-### `distinct`
+#### `listify`
 
-Yields distinct values for a specified key across multiple mappings.
-
-```python
-from mappingtools import distinct
-
-mappings = [
-    {'a': 1, 'b': 2},
-    {'a': 2, 'b': 3},
-    {'a': 1, 'b': 4}
-]
-distinct_values = list(distinct('a', *mappings))
-print(distinct_values)
-# Output: [1, 2]
-```
-
-### `keep`
-
-Yields subsets of mappings by retaining only the specified keys.
+Transforms complex objects into a list of dictionaries with key and value pairs.
 
 ```python
-from mappingtools import keep
+from mappingtools import listify
 
-mappings = [
-    {'a': 1, 'b': 2, 'c': 3},
-    {'a': 4, 'b': 5, 'd': 6}
-]
-keys_to_keep = ['a', 'b']
-result = list(keep(keys_to_keep, *mappings))
-# result: [{'a': 1, 'b': 2}, {'a': 4, 'b': 5}]
+wrapped_data = {'key1': {'subkey': 'value'}, 'key2': ['item1', 'item2']}
+unwrapped_data = listify(wrapped_data)
+print(unwrapped_data)
+# Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
 ```
 
-### `inverse`
+### Collectors
 
-Swaps keys and values in a dictionary.
-
-```python
-from mappingtools import inverse
-
-original_mapping = {'a': {1, 2}, 'b': {3}}
-inverted_mapping = inverse(original_mapping)
-print(inverted_mapping)
-# Output: defaultdict(<class 'set'>, {1: {'a'}, 2: {'a'}, 3: {'b'}})
-```
-
-### `nested_defaultdict`
+#### `nested_defaultdict`
 
 Creates a nested defaultdict with specified depth and factory.
 
@@ -167,37 +223,7 @@ print(nested_dd)
 # Output: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {0: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {1: ['value']})})
 ```
 
-### `remove`
-
-Yields mappings with specified keys removed. It takes an iterable of keys and multiple mappings, and returns a generator
-of mappings with those keys excluded.
-
-```python
-from mappingtools import remove
-
-mappings = [
-    {'a': 1, 'b': 2, 'c': 3},
-    {'a': 4, 'b': 5, 'd': 6}
-]
-keys_to_remove = ['a', 'b']
-result = list(remove(keys_to_remove, *mappings))
-# result: [{'c': 3}, {'d': 6}]
-```
-
-### `unwrap`
-
-Transforms complex objects into a list of dictionaries with key and value pairs.
-
-```python
-from mappingtools import unwrap
-
-wrapped_data = {'key1': {'subkey': 'value'}, 'key2': ['item1', 'item2']}
-unwrapped_data = unwrap(wrapped_data)
-print(unwrapped_data)
-# Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
-```
-
-### `CategoryCounter`
+#### `CategoryCounter`
 
 The CategoryCounter class extends a dictionary to count occurrences of data items categorized by multiple categories.
 It maintains a total count of all data items and allows categorization using direct values or functions.
@@ -217,16 +243,16 @@ print(counter)
 # Output: CategoryCounter({'type': defaultdict(<class 'collections.Counter'>, {'fruit': Counter({'apple': 2, 'banana': 1})}), 'char_count': defaultdict(<class 'collections.Counter'>, {5: Counter({'apple': 2}), 6: Counter({'banana': 1})}), 'unique_char_count': defaultdict(<class 'collections.Counter'>, {4: Counter({'apple': 2}), 3: Counter({'banana': 1})})})
 ```
 
-### `MappingCollector`
+#### `MappingCollector`
 
-A class designed to collect key-value pairs into an internal mapping,
-with two modes of operation: one_to_one and one_to_many.
-The mode determines whether each key maps to a single value or multiple values.
+A class designed to collect key-value pairs into an internal mapping based on different modes.
+It supports modes like ALL, COUNT, DISTINCT, FIRST, and LAST, each dictating how key-value pairs are
+collected.
 
 ```python
 from mappingtools import MappingCollector, MappingCollectorMode
 
-collector = MappingCollector(MappingCollectorMode.one_to_many)
+collector = MappingCollector(MappingCollectorMode.ALL)
 collector.add('a', 1)
 collector.add('a', 2)
 collector.collect([('b', 3), ('b', 4)])
