@@ -79,7 +79,6 @@ def test_adding_key_value_pairs_in_first_mode():
 
 # Initialization with invalid mode
 def test_initialization_with_invalid_mode():
-    from mappingtools import MappingCollector
     # Arrange & Act & Assert
     with pytest.raises(ValueError):
         MappingCollector("INVALID_MODE")

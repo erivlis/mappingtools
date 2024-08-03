@@ -159,4 +159,4 @@ def test_large_dictionaries_performance():
 
     # Act & Assert (no assertion needed for performance, just ensure it runs)
     for _ in stream_dict_records(input_dict):
-        pass
+        assert _ is not None

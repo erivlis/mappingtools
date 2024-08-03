@@ -4,7 +4,7 @@ from collections import Counter, defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping
 from enum import Enum, auto
 from itertools import chain
-from typing import Any, NamedTuple, TypeVar
+from typing import Any, TypeVar
 
 K = TypeVar('K')
 KT = TypeVar('KT')
