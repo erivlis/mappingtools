@@ -208,6 +208,71 @@ print(unwrapped_data)
 # Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
 ```
 
+#### `stream`
+
+Takes a mapping and an optional item factory function, and generates items from the mapping.
+If the item factory is provided, it applies the factory to each key-value pair before yielding.
+
+```python
+from collections import namedtuple
+
+from mappingtools import stream
+
+
+def custom_factory(key, value):
+    return f"{key}: {value}"
+
+
+my_mapping = {'a': 1, 'b': 2, 'c': 3}
+
+for item in stream(my_mapping, custom_factory):
+    print(item)
+# Output:
+# a: 1
+# b: 2
+# c: 3
+
+
+MyTuple = namedtuple('MyTuple', ['key', 'value'])
+data = {'a': 1, 'b': 2}
+
+for item in stream(data, MyTuple):
+    print(item)
+
+
+# Output:
+# MyTuple(key='a', value=1)
+# MyTuple(key='b', value=2)
+
+
+def record(k, v):
+    return {'key': k, 'value': v}
+
+
+for item in stream(data, record):
+    print(item)
+# output:
+# {'key': 'a', 'value': 1}
+# {'key': 'b', 'value': 2}
+```
+
+#### `stream_dict_records`
+
+generates dictionary records from a given mapping, where each record contains a key-value pair from the mapping with
+customizable key and value names.
+
+```python
+from mappingtools import stream_dict_records
+
+mapping = {'a': 1, 'b': 2}
+records = stream_dict_records(mapping, key_name='letter', value_name='number')
+for record in records:
+    print(record)
+# Output:
+# {'letter': 'a', 'number': 1}
+# {'letter': 'b', 'number': 2}
+```
+
 ### Collectors
 
 #### `nested_defaultdict`

@@ -4,7 +4,7 @@ from collections import Counter, defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping
 from enum import Enum, auto
 from itertools import chain
-from typing import Any, TypeVar
+from typing import Any, NamedTuple, TypeVar
 
 K = TypeVar('K')
 KT = TypeVar('KT')
@@ -204,7 +204,8 @@ def remove(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K
 
 
 def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
-    """Return a new dictionary with keys and values swapped from the input mapping.
+    """
+    Return a new dictionary with keys and values swapped from the input mapping.
 
     Args:
         mapping (Mapping[Any, set]): The input mapping to invert.
@@ -342,10 +343,9 @@ def listify(obj: Any, key_name: str = 'key', value_name: str = 'value') -> Any:
 
     Returns:
         Any: The unwrapped object.
-
     """
-    return _process_obj(obj, _listify_mapping, _listify_iterable, _listify_class,
-                        key_name=key_name, value_name=value_name)
+    return _process_obj(obj, _listify_mapping, _listify_iterable, _listify_class, key_name=key_name,
+                        value_name=value_name)
 
 
 def _listify_mapping(obj: Mapping, key_name, value_name) -> list[dict]:
@@ -361,7 +361,46 @@ def _listify_class(obj, key_name, value_name):
             not k.startswith('_')]
 
 
+def stream(mapping: Mapping, item_factory: Callable[[Any, Any], Any] | None = None) -> Generator[Any, Any, None]:
+    """
+    Generate a stream of items from a mapping.
+
+    Args:
+        mapping (Mapping): The mapping object to stream items from.
+        item_factory (Callable[[Any, Any], Any], optional): A function that transforms each key-value pair from
+            the mapping. Defaults to None.
+
+    Yields:
+        The streamed items from the mapping.
+    """
+
+    items = mapping.items() if item_factory is None else iter(item_factory(k, v) for k, v in mapping.items())
+    yield from items
+
+
+def stream_dict_records(mapping: Mapping,
+                        key_name: str = 'key',
+                        value_name: str = 'value') -> Generator[Mapping[str, Any], Any, None]:
+    """
+    Generate dictionary records from a mapping.
+
+    Args:
+        mapping (Mapping): The input mapping to generate records from.
+        key_name (str): The name to use for the key in the generated records. Defaults to 'key'.
+        value_name (str): The name to use for the value in the generated records. Defaults to 'value'.
+
+    Yields:
+        dictionary records based on the input mapping.
+    """
+
+    def record(k, v):
+        return {key_name: k, value_name: v}
+
+    yield from stream(mapping, record)
+
+
 __all__ = (
-    'distinct', 'keep', 'remove', 'inverse', 'nested_defaultdict', 'listify', 'simplify', 'strictify', 'Category',
-    'CategoryCounter', 'MappingCollector', 'MappingCollectorMode'
+    'distinct', 'keep', 'remove', 'inverse', 'nested_defaultdict', 'listify', 'simplify', 'stream',
+    'stream_dict_records', 'strictify', 'Category', 'CategoryCounter',
+    'MappingCollector', 'MappingCollectorMode'
 )
