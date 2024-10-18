@@ -64,6 +64,8 @@ nested defaultdicts, and unwrapping complex objects.
 
 Yields distinct values for a specified key across multiple mappings.
 
+<!-- name: test_distinct -->
+
 ```python
 from mappingtools import distinct
 
@@ -80,6 +82,8 @@ print(distinct_values)
 #### `keep`
 
 Yields subsets of mappings by retaining only the specified keys.
+
+<!-- name: test_keep -->
 
 ```python
 from mappingtools import keep
@@ -98,6 +102,8 @@ result = list(keep(keys_to_keep, *mappings))
 Yields mappings with specified keys removed. It takes an iterable of keys and multiple mappings, and returns a generator
 of mappings with those keys excluded.
 
+<!-- name: test_remove -->
+
 ```python
 from mappingtools import remove
 
@@ -114,6 +120,8 @@ result = list(remove(keys_to_remove, *mappings))
 
 Swaps keys and values in a dictionary.
 
+<!-- name: test_inverse -->
+
 ```python
 from mappingtools import inverse
 
@@ -123,9 +131,29 @@ print(inverted_mapping)
 # Output: defaultdict(<class 'set'>, {1: {'a'}, 2: {'a'}, 3: {'b'}})
 ```
 
+#### `flattened`
+
+The flattened function takes a nested mapping structure and converts it into a single-level dictionary by flattening the
+keys into tuples.
+
+<!-- name: test_flattened -->
+
+```python
+from mappingtools import flattened
+
+nested_dict = {
+    'a': {'b': 1, 'c': {'d': 2}},
+    'e': 3
+}
+flat_dict = flattened(nested_dict)
+# Expected output: {('a', 'b'): 1, ('a', 'c', 'd'): 2, ('e',): 3}
+```
+
 #### `strictify`
 
 Strictify function applies a strict structural conversion to an object using optional converters for keys and values.
+
+<!-- name: test_strictify -->
 
 ```python
 from mappingtools import strictify
@@ -148,6 +176,8 @@ print(result)
 #### `simplify`
 
 Converts objects to strictly structured dictionaries.
+
+<!-- name: test_simplify -->
 
 ```python
 from collections import Counter
@@ -199,6 +229,8 @@ print(simplified_sample_dataclass)
 
 Transforms complex objects into a list of dictionaries with key and value pairs.
 
+<!-- name: test_listify -->
+
 ```python
 from mappingtools import listify
 
@@ -212,6 +244,8 @@ print(unwrapped_data)
 
 Takes a mapping and an optional item factory function, and generates items from the mapping.
 If the item factory is provided, it applies the factory to each key-value pair before yielding.
+
+<!-- name: test_stream -->
 
 ```python
 from collections import namedtuple
@@ -261,6 +295,8 @@ for item in stream(data, record):
 generates dictionary records from a given mapping, where each record contains a key-value pair from the mapping with
 customizable key and value names.
 
+<!-- name: test_stream_dict_records -->
+
 ```python
 from mappingtools import stream_dict_records
 
@@ -279,6 +315,8 @@ for record in records:
 
 Creates a nested defaultdict with specified depth and factory.
 
+<!-- name: test_nested_defaultdict -->
+
 ```python
 from mappingtools import nested_defaultdict
 
@@ -292,6 +330,8 @@ print(nested_dd)
 
 The CategoryCounter class extends a dictionary to count occurrences of data items categorized by multiple categories.
 It maintains a total count of all data items and allows categorization using direct values or functions.
+
+<!-- name: test_category_counter -->
 
 ```python
 from mappingtools import CategoryCounter
@@ -313,6 +353,8 @@ print(counter)
 A class designed to collect key-value pairs into an internal mapping based on different modes.
 It supports modes like ALL, COUNT, DISTINCT, FIRST, and LAST, each dictating how key-value pairs are
 collected.
+
+<!-- name: test_mapping_collector -->
 
 ```python
 from mappingtools import MappingCollector, MappingCollectorMode

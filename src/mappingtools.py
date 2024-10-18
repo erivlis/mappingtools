@@ -250,6 +250,25 @@ def nested_defaultdict(nesting_depth: int = 0, default_factory: Callable | None 
     return defaultdict(factory, **kwargs)
 
 
+def flattened(mapping: Mapping[Any, Any]) -> dict[tuple, Any]:
+    """
+    Flatten a nested mapping structure into a single-level dictionary.
+
+    :param mapping: A nested mapping structure to be flattened.
+    :return: A dictionary representing the flattened structure.
+    """
+
+    def flatten(key: tuple, value: Any):
+        if isinstance(value, Mapping):
+            for k, v in value.items():
+                new_key = tuple([*key, *k] if _is_strict_iterable(k) else [*key, k])
+                yield from flatten(new_key, v)
+        else:
+            yield key, value
+
+    return dict(flatten((), mapping))
+
+
 def _is_strict_iterable(obj: Iterable) -> bool:
     return isinstance(obj, Iterable) and not isinstance(obj, str | bytes | bytearray)
 
@@ -400,7 +419,6 @@ def stream_dict_records(mapping: Mapping,
 
 
 __all__ = (
-    'distinct', 'keep', 'remove', 'inverse', 'nested_defaultdict', 'listify', 'simplify', 'stream',
-    'stream_dict_records', 'strictify', 'Category', 'CategoryCounter',
-    'MappingCollector', 'MappingCollectorMode'
+    'Category', 'CategoryCounter', 'MappingCollector', 'MappingCollectorMode', 'distinct', 'flattened', 'inverse',
+    'keep', 'listify', 'nested_defaultdict', 'remove', 'simplify', 'stream', 'stream_dict_records', 'strictify'
 )
