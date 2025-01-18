@@ -170,8 +170,6 @@ def test_simplify_circular_references():
                            [2, 3, 'b', CIRCULAR_REFERENCE]], f'{message} {obj3}'
         assert result4 == {'value1': 'c', 'value2': 4, 'list_obj': [2, 3, 'b', CIRCULAR_REFERENCE],
                            'dict_obj': {'a': 1, 'obj2': [2, 3, 'b', CIRCULAR_REFERENCE]}}, f'{message} {obj4}'
-
-        assert True, 'Circular Reference handled. A RecursionError is not raised.'
     except RecursionError:
         pytest.fail('Circular Reference handling failed. RecursionError is raised.')
 

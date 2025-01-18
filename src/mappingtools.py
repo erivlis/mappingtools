@@ -400,10 +400,6 @@ def strictify(obj: Any,
 
     return processor(obj)
 
-    # return _process_obj(obj, _strictify_mapping, _strictify_iterable, _strictify_class,
-    #                     key_converter=key_converter,
-    #                     value_converter=value_converter)
-
 
 def _listify_mapping(obj: Mapping, processor, key_name, value_name) -> list[dict]:
     return [{key_name: k, value_name: processor(v)} for k, v in obj.items()]
@@ -437,8 +433,6 @@ def listify(obj: Any, key_name: str = 'key', value_name: str = 'value') -> Any:
                           value_name=value_name)
 
     return processor(obj)
-    # return _process_obj(obj, _listify_mapping, _listify_iterable, _listify_class, key_name=key_name,
-    #                     value_name=value_name)
 
 
 def simplify(obj: Any) -> Any:
