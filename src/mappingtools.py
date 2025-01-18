@@ -285,6 +285,7 @@ def _process_obj(obj: Any,
                  mapping_handler: Callable | None = None,
                  iterable_handler: Callable | None = None,
                  class_handler: Callable | None = None,
+                 default_handler: Callable | None = None,
                  *args,
                  **kwargs):
     if callable(mapping_handler) and isinstance(obj, Mapping):
@@ -294,7 +295,7 @@ def _process_obj(obj: Any,
     elif callable(class_handler) and _is_class_instance(obj):
         return class_handler(obj, *args, **kwargs)
     else:
-        return obj
+        return default_handler(obj, *args, **kwargs) if callable(default_handler) else obj
 
 
 def _strictify_mapping(obj, key_converter, value_converter):
@@ -339,16 +340,17 @@ def strictify(obj: any,
                         value_converter=value_converter)
 
 
-def simplify(obj: Any) -> Any:
-    """Dictify recursively the given object.
+def _listify_mapping(obj: Mapping, key_name, value_name) -> list[dict]:
+    return [{key_name: k, value_name: listify(v, key_name, value_name)} for k, v in obj.items()]
 
-    Args:
-        obj (Any): The object to be simplified.
 
-    Returns:
-        The simplified object.
-    """
-    return strictify(obj, key_converter=str)
+def _listify_iterable(obj: Iterable, key_name, value_name) -> list:
+    return [listify(v, key_name, value_name) for v in obj]
+
+
+def _listify_class(obj, key_name, value_name):
+    return [{key_name: k, value_name: listify(v, key_name, value_name)} for k, v in inspect.getmembers(obj) if
+            not k.startswith('_')]
 
 
 def listify(obj: Any, key_name: str = 'key', value_name: str = 'value') -> Any:
@@ -367,17 +369,59 @@ def listify(obj: Any, key_name: str = 'key', value_name: str = 'value') -> Any:
                         value_name=value_name)
 
 
-def _listify_mapping(obj: Mapping, key_name, value_name) -> list[dict]:
-    return [{key_name: k, value_name: listify(v, key_name, value_name)} for k, v in obj.items()]
+def simplify(obj: Any) -> Any:
+    """Dictify recursively the given object.
+
+    Args:
+        obj (Any): The object to be simplified.
+
+    Returns:
+        The simplified object.
+    """
+    return strictify(obj, key_converter=str)
 
 
-def _listify_iterable(obj: Iterable, key_name, value_name) -> list:
-    return [listify(v, key_name, value_name) for v in obj]
+def _stringify_kv_stream(iterable: Iterable[tuple[Any, Any]],
+                         kv_delimiter,
+                         item_delimiter,
+                         key_converter,
+                         *args,
+                         **kwargs):
+    items = (f"{key_converter(k)}{kv_delimiter}{stringify(v, kv_delimiter, item_delimiter, key_converter, *args, **kwargs)}"
+             for k, v in iterable)
+    return item_delimiter.join(items)
 
 
-def _listify_class(obj, key_name, value_name):
-    return [{key_name: k, value_name: listify(v, key_name, value_name)} for k, v in inspect.getmembers(obj) if
-            not k.startswith('_')]
+def _stringify_mapping(obj, kv_delimiter, item_delimiter, *args, **kwargs):
+    return _stringify_kv_stream(obj.items(), kv_delimiter, item_delimiter, *args, **kwargs)
+
+
+def _stringify_iterable(obj, kv_delimiter, item_delimiter, *args, **kwargs):
+    return f'[{item_delimiter.join(stringify(v, kv_delimiter, item_delimiter, *args, **kwargs) for v in obj)}]'
+
+
+def _stringify_class(obj, kv_delimiter, item_delimiter, *args, **kwargs):
+    return _stringify_kv_stream(_class_generator(obj), kv_delimiter, item_delimiter, *args, **kwargs)
+
+
+def _stringify_default(obj, *args, **kwargs):
+    return str(obj)
+
+
+def stringify(obj: Any, kv_delimiter: str = '=', item_delimiter: str = ', ', *args, **kwargs) -> str:
+    """Stringify recursively the given object.
+
+    Args:
+        obj (Any): The object to be stringified.
+        kv_delimiter (str): The key-value delimiter. Defaults to '='.
+        item_delimiter (str): The item delimiter. Defaults to ', '.
+
+    Returns:
+        str: The stringified object.
+    """
+
+    return _process_obj(obj, _stringify_mapping, _stringify_iterable, _stringify_class, _stringify_default,
+                        kv_delimiter, item_delimiter, str, *args, **kwargs)
 
 
 def stream(mapping: Mapping, item_factory: Callable[[Any, Any], Any] | None = None) -> Generator[Any, Any, None]:
@@ -420,5 +464,6 @@ def stream_dict_records(mapping: Mapping,
 
 __all__ = (
     'Category', 'CategoryCounter', 'MappingCollector', 'MappingCollectorMode', 'distinct', 'flattened', 'inverse',
-    'keep', 'listify', 'nested_defaultdict', 'remove', 'simplify', 'stream', 'stream_dict_records', 'strictify'
+    'keep', 'listify', 'nested_defaultdict', 'remove', 'simplify', 'stream', 'stream_dict_records', 'strictify',
+    'stringify'
 )

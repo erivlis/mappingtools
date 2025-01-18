@@ -149,28 +149,19 @@ flat_dict = flattened(nested_dict)
 # Expected output: {('a', 'b'): 1, ('a', 'c', 'd'): 2, ('e',): 3}
 ```
 
-#### `strictify`
+#### `listify`
 
-Strictify function applies a strict structural conversion to an object using optional converters for keys and values.
+Transforms complex objects into a list of dictionaries with key and value pairs.
 
-<!-- name: test_strictify -->
+<!-- name: test_listify -->
 
 ```python
-from mappingtools import strictify
+from mappingtools import listify
 
-
-def uppercase_key(key):
-    return key.upper()
-
-
-def double_value(value):
-    return value * 2
-
-
-data = {'a': 1, 'b': 2}
-result = strictify(data, key_converter=uppercase_key, value_converter=double_value)
-print(result)
-# Output: {'A': 2, 'B': 4}
+wrapped_data = {'key1': {'subkey': 'value'}, 'key2': ['item1', 'item2']}
+unwrapped_data = listify(wrapped_data)
+print(unwrapped_data)
+# Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
 ```
 
 #### `simplify`
@@ -225,19 +216,50 @@ print(simplified_sample_dataclass)
 # Output: {'a': 1, 'aa': '11', 'b': 2, 'bb': '22', 'c': [1, 2], 'd': {'aaa': 111, 'bbb': '222'}, 'e': datetime.datetime(2024, 7, 22, 21, 42, 17, 314159)}
 ```
 
-#### `listify`
+#### `strictify`
 
-Transforms complex objects into a list of dictionaries with key and value pairs.
+Applies a strict structural conversion to an object using optional converters for keys and values.
 
-<!-- name: test_listify -->
+<!-- name: test_strictify -->
 
 ```python
-from mappingtools import listify
+from mappingtools import strictify
 
-wrapped_data = {'key1': {'subkey': 'value'}, 'key2': ['item1', 'item2']}
-unwrapped_data = listify(wrapped_data)
-print(unwrapped_data)
-# Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
+
+def uppercase_key(key):
+    return key.upper()
+
+
+def double_value(value):
+    return value * 2
+
+
+data = {'a': 1, 'b': 2}
+result = strictify(data, key_converter=uppercase_key, value_converter=double_value)
+print(result)
+# Output: {'A': 2, 'B': 4}
+```
+
+#### `stringify`
+
+Converts an object into a string representation by recursively processing it based on its type.
+
+<!-- Name: test_stringify -->
+
+```python
+from mappingtools import stringify
+
+data = {'key1': 'value1', 'key2': 'value2'}
+result = stringify(data)
+
+print(result)
+# Output: "key1=value1, key2=value2"
+
+data = [1, 2, 3]
+result = stringify(data)
+
+print(result)
+# Output: "[1, 2, 3]"
 ```
 
 #### `stream`
