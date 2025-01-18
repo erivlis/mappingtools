@@ -1,5 +1,7 @@
 # MappingTools
 
+> Do stuff with Mappings and more!!!
+
 This library provides utility functions for manipulating and transforming data structures which have or include
 Mapping-like characteristics. Including inverting dictionaries, converting class like objects to dictionaries, creating
 nested defaultdicts, and unwrapping complex objects.
@@ -395,6 +397,8 @@ print(collector.mapping)
 
 ```shell
 ruff check src
+
+ruff check tests
 ```
 
 ### Test

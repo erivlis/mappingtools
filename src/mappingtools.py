@@ -6,6 +6,8 @@ from enum import Enum, auto
 from itertools import chain
 from typing import Any, TypeVar
 
+CIRCULAR_REFERENCE = '...'
+
 K = TypeVar('K')
 KT = TypeVar('KT')
 VT = TypeVar('VT')
@@ -45,7 +47,16 @@ class CategoryCounter(dict[str, defaultdict[Category, Counter]]):
 
 class MappingCollectorMode(Enum):
     """
-    Define an enumeration class for mapping collector modes with two options: one_to_one and one_to_many.
+    Define an enumeration class for mapping collector modes.
+
+    Attributes:
+        ALL: Collect all values for each key.
+        COUNT: Count the occurrences of each value for each key.
+        DISTINCT: Collect distinct values for each key.
+        FIRST: Collect the first value for each key.
+        LAST: Collect the last value for each key.
+
+
     """
     ALL = auto()
     COUNT = auto()
@@ -56,7 +67,7 @@ class MappingCollectorMode(Enum):
 
 class MappingCollector:
 
-    def __init__(self, mode: MappingCollectorMode = MappingCollectorMode.ALL, *args, **kwargs):
+    def __init__(self, mode: MappingCollectorMode = MappingCollectorMode.ALL, **kwargs):
         """
         Initialize the MappingCollector with the specified mode.
 
@@ -65,18 +76,19 @@ class MappingCollector:
             *args: Variable positional arguments used to initialize the internal mapping.
             **kwargs: Variable keyword arguments used to initialize the internal mapping.
         """
+        self._mapping: Mapping[KT, VT_co]
 
         self.mode = mode
 
         match self.mode:
             case MappingCollectorMode.ALL:
-                self._mapping = defaultdict(list, *args, **kwargs)
+                self._mapping = defaultdict(list, **kwargs)
             case MappingCollectorMode.COUNT:
-                self._mapping = defaultdict(Counter, *args, **kwargs)
+                self._mapping = defaultdict(Counter, **kwargs)
             case MappingCollectorMode.DISTINCT:
-                self._mapping = defaultdict(set, *args, **kwargs)
+                self._mapping = defaultdict(set, **kwargs)
             case MappingCollectorMode.FIRST | MappingCollectorMode.LAST:
-                self._mapping = dict(*args, **kwargs)
+                self._mapping = dict(**kwargs)
             case _:
                 raise ValueError("Invalid mode")
 
@@ -281,48 +293,92 @@ def _class_generator(obj):
     yield from ((k, v) for k, v in inspect.getmembers(obj) if not k.startswith('_'))
 
 
-def _process_obj(obj: Any,
+class Processor:
+    """
+    A class to process objects recursively based on their type.
+    """
+
+    def __init__(self,
                  mapping_handler: Callable | None = None,
                  iterable_handler: Callable | None = None,
                  class_handler: Callable | None = None,
                  default_handler: Callable | None = None,
                  *args,
                  **kwargs):
-    if callable(mapping_handler) and isinstance(obj, Mapping):
-        return mapping_handler(obj, *args, **kwargs)
-    elif callable(iterable_handler) and _is_strict_iterable(obj):
-        return iterable_handler(obj, *args, **kwargs)
-    elif callable(class_handler) and _is_class_instance(obj):
-        return class_handler(obj, *args, **kwargs)
-    else:
-        return default_handler(obj, *args, **kwargs) if callable(default_handler) else obj
+        """
+        Initialize the Processor with optional handlers for different types of objects.
+
+        Args:
+            mapping_handler (Optional[Callable]): Handler for mapping objects.
+            Iterable_handler (Optional[Callable]): Handler for iterable objects.
+            Class_handler (Optional[Callable]): Handler for class instances.
+            Default_handler (Optional[Callable]): Default handler for other objects.
+            *args: Additional positional arguments for handlers.
+            **kwargs: Additional keyword arguments for handlers.
+        """
+
+        self.mapping_handler = mapping_handler
+        self.iterable_handler = iterable_handler
+        self.class_handler = class_handler
+        self.default_handler = default_handler
+        self.args = args
+        self.kwargs = kwargs
+
+        self.objects_counter = Counter()
+        self.objects = {}
+
+    def __call__(self, obj: Any):
+        """
+           Process the given object using the appropriate handler.
+
+           Args:
+               obj (Any): The object to process.
+
+           Returns:
+               Any: The processed object.
+           """
+        obj_id = id(obj)
+        self.objects_counter[obj_id] += 1
+        if self.objects_counter[obj_id] == 1:
+            processed_obj = self._process(obj)
+            self.objects[obj_id] = processed_obj
+            return self.objects[obj_id]
+        elif self.objects_counter[obj_id] == 2:
+            return self.objects.get(obj_id, CIRCULAR_REFERENCE)
+
+    def _process(self, obj: Any):
+        if callable(self.mapping_handler) and isinstance(obj, Mapping):
+            return self.mapping_handler(obj, self, *self.args, **self.kwargs)
+        elif callable(self.iterable_handler) and _is_strict_iterable(obj):
+            return self.iterable_handler(obj, self, *self.args, **self.kwargs)
+        elif callable(self.class_handler) and _is_class_instance(obj):
+            return self.class_handler(obj, self, *self.args, **self.kwargs)
+        elif callable(self.default_handler):
+            self.objects_counter.pop(id(obj))
+            return self.default_handler(obj)
+        else:
+            self.objects_counter.pop(id(obj))
+            return obj
 
 
-def _strictify_mapping(obj, key_converter, value_converter):
+def _strictify_mapping(obj, processor, key_converter, value_converter):
     return {
-        (key_converter(k) if key_converter else k): strictify(value_converter(v) if value_converter else v,
-                                                              key_converter=key_converter,
-                                                              value_converter=value_converter)
+        (key_converter(k) if key_converter else k): processor(value_converter(v) if value_converter else v)
         for k, v in obj.items()}
 
 
-def _strictify_iterable(obj, key_converter, value_converter):
-    return [strictify(value_converter(v) if value_converter else v,
-                      key_converter=key_converter,
-                      value_converter=value_converter)
-            for v in obj]
+def _strictify_iterable(obj, processor, key_converter, value_converter):
+    return [processor(value_converter(v) if value_converter else v) for v in obj]
 
 
-def _strictify_class(obj, key_converter, value_converter):
+def _strictify_class(obj, processor, key_converter, value_converter):
     return {
-        (key_converter(k) if key_converter else k): strictify(value_converter(v) if value_converter else v,
-                                                              key_converter=key_converter,
-                                                              value_converter=value_converter)
+        (key_converter(k) if key_converter else k): processor(value_converter(v) if value_converter else v)
         for k, v in _class_generator(obj)
     }
 
 
-def strictify(obj: any,
+def strictify(obj: Any,
               key_converter: Callable[[Any], str] | None = None,
               value_converter: Callable[[Any], Any] | None = None) -> Any:
     """Applies strict structural conversion to the given object using optional specific converters for keys and values.
@@ -335,22 +391,30 @@ def strictify(obj: any,
        Returns:
            The object content after applying the conversion.
        """
-    return _process_obj(obj, _strictify_mapping, _strictify_iterable, _strictify_class,
-                        key_converter=key_converter,
-                        value_converter=value_converter)
+
+    processor = Processor(mapping_handler=_strictify_mapping,
+                          iterable_handler=_strictify_iterable,
+                          class_handler=_strictify_class,
+                          key_converter=key_converter,
+                          value_converter=value_converter)
+
+    return processor(obj)
+
+    # return _process_obj(obj, _strictify_mapping, _strictify_iterable, _strictify_class,
+    #                     key_converter=key_converter,
+    #                     value_converter=value_converter)
 
 
-def _listify_mapping(obj: Mapping, key_name, value_name) -> list[dict]:
-    return [{key_name: k, value_name: listify(v, key_name, value_name)} for k, v in obj.items()]
+def _listify_mapping(obj: Mapping, processor, key_name, value_name) -> list[dict]:
+    return [{key_name: k, value_name: processor(v)} for k, v in obj.items()]
 
 
-def _listify_iterable(obj: Iterable, key_name, value_name) -> list:
-    return [listify(v, key_name, value_name) for v in obj]
+def _listify_iterable(obj: Iterable, processor, key_name, value_name) -> list:
+    return [processor(v) for v in obj]
 
 
-def _listify_class(obj, key_name, value_name):
-    return [{key_name: k, value_name: listify(v, key_name, value_name)} for k, v in inspect.getmembers(obj) if
-            not k.startswith('_')]
+def _listify_class(obj, processor, key_name, value_name):
+    return [{key_name: k, value_name: processor(v)} for k, v in inspect.getmembers(obj) if not k.startswith('_')]
 
 
 def listify(obj: Any, key_name: str = 'key', value_name: str = 'value') -> Any:
@@ -365,8 +429,16 @@ def listify(obj: Any, key_name: str = 'key', value_name: str = 'value') -> Any:
     Returns:
         Any: The unwrapped object.
     """
-    return _process_obj(obj, _listify_mapping, _listify_iterable, _listify_class, key_name=key_name,
-                        value_name=value_name)
+
+    processor = Processor(mapping_handler=_listify_mapping,
+                          iterable_handler=_listify_iterable,
+                          class_handler=_listify_class,
+                          key_name=key_name,
+                          value_name=value_name)
+
+    return processor(obj)
+    # return _process_obj(obj, _listify_mapping, _listify_iterable, _listify_class, key_name=key_name,
+    #                     value_name=value_name)
 
 
 def simplify(obj: Any) -> Any:
@@ -382,33 +454,29 @@ def simplify(obj: Any) -> Any:
 
 
 def _stringify_kv_stream(iterable: Iterable[tuple[Any, Any]],
+                         processor,
                          kv_delimiter,
                          item_delimiter,
                          key_converter,
                          *args,
                          **kwargs):
-    items = (f"{key_converter(k)}{kv_delimiter}{stringify(v, kv_delimiter, item_delimiter, key_converter, *args, **kwargs)}"
-             for k, v in iterable)
+    items = (f"{key_converter(k)}{kv_delimiter}{processor(v)}" for k, v in iterable)
     return item_delimiter.join(items)
 
 
-def _stringify_mapping(obj, kv_delimiter, item_delimiter, *args, **kwargs):
-    return _stringify_kv_stream(obj.items(), kv_delimiter, item_delimiter, *args, **kwargs)
+def _stringify_mapping(obj, *args, **kwargs):
+    return _stringify_kv_stream(obj.items(), *args, **kwargs)
 
 
-def _stringify_iterable(obj, kv_delimiter, item_delimiter, *args, **kwargs):
-    return f'[{item_delimiter.join(stringify(v, kv_delimiter, item_delimiter, *args, **kwargs) for v in obj)}]'
+def _stringify_iterable(obj, processor, kv_delimiter, item_delimiter, *args, **kwargs):
+    return f'[{item_delimiter.join(processor(v) for v in obj)}]'
 
 
-def _stringify_class(obj, kv_delimiter, item_delimiter, *args, **kwargs):
-    return _stringify_kv_stream(_class_generator(obj), kv_delimiter, item_delimiter, *args, **kwargs)
+def _stringify_class(obj, processor, kv_delimiter, item_delimiter, *args, **kwargs):
+    return _stringify_kv_stream(_class_generator(obj), processor, kv_delimiter, item_delimiter, *args, **kwargs)
 
 
-def _stringify_default(obj, *args, **kwargs):
-    return str(obj)
-
-
-def stringify(obj: Any, kv_delimiter: str = '=', item_delimiter: str = ', ', *args, **kwargs) -> str:
+def stringify(obj: Any, kv_delimiter: str = '=', item_delimiter: str = ', ') -> str:
     """Stringify recursively the given object.
 
     Args:
@@ -420,8 +488,15 @@ def stringify(obj: Any, kv_delimiter: str = '=', item_delimiter: str = ', ', *ar
         str: The stringified object.
     """
 
-    return _process_obj(obj, _stringify_mapping, _stringify_iterable, _stringify_class, _stringify_default,
-                        kv_delimiter, item_delimiter, str, *args, **kwargs)
+    processor = Processor(mapping_handler=_stringify_mapping,
+                          iterable_handler=_stringify_iterable,
+                          class_handler=_stringify_class,
+                          default_handler=str,
+                          kv_delimiter=kv_delimiter,
+                          item_delimiter=item_delimiter,
+                          key_converter=str)
+
+    return processor(obj)
 
 
 def stream(mapping: Mapping, item_factory: Callable[[Any, Any], Any] | None = None) -> Generator[Any, Any, None]:

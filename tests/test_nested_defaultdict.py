@@ -87,7 +87,7 @@ def test_non_callable_default_factory():
 def test_negative_nesting_depth():
     import pytest
     # Arrange & Act & Assert
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError):
         nested_defaultdict(-1, int)
 
 
