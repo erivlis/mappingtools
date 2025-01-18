@@ -3,7 +3,7 @@ import random
 
 import pytest
 
-from mappingtools import flattened
+from mappingtools.operators import flattened
 
 
 # Flatten a nested dictionary into a single-level dictionary with tuple keys

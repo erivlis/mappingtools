@@ -3,7 +3,7 @@ import random
 
 import pytest
 
-from mappingtools import stringify
+from mappingtools.transformers import stringify
 
 
 # Basic mapping object is stringified with default delimiters

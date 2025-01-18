@@ -3,7 +3,7 @@ from collections import Counter
 
 import pytest
 
-from mappingtools import keep
+from mappingtools.operators import keep
 
 
 def test_keep_invalid_input():

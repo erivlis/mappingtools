@@ -4,7 +4,7 @@ from collections import OrderedDict, namedtuple
 
 import pytest
 
-from mappingtools import stream
+from mappingtools.operators import stream
 
 
 # Converts mapping to namedtuples correctly

@@ -3,7 +3,7 @@ from collections import defaultdict
 
 import pytest
 
-from mappingtools import MappingCollector, MappingCollectorMode
+from mappingtools.collectors import MappingCollector, MappingCollectorMode
 
 
 # Initialization with default mode

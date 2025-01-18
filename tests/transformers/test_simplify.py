@@ -3,7 +3,8 @@ import dataclasses
 
 import pytest
 
-from mappingtools import CIRCULAR_REFERENCE, simplify
+from mappingtools.transformers import simplify
+from mappingtools.transformers.transformer import CIRCULAR_REFERENCE
 
 
 #  Converts a list of dictionaries to a list of simplified dictionaries
