@@ -2,6 +2,7 @@
 from collections import Counter
 
 import pytest
+
 from mappingtools import CategoryCounter
 
 fruits = ['apple', 'apricot', 'banana', 'cherry', 'pear', 'pineapple', 'plum', 'banana']

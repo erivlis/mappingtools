@@ -132,18 +132,18 @@ def test_simplify_deeply_nested_structures():
     assert actual == expected
 
 
-#  Handles objects with circular references
-# def test_simplify_circular_references():
-#     # Arrange
-#     obj = {}
-#     obj['self'] = obj
-#
-#     # Act & Assert (should not raise an error)
-#     try:
-#         dictify(obj)
-#         assert True  # If no exception is raised, the test passes.
-#     except RecursionError:
-#         assert False  # If a RecursionError is raised, the test fails.
+ # Handles objects with circular references
+def test_simplify_circular_references():
+    # Arrange
+    obj = {}
+    obj['self'] = obj
+
+    # Act & Assert (should not raise an error)
+    try:
+        simplify(obj)
+        assert True, 'If no exception is raised, the test passes.'
+    except RecursionError:
+        assert False, 'If a RecursionError is raised, the test fails.'
 
 #  Handles mixed types within lists
 def test_simplify_mixed_types_within_lists():

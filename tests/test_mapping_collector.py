@@ -2,6 +2,7 @@
 from collections import defaultdict
 
 import pytest
+
 from mappingtools import MappingCollector, MappingCollectorMode
 
 
