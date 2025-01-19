@@ -56,6 +56,10 @@ nested defaultdicts, and unwrapping complex objects.
       <br>
       <a href="https://app.codacy.com/gh/erivlis/mappingtools/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"><img alt="Codacy Quality" src="https://app.codacy.com/project/badge/Grade/8b83a99f939b4883ae2f37d7ec3419d1"></a>
       <a href="https://app.codacy.com/gh/erivlis/mappingtools/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage"><img alt="Codacy Coverage" src="https://app.codacy.com/project/badge/Coverage/8b83a99f939b4883ae2f37d7ec3419d1"/></a>
+      <br>
+      <a href="https://www.codefactor.io/repository/github/erivlis/mappingtools/overview/main"><img src="https://www.codefactor.io/repository/github/erivlis/mappingtools/badge/main" alt="CodeFactor" /></a>
+      <br>
+      <a href="https://snyk.io/test/github/erivlis/mappingtools"><img alt="Snyk" src="https://snyk.io/test/github/erivlis/mappingtools/badge.svg"></a>
     </td>
   </tr>
 </table>
