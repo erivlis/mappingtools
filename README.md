@@ -1,8 +1,8 @@
 # MappingTools
 
-> Do stuff with Mappings and more!!!
+> Do stuff with Mappings and more
 
-## Introdcution
+## Introduction
 
 This library provides utility functions for manipulating and transforming data structures which have or include
 Mapping-like characteristics. Including inverting dictionaries, converting class like objects to dictionaries, creating
@@ -12,30 +12,37 @@ nested defaultdicts, and unwrapping complex objects.
   <tr style="vertical-align: middle;">
     <td>Package</td>
     <td>
-      <img alt="PyPI - version" src="https://img.shields.io/pypi/v/mappingtools">
-      <img alt="PyPI - Status" src="https://img.shields.io/pypi/status/mappingtools">
-      <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/mappingtools">
-      <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dd/mappingtools">
-      <br>
+      <img alt="PyPI - Version" class="off-glb" loading="lazy" src="https://img.shields.io/pypi/v/mappingtools.svg?logo=pypi&logoColor=lightblue">
+      <img alt="PyPI - Status" class="off-glb" loading="lazy" src="https://img.shields.io/pypi/status/mappingtools.svg?logo=pypi&logoColor=lightblue">
+      <img alt="PyPI - Python Version" class="off-glb" loading="lazy" src="https://img.shields.io/pypi/pyversions/mappingtools.svg?logo=python&label=Python&logoColor=lightblue">
+      <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dd/mappingtools.svg?logo=pypi&logoColor=lightblue">
+      <img alt="Libraries.io SourceRank" src="https://img.shields.io/librariesio/sourcerank/pypi/mappingtools.svg?logo=Libraries.io&label=SourceRank">
+    </td>
+  </tr>
+  <tr>
+    <td>Code</td>
+    <td>
       <img alt="GitHub" src="https://img.shields.io/github/license/erivlis/mappingtools">
-      <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/erivlis/mappingtools">
-      <img alt="GitHub last commit (by committer)" src="https://img.shields.io/github/last-commit/erivlis/mappingtools">
-      <a href="https://github.com/erivlis/mappingtools/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/erivlis/mappingtools.svg"></a>
+      <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/erivlis/mappingtools.svg?label=Size&logo=git">
+      <img alt="GitHub last commit (by committer)" src="https://img.shields.io/github/last-commit/erivlis/mappingtools.svg?&logo=git">
+      <a href="https://github.com/erivlis/mappingtools/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/erivlis/mappingtools.svg?&logo=git"></a>
     </td>
   </tr>
   <tr>
     <td>Tools</td>
     <td>
       <a href="https://www.jetbrains.com/pycharm/"><img alt="PyCharm" src="https://img.shields.io/badge/PyCharm-FCF84A.svg?logo=PyCharm&logoColor=black&labelColor=21D789&color=FCF84A"></a>
-      <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff" style="max-width:100%;"></a>
-      <a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv" style="max-width:100%;"></a>
-      <!-- a href="https://squidfunk.github.io/mkdocs-material/"><img src="https://img.shields.io/badge/Material_for_MkDocs-526CFE?&logo=MaterialForMkDocs&logoColor=white&labelColor=grey"></a -->
+      <a href="https://github.com/astral-sh/uv"><img alt="uv" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" style="max-width:100%;"></a>
+      <a href="https://github.com/astral-sh/ruff"><img  alt="Ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" style="max-width:100%;"></a>
+      <!--a href="https://squidfunk.github.io/mkdocs-material/"><img src="https://img.shields.io/badge/Material_for_MkDocs-526CFE?&logo=MaterialForMkDocs&logoColor=white&labelColor=grey"></a-->
+      <a href="https://hatch.pypa.io"><img alt="Hatch project" class="off-glb" loading="lazy" src="https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg"></a>
     </td>
   </tr>
   <tr>
     <td>CI/CD</td>
     <td>
-      <a href="https://github.com/erivlis/mappingtools/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/erivlis/mappingtools/actions/workflows/test.yml/badge.svg?branch=main"></a>
+      <a href="https://github.com/erivlis/mappingtools/actions/workflows/test.yml"><img alt="Test" src="https://github.com/erivlis/mappingtools/actions/workflows/test.yml/badge.svg"></a>
+      <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml"><img alt="Publish" src="https://github.com/erivlis/mappingtools/actions/workflows/test-beta.yml/badge.svg"></a>
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml"><img alt="Publish" src="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml/badge.svg"></a>
       <!--a href="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml"><img alt="Publish Docs" src="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml/badge.svg"></a-->
     </td>
@@ -44,29 +51,63 @@ nested defaultdicts, and unwrapping complex objects.
     <td>Scans</td>
     <td>
       <a href="https://codecov.io/gh/erivlis/mappingtools"><img alt="Coverage" src="https://codecov.io/gh/erivlis/mappingtools/graph/badge.svg?token=POODT8M9NV"/></a>
-      <br>
       <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=alert_status"></a>
       <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Security Rating" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=security_rating"></a>
       <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Maintainability Rating" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=sqale_rating"></a>
       <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Reliability Rating" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=reliability_rating"></a>
-      <br>
       <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Lines of Code" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=ncloc"></a>
       <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Vulnerabilities" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=vulnerabilities"></a>
       <a href="https://sonarcloud.io/summary/new_code?id=erivlis_mappingtools"><img alt="Bugs" src="https://sonarcloud.io/api/project_badges/measure?project=erivlis_mappingtools&metric=bugs"></a>
-      <br>
       <a href="https://app.codacy.com/gh/erivlis/mappingtools/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"><img alt="Codacy Quality" src="https://app.codacy.com/project/badge/Grade/8b83a99f939b4883ae2f37d7ec3419d1"></a>
       <a href="https://app.codacy.com/gh/erivlis/mappingtools/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage"><img alt="Codacy Coverage" src="https://app.codacy.com/project/badge/Coverage/8b83a99f939b4883ae2f37d7ec3419d1"/></a>
-      <br>
       <a href="https://www.codefactor.io/repository/github/erivlis/mappingtools/overview/main"><img src="https://www.codefactor.io/repository/github/erivlis/mappingtools/badge/main" alt="CodeFactor" /></a>
-      <br>
       <a href="https://snyk.io/test/github/erivlis/mappingtools"><img alt="Snyk" src="https://snyk.io/test/github/erivlis/mappingtools/badge.svg"></a>
     </td>
   </tr>
+  <tr>
+    <td>Trends</td>
+  </tr>
 </table>
+
+## Overview
+
+The `MappingTools` library is organized into several namespaces, each containing specific functionalities for
+manipulating and transforming data structures. Below is a brief description of the main namespaces within the library:
+
+### `collectors`
+
+This namespace contains classes and functions for collecting and categorizing data items into mappings.
+
+- **`CategoryCounter`**: Extends a dictionary to count occurrences of data items categorized by multiple categories.
+- **`MappingCollector`**: Collects key-value pairs into an internal mapping based on different modes (ALL, COUNT,
+  DISTINCT, FIRST, LAST).
+- **`nested_defaultdict`**: Creates a nested `defaultdict` with specified depth and factory.
+
+### `operators`
+
+This namespace provides functions that perform operations on mappings.
+
+- **`distinct`**: Yields distinct values for a specified key across multiple mappings.
+- **`keep`**: Yields subsets of mappings by retaining only the specified keys.
+- **`remove`**: Yields mappings with specified keys removed.
+- **`inverse`**: Swaps keys and values in a dictionary.
+- **`flattened`**: Converts a nested mapping structure into a single-level dictionary by flattening the keys into
+  tuples.
+- **`stream`**: Generates items from a mapping, optionally applying a factory function to each key-value pair.
+- **`stream_dict_records`**: Generates dictionary records from a mapping with customizable key and value names.
+
+### `transformers`
+
+This namespace includes functions that reshape objects while maintaining the consistency of their structure.
+
+- **`listify`**: Transforms complex objects into a list of dictionaries with key and value pairs.
+- **`simplify`**: Converts objects to strictly structured dictionaries.
+- **`strictify`**: Applies a strict structural conversion to an object using optional converters for keys and values.
+- **`stringify`**: Converts an object into a string representation by recursively processing it based on its type.
 
 ## Usage
 
-### Collectors
+### [Collectors](#collectors)
 
 Collectors are classes that collect data items into a Mapping.
 
@@ -89,7 +130,7 @@ print(counter.total)
 # Output: Counter({'apple': 2, 'banana': 1})
 
 print(counter)
-# Output: CategoryCounter({'type': defaultdict(<class 'collections.Counter'>, {'fruit': Counter({'apple': 2, 'banana': 1})}), 'char_count': defaultdict(<class 'collections.Counter'>, {5: Counter({'apple': 2}), 6: Counter({'banana': 1})}), 'unique_char_count': defaultdict(<class 'collections.Counter'>, {4: Counter({'apple': 2}), 3: Counter({'banana': 1})})})
+# output: CategoryCounter({'type': defaultdict(<class 'collections.Counter'>, {'fruit': Counter({'apple': 2, 'banana': 1})}), 'char_count': defaultdict(<class 'collections.Counter'>, {5: Counter({'apple': 2}), 6: Counter({'banana': 1})}), 'unique_char_count': defaultdict(<class 'collections.Counter'>, {4: Counter({'apple': 2}), 3: Counter({'banana': 1})})})
 ```
 
 #### `MappingCollector`
@@ -108,7 +149,7 @@ collector.add('a', 1)
 collector.add('a', 2)
 collector.collect([('b', 3), ('b', 4)])
 print(collector.mapping)
-# Output: {'a': [1, 2], 'b': [3, 4]}
+# output: {'a': [1, 2], 'b': [3, 4]}
 ```
 
 #### `nested_defaultdict`
@@ -123,10 +164,10 @@ from mappingtools.collectors import nested_defaultdict
 nested_dd = nested_defaultdict(1, list)
 nested_dd[0][1].append('value')
 print(nested_dd)
-# Output: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {0: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {1: ['value']})})
+# output: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {0: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {1: ['value']})})
 ```
 
-### Operators
+### `Operators`
 
 Operators are functions that perform operations on Mappings.
 
@@ -146,7 +187,7 @@ mappings = [
 ]
 distinct_values = list(distinct('a', *mappings))
 print(distinct_values)
-# Output: [1, 2]
+# output: [1, 2]
 ```
 
 #### `keep`
@@ -163,8 +204,9 @@ mappings = [
     {'a': 4, 'b': 5, 'd': 6}
 ]
 keys_to_keep = ['a', 'b']
-result = list(keep(keys_to_keep, *mappings))
-# result: [{'a': 1, 'b': 2}, {'a': 4, 'b': 5}]
+output = list(keep(keys_to_keep, *mappings))
+print(output)
+# output: [{'a': 1, 'b': 2}, {'a': 4, 'b': 5}]
 ```
 
 #### `remove`
@@ -182,8 +224,9 @@ mappings = [
     {'a': 4, 'b': 5, 'd': 6}
 ]
 keys_to_remove = ['a', 'b']
-result = list(remove(keys_to_remove, *mappings))
-# result: [{'c': 3}, {'d': 6}]
+output = list(remove(keys_to_remove, *mappings))
+print(output)
+# output: [{'c': 3}, {'d': 6}]
 ```
 
 #### `inverse`
@@ -198,7 +241,7 @@ from mappingtools.operators import inverse
 original_mapping = {'a': {1, 2}, 'b': {3}}
 inverted_mapping = inverse(original_mapping)
 print(inverted_mapping)
-# Output: defaultdict(<class 'set'>, {1: {'a'}, 2: {'a'}, 3: {'b'}})
+# output: defaultdict(<class 'set'>, {1: {'a'}, 2: {'a'}, 3: {'b'}})
 ```
 
 #### `flattened`
@@ -216,7 +259,8 @@ nested_dict = {
     'e': 3
 }
 flat_dict = flattened(nested_dict)
-# Expected output: {('a', 'b'): 1, ('a', 'c', 'd'): 2, ('e',): 3}
+print(flat_dict)
+# output: {('a', 'b'): 1, ('a', 'c', 'd'): 2, ('e',): 3}
 ```
 
 #### `stream`
@@ -240,7 +284,8 @@ my_mapping = {'a': 1, 'b': 2, 'c': 3}
 
 for item in stream(my_mapping, custom_factory):
     print(item)
-# Output:
+
+# output:
 # a: 1
 # b: 2
 # c: 3
@@ -253,7 +298,7 @@ for item in stream(data, MyTuple):
     print(item)
 
 
-# Output:
+# output:
 # MyTuple(key='a', value=1)
 # MyTuple(key='b', value=2)
 
@@ -264,6 +309,7 @@ def record(k, v):
 
 for item in stream(data, record):
     print(item)
+
 # output:
 # {'key': 'a', 'value': 1}
 # {'key': 'b', 'value': 2}
@@ -283,12 +329,12 @@ mapping = {'a': 1, 'b': 2}
 records = stream_dict_records(mapping, key_name='letter', value_name='number')
 for record in records:
     print(record)
-# Output:
+# output:
 # {'letter': 'a', 'number': 1}
 # {'letter': 'b', 'number': 2}
 ```
 
-### Transformers
+### `Transformers`
 
 Transformers are functions that reshape an object, while maintaining the consistency of the structure.
 
@@ -304,7 +350,7 @@ from mappingtools.transformers import listify
 wrapped_data = {'key1': {'subkey': 'value'}, 'key2': ['item1', 'item2']}
 unwrapped_data = listify(wrapped_data)
 print(unwrapped_data)
-# Output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
+# output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
 ```
 
 #### `simplify`
@@ -334,7 +380,7 @@ simplified_counter = simplify(counter)
 print(simplified_counter)
 
 
-# Output: {'a': 1, 'b': 2}
+# output: {'a': 1, 'b': 2}
 
 
 @dataclass
@@ -350,13 +396,12 @@ class SampleDataClass:
 
 sample_datetime = datetime(2024, 7, 22, 21, 42, 17, 314159)
 sample_dataclass = SampleDataClass(1, 2, '11', '22', [1, 2], {'aaa': 111, 'bbb': '222'}, sample_datetime)
-
 print(sample_dataclass)
-# Output: SampleDataClass(a=1, b=2, aa='11', bb='22', c=[1, 2], d={'aaa': 111, 'bbb': '222'}, e=datetime.datetime(2024, 7, 22, 21, 42, 17, 314159))
+# output: SampleDataClass(a=1, b=2, aa='11', bb='22', c=[1, 2], d={'aaa': 111, 'bbb': '222'}, e=datetime.datetime(2024, 7, 22, 21, 42, 17, 314159))
 
 simplified_sample_dataclass = simplify(sample_dataclass)
 print(simplified_sample_dataclass)
-# Output: {'a': 1, 'aa': '11', 'b': 2, 'bb': '22', 'c': [1, 2], 'd': {'aaa': 111, 'bbb': '222'}, 'e': datetime.datetime(2024, 7, 22, 21, 42, 17, 314159)}
+# output: {'a': 1, 'aa': '11', 'b': 2, 'bb': '22', 'c': [1, 2], 'd': {'aaa': 111, 'bbb': '222'}, 'e': datetime.datetime(2024, 7, 22, 21, 42, 17, 314159)}
 ```
 
 #### `strictify`
@@ -380,7 +425,7 @@ def double_value(value):
 data = {'a': 1, 'b': 2}
 result = strictify(data, key_converter=uppercase_key, value_converter=double_value)
 print(result)
-# Output: {'A': 2, 'B': 4}
+# output: {'A': 2, 'B': 4}
 ```
 
 #### `stringify`
@@ -396,13 +441,13 @@ data = {'key1': 'value1', 'key2': 'value2'}
 result = stringify(data)
 
 print(result)
-# Output: "key1=value1, key2=value2"
+# output: "key1=value1, key2=value2"
 
 data = [1, 2, 3]
 result = stringify(data)
 
 print(result)
-# Output: "[1, 2, 3]"
+# output: "[1, 2, 3]"
 ```
 
 ## Development
