@@ -20,7 +20,7 @@ class Transformer:
                  *args,
                  **kwargs):
         """
-        Initialize the Processor with optional handlers for different types of objects.
+        Initialize the Transformer with optional handlers for different types of objects.
 
         Args:
             mapping_handler (Optional[Callable]): Handler for mapping objects.
@@ -43,24 +43,24 @@ class Transformer:
 
     def __call__(self, obj: Any):
         """
-           Process the given object using the appropriate handler.
+           Transform the given object using the appropriate handler.
 
            Args:
-               obj (Any): The object to process.
+               obj (Any): The object to transform.
 
            Returns:
-               Any: The processed object.
+               Any: The transformed object.
            """
         obj_id = id(obj)
         self.objects_counter[obj_id] += 1
         if self.objects_counter[obj_id] == 1:
-            processed_obj = self._process(obj)
-            self.objects[obj_id] = processed_obj
+            transformed_obj = self._transform(obj)
+            self.objects[obj_id] = transformed_obj
             return self.objects[obj_id]
         elif self.objects_counter[obj_id] == 2:
             return self.objects.get(obj_id, CIRCULAR_REFERENCE)
 
-    def _process(self, obj: Any):
+    def _transform(self, obj: Any):
         if callable(self.mapping_handler) and isinstance(obj, Mapping):
             return self.mapping_handler(obj, self, *self.args, **self.kwargs)
         elif callable(self.iterable_handler) and _is_strict_iterable(obj):
