@@ -64,9 +64,6 @@ nested defaultdicts, and unwrapping complex objects.
       <a href="https://snyk.io/test/github/erivlis/mappingtools"><img alt="Snyk" src="https://snyk.io/test/github/erivlis/mappingtools/badge.svg"></a>
     </td>
   </tr>
-  <tr>
-    <td>Trends</td>
-  </tr>
 </table>
 
 ## Overview
