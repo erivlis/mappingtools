@@ -25,8 +25,6 @@ classifiers = [
     "Typing :: Typed"
 ]
 keywords = ['Mapping', 'manipulate', 'mutate', 'transform']
-#dependencies = []
-
 
 [project.urls]
 "Homepage" = "https://erivlis.github.io/mappingtools"
@@ -34,10 +32,11 @@ keywords = ['Mapping', 'manipulate', 'mutate', 'transform']
 "Bug Tracker" = "https://github.com/erivlis/mappingtools/issues"
 "Source" = "https://github.com/erivlis/mappingtools"
 
-
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
+    "uv",
     "ruff",
+    "pipdeptree"
 ]
 docs = [
     "mkdocs-material",
@@ -49,11 +48,14 @@ docs = [
     "mkdocs-section-index",
 ]
 test = [
+    "faker",
     "pytest",
+    "pytest-asyncio",
     "pytest-cov",
     "pytest-randomly",
     "pytest-xdist"
 ]
+
 
 
 [build-system]
