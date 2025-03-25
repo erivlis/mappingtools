@@ -136,7 +136,7 @@ select = [
     "TRY",
     "RUF",
 ]
-ignore = ["F401", "PT011", "TRY003"]
+ignore = ["F401", "PT011","RUF001", "TRY003"]
 # Exclude a variety of commonly ignored directories.
 exclude = [
     ".bzr",

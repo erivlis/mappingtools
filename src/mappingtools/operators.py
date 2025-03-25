@@ -1,7 +1,9 @@
+import itertools
+import string
 from collections import defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping
 from itertools import chain
-from typing import Any
+from typing import Any, LiteralString
 
 from mappingtools._tools import _is_strict_iterable
 from mappingtools.typing import K
@@ -154,4 +156,32 @@ def stream_dict_records(mapping: Mapping,
     yield from stream(mapping, record)
 
 
-__all__ = ['distinct', 'flattened', 'inverse', 'keep', 'remove', 'stream', 'stream_dict_records']
+def unique_strings(alphabet: str = string.ascii_uppercase, string_length: int = 0):
+    """Generates an endless stream of the shortest possible strings using the given alphabet.
+
+    Args:
+        alphabet (str): The alphabet to use for generating strings. Defaults to string.ascii_uppercase.
+        string_length (int, optional): The length of the strings to generate. Defaults to 0.
+            If length is 0, the generator will start with strings of length 1 and increase the length indefinitely.
+
+    Yields:
+        str: The generated strings.
+    """
+
+    def _strings(_length: int):
+        for s in itertools.product(alphabet, repeat=_length):
+            yield ''.join(s)
+
+    if string_length > 0:
+        yield from _strings(string_length)
+    else:
+        _length = 1
+        while True:
+            yield from _strings(_length)
+            _length += 1
+
+
+__all__ = ['distinct', 'flattened', 'inverse', 'keep', 'remove', 'stream', 'stream_dict_records', 'unique_strings']
+
+
+

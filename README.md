@@ -332,6 +332,35 @@ for record in records:
 # {'letter': 'b', 'number': 2}
 ```
 
+#### `unique_string`
+
+The unique_strings function generates an endless stream of the shortest possible strings using a specified alphabet.
+By default, it uses the uppercase English alphabet (string.ascii_uppercase).
+The function can generate strings of a fixed length or start with the shortest strings and increase the length
+indefinitely.
+
+<!-- name: test_unique_string -->
+
+```python
+from mappingtools.operators import unique_strings
+
+alphabet1 = 'AB'
+string_length = 3
+generator1 = unique_strings(alphabet1, string_length)
+
+for s in list(generator1):
+    print(s)
+
+print('---------------')
+
+# Example 2: Generate strings of increasing length
+alphabet2 = '01'
+generator2 = unique_strings(alphabet2)
+
+for _ in range(10):
+    print(next(generator2))
+```
+
 ### `Transformers`
 
 Transformers are functions that reshape an object, while maintaining the consistency of the structure.
@@ -349,6 +378,47 @@ wrapped_data = {'key1': {'subkey': 'value'}, 'key2': ['item1', 'item2']}
 unwrapped_data = listify(wrapped_data)
 print(unwrapped_data)
 # output: [{'key': 'key1', 'value': [{'key': 'subkey', 'value': 'value'}]}, {'key': 'key2', 'value': ['item1', 'item2']}]
+```
+
+#### `minify`
+
+The minify function is designed to shorten the keys of an object using a specified alphabet.
+This function can be particularly useful for reducing the size of data structures, making
+them more efficient for storage or transmission.
+
+<!-- name: test_minify -->
+
+```python
+from mappingtools.transformers import minify
+
+data = [
+    {
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'age': 30,
+        'address': {
+            'street': '123 Main St',
+            'city': 'New York',
+            'state': 'CA'
+        }
+    },
+    {
+        'first_name': 'Jane',
+        'last_name': 'Smith',
+        'age': 25,
+        'address': {
+            'street': '456 Rodeo Dr',
+            'city': 'Los Angeles',
+            'state': 'CA'
+        }
+    }
+]
+
+# Minify the dictionary keys
+minified_dict = minify(data)
+
+print(minified_dict)
+# [{'A': 'John', 'B': 'Doe', 'C': 30, 'D': {'E': '123 Main St', 'F': 'New York', 'G': 'CA'}}, {'A': 'Jane', 'B': 'Smith', 'C': 25, 'D': {'E': '456 Rodeo Dr', 'F': 'Los Angeles', 'G': 'CA'}}]
 ```
 
 #### `simplify`
