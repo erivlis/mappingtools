@@ -3,7 +3,7 @@ import string
 from collections import defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping
 from itertools import chain
-from typing import Any, LiteralString
+from typing import Any
 
 from mappingtools._tools import _is_strict_iterable
 from mappingtools.typing import K
@@ -182,6 +182,3 @@ def unique_strings(alphabet: str = string.ascii_uppercase, string_length: int = 
 
 
 __all__ = ['distinct', 'flattened', 'inverse', 'keep', 'remove', 'stream', 'stream_dict_records', 'unique_strings']
-
-
-
