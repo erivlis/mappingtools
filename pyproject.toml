@@ -28,15 +28,15 @@ keywords = ['Mapping', 'manipulate', 'mutate', 'transform']
 
 [project.urls]
 "Homepage" = "https://erivlis.github.io/mappingtools"
-#"Documentation" = "https://erivlis.github.io/mappingtools"
+"Documentation" = "https://erivlis.github.io/mappingtools/README.md"
 "Bug Tracker" = "https://github.com/erivlis/mappingtools/issues"
 "Source" = "https://github.com/erivlis/mappingtools"
 
 [dependency-groups]
 dev = [
-    "uv",
+    "pipdeptree",
     "ruff",
-    "pipdeptree"
+    "uv"
 ]
 docs = [
     "mkdocs-material",
@@ -136,7 +136,7 @@ select = [
     "TRY",
     "RUF",
 ]
-ignore = ["F401", "PT011","RUF001", "TRY003"]
+ignore = ["F401", "PT011", "RUF001", "TRY003"]
 # Exclude a variety of commonly ignored directories.
 exclude = [
     ".bzr",
