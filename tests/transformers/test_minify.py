@@ -154,7 +154,6 @@ def test_minify_custom_alphabet():
     # Arrange
     import string
 
-    from mappingtools.transformers.minify import minify
     original = {
         "name": "John",
         "age": 30,

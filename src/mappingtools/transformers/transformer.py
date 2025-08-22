@@ -50,7 +50,7 @@ class Transformer:
 
            Returns:
                Any: The transformed object.
-           """
+        """
         obj_id = id(obj)
         self.objects_counter[obj_id] += 1
         if self.objects_counter[obj_id] == 1:
@@ -59,6 +59,7 @@ class Transformer:
             return self.objects[obj_id]
         elif self.objects_counter[obj_id] == 2:
             return self.objects.get(obj_id, CIRCULAR_REFERENCE)
+        return None
 
     def _transform(self, obj: Any):
         if callable(self.mapping_handler) and isinstance(obj, Mapping):

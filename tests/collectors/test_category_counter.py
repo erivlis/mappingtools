@@ -120,10 +120,10 @@ def test_update_with_mixed_data_types():
     counter = CategoryCounter()
     data = ['apple', 1, 2.5, 1, 1]
 
-    # Act & Assert
-    # with pytest.raises(TypeError):
+    # Act
     counter.update(data)
 
+    # Assert
     assert counter.total == Counter({'apple': 1, 1: 3, 2.5: 1})
 
 

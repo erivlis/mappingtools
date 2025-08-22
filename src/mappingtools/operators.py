@@ -169,8 +169,7 @@ def unique_strings(alphabet: str = string.ascii_uppercase, string_length: int = 
     """
 
     def _strings(_length: int):
-        for s in itertools.product(alphabet, repeat=_length):
-            yield ''.join(s)
+        yield from (''.join(s) for s in itertools.product(alphabet, repeat=_length))
 
     if string_length > 0:
         yield from _strings(string_length)
