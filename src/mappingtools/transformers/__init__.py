@@ -5,4 +5,11 @@ from .strictify import strictify
 from .stringify import stringify
 from .transformer import Transformer
 
-__all__ = ['Transformer', 'listify', 'minify', 'simplify', 'strictify', 'stringify']
+__all__ = (
+    'Transformer',
+    'listify',
+    'minify',
+    'simplify',
+    'strictify',
+    'stringify'
+)
