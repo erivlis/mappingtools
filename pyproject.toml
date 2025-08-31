@@ -1,6 +1,6 @@
 [project]
 name = "mappingtools"
-version = "0.4.1"
+version = "0.5.0"
 authors = [
     { name = "Eran Rivlis", email = "eran@rivlis.info" },
 ]
