@@ -244,6 +244,18 @@ class StringArrangements:
 def probabilities(length: int,
                   alphabet: str = string.ascii_uppercase,
                   distribution: Callable[[str], float] | None = None):
+    """
+    Generate probabilities for all possible string arrangements of a given length using the defined alphabet.
+
+    Args:
+        length (int): The length of the strings to generate.
+        alphabet (str): The alphabet to use for generating strings. Defaults to string.ascii_uppercase.
+        distribution (Callable[[str], float] | None, optional): A function that takes a string and returns its
+            probability. If None, a uniform distribution is assumed. Defaults to None.
+
+    Yields:
+        Generator[float]: A generator of probabilities for each string arrangement.
+    """
     if distribution is None or not callable(distribution):
         alphabet_length = len(alphabet)
 
@@ -256,7 +268,19 @@ def probabilities(length: int,
         yield distribution(x)
 
 
-def entropy(length: int, alphabet: str = string.ascii_uppercase, distribution: Callable[[str], float] | None = None):
+def shannon_entropy(length: int, alphabet: str = string.ascii_uppercase,
+                    distribution: Callable[[str], float] | None = None):
+    """
+    Calculate the Shannon entropy for all possible string arrangements of a given length using the defined alphabet.
+    Args:
+        length: int - The length of the strings to generate.
+        alphabet: str - The alphabet to use for generating strings. Defaults to string.ascii_uppercase.
+        distribution: Callable[[str], float] | None - A function that takes a string and returns its probability.
+            If None, a uniform distribution is assumed. Defaults to None.
+
+    Returns:
+        float: The Shannon entropy of the string arrangements.
+    """
     return -sum(p * math.log(p) for p in probabilities(length, alphabet, distribution))
 
 
