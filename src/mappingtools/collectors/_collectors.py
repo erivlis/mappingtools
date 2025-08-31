@@ -1,7 +1,9 @@
+import string
 from collections import Counter, defaultdict
 from collections.abc import Callable
 from typing import Any
 
+from mappingtools._tools import unique_strings
 from mappingtools.typing import Category
 
 
@@ -34,6 +36,23 @@ class CategoryCounter(dict[str, defaultdict[Category, Counter]]):
             self[category_name][category_value].update(data)
 
 
+class MinifyingMapper:
+    """
+    Minify keys using the provided alphabet.
+    """
+
+    def __init__(self, alphabet: str = string.ascii_uppercase):
+        self._us = unique_strings(alphabet)
+
+        def _next_key():
+            return next(self._us)
+
+        self._minified_keys = defaultdict(_next_key)
+
+    def get(self, key):
+        return self._minified_keys[key]
+
+
 def nested_defaultdict(nesting_depth: int = 0, default_factory: Callable | None = None, **kwargs) -> defaultdict:
     """Return a nested defaultdict with the specified nesting depth and default factory.
     A nested_defaultdict with nesting_depth=0 is equivalent to builtin 'collections.defaultdict'.
@@ -61,5 +80,3 @@ def nested_defaultdict(nesting_depth: int = 0, default_factory: Callable | None 
             return default_factory() if default_factory else None
 
     return defaultdict(factory, **kwargs)
-
-

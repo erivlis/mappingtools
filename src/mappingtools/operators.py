@@ -1,6 +1,3 @@
-import itertools
-import math
-import string
 from collections import defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping
 from itertools import chain
@@ -8,6 +5,16 @@ from typing import Any
 
 from mappingtools._tools import _is_strict_iterable
 from mappingtools.typing import K
+
+__all__ = [
+    'distinct',
+    'flattened',
+    'inverse',
+    'keep',
+    'remove',
+    'stream',
+    'stream_dict_records',
+]
 
 
 def _take(keys: Iterable[K], mapping: Mapping[K, Any], exclude: bool = False) -> dict[K, Any]:
@@ -155,157 +162,3 @@ def stream_dict_records(mapping: Mapping,
         return {key_name: k, value_name: v}
 
     yield from stream(mapping, record)
-
-
-class StringArrangements:
-    """
-    A string arrangement is a permutation with repetition of characters taken from the alphabet.
-    The ordinality of the generated strings is determined by the ordinality expressed by the characters'
-    order within the input alphabet.
-    """
-
-    @classmethod
-    def ascii_uppercase(cls):
-        return cls(string.ascii_uppercase)
-
-    @classmethod
-    def ascii_lowercase(cls):
-        return cls(string.ascii_lowercase)
-
-    @classmethod
-    def ascii_letters(cls):
-        return cls(string.ascii_letters)
-
-    @classmethod
-    def ascii_digits(cls):
-        return cls(string.digits)
-
-    @classmethod
-    def hex_digits(cls):
-        return cls(string.hexdigits)
-
-    @classmethod
-    def oct_digits(cls):
-        return cls(string.octdigits)
-
-    def __init__(self, alphabet: str = string.ascii_uppercase):
-        self.alphabet = alphabet
-
-    def count_of(self, word_length: int) -> int:
-        return len(self.alphabet) ** word_length
-
-    def of(self, length: int) -> Generator[str, None, None]:
-        """
-        Generates all possible string arrangements of a given length using the defined alphabet.
-
-        Args:
-            length (int): The length of the strings to generate.
-
-        Yields:
-            Generator[str]: A generator of strings.
-
-        Raises:
-            ValueError: if length is not a positive integer.
-        """
-        if length <= 0:
-            raise ValueError("'length' must be greater than 0.")
-        for s in itertools.product(self.alphabet, repeat=length):
-            yield ''.join(s)
-
-    def stream(self, count: int) -> Generator[str, None, None]:
-        """
-        Generates the given count of possible string arrangements with all lengths.
-        Starting with length 1 then if possible 2 .
-
-        Args:
-            count (int): The number of strings to generate.
-
-        Yields:
-            Generator[str]: A generator of strings.
-
-        Raises:
-            ValueError: if count is not a positive integer.
-
-        """
-        if count <= 0:
-            raise ValueError("'count' must be greater than 0.")
-
-        _length: int = 1
-        _count: int = 0
-        while True:
-            for s in self.of(_length):
-                yield s
-                _count += 1
-                if _count >= count:
-                    break
-            _length += 1
-
-
-def probabilities(length: int,
-                  alphabet: str = string.ascii_uppercase,
-                  distribution: Callable[[str], float] | None = None):
-    """
-    Generate probabilities for all possible string arrangements of a given length using the defined alphabet.
-
-    Args:
-        length (int): The length of the strings to generate.
-        alphabet (str): The alphabet to use for generating strings. Defaults to string.ascii_uppercase.
-        distribution (Callable[[str], float] | None, optional): A function that takes a string and returns its
-            probability. If None, a uniform distribution is assumed. Defaults to None.
-
-    Yields:
-        Generator[float]: A generator of probabilities for each string arrangement.
-    """
-    if distribution is None or not callable(distribution):
-        alphabet_length = len(alphabet)
-
-        def p(_):
-            return alphabet_length ** -length
-
-        distribution = p
-
-    for x in StringArrangements(alphabet).of(length):
-        yield distribution(x)
-
-
-def shannon_entropy(length: int, alphabet: str = string.ascii_uppercase,
-                    distribution: Callable[[str], float] | None = None):
-    """
-    Calculate the Shannon entropy for all possible string arrangements of a given length using the defined alphabet.
-    Args:
-        length: int - The length of the strings to generate.
-        alphabet: str - The alphabet to use for generating strings. Defaults to string.ascii_uppercase.
-        distribution: Callable[[str], float] | None - A function that takes a string and returns its probability.
-            If None, a uniform distribution is assumed. Defaults to None.
-
-    Returns:
-        float: The Shannon entropy of the string arrangements.
-    """
-    return -sum(p * math.log(p) for p in probabilities(length, alphabet, distribution))
-
-
-def unique_strings(alphabet: str = string.ascii_uppercase, string_length: int = 0) -> Generator[Any, Any, None]:
-    """Generates a stream of the strings using the given alphabet and string_length.
-       If string_length=0 (the default), the stream will be **infinite**, and consist of all string lengths.
-
-    Args:
-        alphabet (str): The alphabet to use for generating strings. Defaults to string.ascii_uppercase.
-        string_length (int, optional): The length of the strings to generate. Defaults to 0. If string_length is 0,
-            the generator will start with strings of length 1 and increase the lengths indefinitely.
-
-    Yields:
-        str: The generated strings.
-    """
-
-    string_arrangements = StringArrangements(alphabet)
-
-    if string_length > 0:
-        yield from string_arrangements.of(string_length)
-    else:
-        _length = 1
-        while True:
-            yield from string_arrangements.of(_length)
-            _length += 1
-
-
-__all__ = ['distinct', 'flattened', 'inverse', 'keep', 'remove', 'stream', 'stream_dict_records', 'unique_strings']
