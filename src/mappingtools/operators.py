@@ -157,11 +157,11 @@ def stream_dict_records(mapping: Mapping,
     yield from stream(mapping, record)
 
 
-class StringArrangments:
+class StringArrangements:
     """
     A string arrangement is a permutation with repetition of characters taken from the alphabet.
-    The ordinality of the generated strings, is determined by the ordinality,
-    expressed by the characters' order within the input alphabet.
+    The ordinality of the generated strings is determined by the ordinality expressed by the characters'
+    order within the input alphabet.
     """
 
     @classmethod
@@ -252,7 +252,7 @@ def probabilities(length: int,
 
         distribution = p
 
-    for x in StringArrangments(alphabet).of(length):
+    for x in StringArrangements(alphabet).of(length):
         yield distribution(x)
 
 
@@ -273,14 +273,14 @@ def unique_strings(alphabet: str = string.ascii_uppercase, string_length: int = 
         str: The generated strings.
     """
 
-    string_arrangments = StringArrangments(alphabet)
+    string_arrangements = StringArrangements(alphabet)
 
     if string_length > 0:
-        yield from string_arrangments.of(string_length)
+        yield from string_arrangements.of(string_length)
     else:
         _length = 1
         while True:
-            yield from string_arrangments.of(_length)
+            yield from string_arrangements.of(_length)
             _length += 1
 
 
