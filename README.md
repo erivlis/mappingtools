@@ -75,10 +75,12 @@ manipulating and transforming data structures. Below is a brief description of t
 
 - **collectors** - This namespace contains classes and functions for collecting and categorizing data items into
   mappings.
+    - **AutoMapper** - A Mapping-like class that automatically generates and assigns unique, minified strings values for
+      any new keys accessed.
     - **CategoryCounter** - Extends a dictionary to count occurrences of data items categorized by multiple categories.
     - **MappingCollector** - Collects key-value pairs into an internal mapping based on different modes (ALL, COUNT,
       DISTINCT, FIRST, LAST).
-    - **MinifyingMapper** - A mapping-like map that shortens its keys using a specified alphabet.
+    - **MeteredDict** - A dictionary that tracks changes made to it.
     - **nested_defaultdict** - Creates a nested `defaultdict` with specified depth and factory.
 - **operators** - This namespace provides functions that perform operations on mappings.
     - **distinct** - Yields distinct values for a specified key across multiple mappings.
@@ -102,6 +104,43 @@ manipulating and transforming data structures. Below is a brief description of t
 ### Collectors
 
 Collectors are classes that collect data items into a Mapping.
+
+#### AutoMapper
+
+A Mapping that automatically generates and assigns unique, minified string values for any new keys accessed.
+The values are generated using the specified alphabet.
+
+<!-- name: test_auto_mapper -->
+
+```python
+from mappingtools.collectors import AutoMapper
+
+auto_mapper = AutoMapper()
+print(auto_mapper['example_key'])
+print(auto_mapper['another_key'])
+print(auto_mapper['example_key'])
+auto_mapper
+# output:
+# 'A'
+# 'B'
+# 'A'
+# AutoMapper({'example_key': 'A', 'another_key': 'B'})
+greek_auto_mapper = AutoMapper(alphabet='αβγ')
+print(greek_auto_mapper['first'])
+print(greek_auto_mapper['second'])
+print(greek_auto_mapper['first'])
+print(greek_auto_mapper['third'])
+print(greek_auto_mapper['fourth'])
+print(greek_auto_mapper['fifth'])
+greek_auto_mapper
+# output:
+# 'α'
+# 'β'
+# 'γ'
+# 'αα'
+# 'αβ'
+# AutoMapper({'first': 'α', 'second': 'β', 'third': 'γ', 'fourth': 'αα', 'fifth': 'αβ'})
+```
 
 #### CategoryCounter
 
@@ -144,16 +183,25 @@ print(collector.mapping)
 # output: {'a': [1, 2], 'b': [3, 4]}
 ```
 
-#### MinifyingMapper
+#### MeteredDict
 
-A mapping-like map that shortens its keys using a specified alphabet.
+A dictionary that tracks changes made to it.
 
-<!-- name: test_minifying_mapper -->
+<!-- name: test_metered_dict -->
 
 ```python
-from mappingtools.collectors import MinifyingMapper
+from mappingtools.collectors import MeteredDict
 
-# TBD
+metered_dict = MeteredDict()
+metered_dict['a'] = 1
+metered_dict['b'] = 2
+_ = metered_dict['a']
+
+metered_dict
+# output: {'a': 1, 'b': 2}
+
+metered_dict.summary()
+# output: {'a': {'get': {'count': 1, 'first': datetime.datetime(2025, 10, 26, 9, 3, 52, 347825, tzinfo=datetime.timezone.utc), 'last': datetime.datetime(2025, 10, 26, 9, 3, 52, 347825, tzinfo=datetime.timezone.utc), 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'get_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set': {'count': 1, 'first': datetime.datetime(2025, 10, 26, 9, 3, 52, 347806, tzinfo=datetime.timezone.utc), 'last': datetime.datetime(2025, 10, 26, 9, 3, 52, 347806, tzinfo=datetime.timezone.utc), 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'pop': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}}, 'b': {'get': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'get_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set': {'count': 1, 'first': datetime.datetime(2025, 10, 26, 9, 3, 52, 347820, tzinfo=datetime.timezone.utc), 'last': datetime.datetime(2025, 10, 26, 9, 3, 52, 347820, tzinfo=datetime.timezone.utc), 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'pop': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}}}
 ```
 
 #### nested_defaultdict
@@ -171,7 +219,6 @@ print(nested_dd)
 # output: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {0: defaultdict(<function nested_defaultdict.<locals>.factory at ...>, {1: ['value']})})
 ```
 
-### `Operators`
 ### Operators
 
 Operators are functions that perform operations on Mappings.
@@ -476,7 +523,16 @@ print(result)
 # output: {'A': 2, 'B': 4}
 ```
 
-#### `stringify`
+##### Example 2
+
+```python
+from mappingtools.transformers import strictify
+
+
+
+
+```
+
 #### stringify
 
 Converts an object into a string representation by recursively processing it based on its type.
@@ -522,3 +578,4 @@ python -m pytest tests -n auto --cov=src --cov-branch --doctest-modules --cov-re
 ```shell
 python -m pytest tests -n auto --cov=src --cov-branch --doctest-modules --cov-report=html
 ```
+
