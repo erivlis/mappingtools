@@ -1,6 +1,6 @@
 [project]
 name = "mappingtools"
-version = "0.5.0"
+version = "0.6.0"
 authors = [
     { name = "Eran Rivlis", email = "eran@rivlis.info" },
 ]
@@ -34,29 +34,15 @@ keywords = ['Mapping', 'manipulate', 'mutate', 'transform']
 
 [dependency-groups]
 dev = [
-    "pipdeptree",
     "ruff",
     "uv"
 ]
-docs = [
-    "mkdocs-material",
-    "mkdocstrings-python",
-    "mkdocs-git-revision-date-localized-plugin",
-    "mkdocs-gen-files",
-    "mkdocs-glightbox",
-    "mkdocs-literate-nav",
-    "mkdocs-section-index",
-]
 test = [
-    "faker",
     "pytest",
-    "pytest-asyncio",
     "pytest-cov",
     "pytest-randomly",
     "pytest-xdist"
 ]
-
-
 
 [build-system]
 requires = ["hatchling"]
