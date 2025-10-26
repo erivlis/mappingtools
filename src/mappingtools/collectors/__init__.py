@@ -1,11 +1,12 @@
-from ._collectors import CategoryCounter, MinifyingMapper, nested_defaultdict
+from ._collectors import AutoMapper, CategoryCounter, nested_defaultdict
 from .mapping_collector import MappingCollector, MappingCollectorMode
-
+from .metered_dict import DictOperation, MeteredDict
 
 __all__ = (
+    'AutoMapper',
     'CategoryCounter',
     'MappingCollector',
     'MappingCollectorMode',
-    'MinifyingMapper',
+    'MeteredDict',
     'nested_defaultdict'
 )

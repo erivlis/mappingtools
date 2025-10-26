@@ -1,6 +1,6 @@
 import string
 from collections import Counter, defaultdict
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import Any
 
 from mappingtools._tools import unique_strings
@@ -36,9 +36,26 @@ class CategoryCounter(dict[str, defaultdict[Category, Counter]]):
             self[category_name][category_value].update(data)
 
 
-class MinifyingMapper:
+class AutoMapper(Mapping):
     """
-    Minify keys using the provided alphabet.
+    A Mapping that automatically generates and assigns unique, minified strings
+    for any new keys accessed. The minified keys are generated using the specified alphabet.
+
+    Args:
+        alphabet: str - The alphabet to use for generating minified keys. Default is uppercase ASCII
+          letters (A-Z).
+
+    Example:
+        >>> from mappingtools.collectors import AutoMapper
+        >>> auto_mapper = AutoMapper()
+        >>> auto_mapper['example_key']
+        'A'
+        >>> auto_mapper['another_key']
+        'B'
+        >>> auto_mapper['example_key']
+        'A'
+        >>> auto_mapper
+        {'example_key': 'A', 'another_key': 'B'}
     """
 
     def __init__(self, alphabet: str = string.ascii_uppercase):
@@ -47,10 +64,22 @@ class MinifyingMapper:
         def _next_key():
             return next(self._us)
 
-        self._minified_keys = defaultdict(_next_key)
+        self._mapping = defaultdict(_next_key)
 
-    def get(self, key):
-        return self._minified_keys[key]
+    def __getitem__(self, item):
+        return self._mapping[item]
+
+    def __iter__(self):
+        return iter(self._mapping)
+
+    def __len__(self):
+        return len(self._mapping)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({dict(self._mapping)})"
+
+    def __str__(self):
+        return repr(self)
 
 
 def nested_defaultdict(nesting_depth: int = 0, default_factory: Callable | None = None, **kwargs) -> defaultdict:

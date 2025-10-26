@@ -1,7 +1,7 @@
 import string
 from typing import Any
 
-from mappingtools.collectors import MinifyingMapper
+from mappingtools.collectors import AutoMapper
 from mappingtools.transformers.strictify import strictify
 
 
@@ -16,6 +16,6 @@ def minify(obj: Any, alphabet=string.ascii_uppercase) -> Any:
         Any: The minified object.
     """
 
-    minifying_mapper = MinifyingMapper(alphabet)
+    minifying_mapper = AutoMapper(alphabet)
 
     return strictify(obj, key_converter=minifying_mapper.get)
