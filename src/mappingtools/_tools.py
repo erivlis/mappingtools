@@ -89,11 +89,13 @@ class StringArrangements:
 
         _length: int = 1
         _count: int = 0
-        while True:
+        _continue = True
+        while _continue:
             for s in self.of(_length):
                 yield s
                 _count += 1
                 if _count >= count:
+                    _continue = False
                     break
             _length += 1
 

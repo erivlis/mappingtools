@@ -5,6 +5,7 @@ from .metered_dict import DictOperation, MeteredDict
 __all__ = (
     'AutoMapper',
     'CategoryCounter',
+    'DictOperation',
     'MappingCollector',
     'MappingCollectorMode',
     'MeteredDict',

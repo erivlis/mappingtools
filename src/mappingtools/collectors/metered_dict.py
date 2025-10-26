@@ -1,5 +1,6 @@
 import functools
 from collections import defaultdict, deque
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from enum import Flag, auto
 from typing import Any, Self
@@ -88,22 +89,7 @@ class TimeSeries:
         Returns the duration between the first and last access times.
         If no access has been recorded, it returns 0.0.
         """
-        if self.first and self.last:
-            return self.last - self.first
-        return timedelta()
-
-    def frequency(self) -> float:
-        """
-        Returns the frequency of accesses per second.
-        If the access count is 0 or 1, returns 0.0.
-
-        Returns:
-            float: The frequency of accesses per second.
-        """
-        if self.count <= 1:
-            return 0.0
-        duration_seconds = self.duration().total_seconds()
-        return self.count / duration_seconds if duration_seconds > 0 else 0.0
+        return self.last - self.first if all((self.first, self.last)) else timedelta()
 
     def duration_cma(self, weights: tuple | None) -> float:
         """
@@ -133,6 +119,19 @@ class TimeSeries:
 
     def durations(self) -> list[timedelta]:
         return list(self._durations)
+
+    def frequency(self) -> float:
+        """
+        Returns the frequency of accesses per second.
+        If the access count is 0 or 1, returns 0.0.
+
+        Returns:
+            float: The frequency of accesses per second.
+        """
+        if self.count <= 1:
+            return 0.0
+        duration_seconds = self.duration().total_seconds()
+        return self.count / duration_seconds if duration_seconds > 0 else 0.0
 
     def summary(self) -> dict[str, Any]:
         """
@@ -238,7 +237,18 @@ class MeteredDict(dict[KT, VT_co]):
 
         return default
 
-    def count(self, key: KT, operations: DictOperation | None = None):
+    def _invoke(
+            self,
+            func: Callable[[TimeSeries], Any],
+            key: KT,
+            operations: DictOperation | None = None
+    ) -> dict[str, Any]:
+        return {
+            o.repr_name: func(self._metering[o][key])
+            for o in (self.operations if operations is None else self._atomic_operations(operations))
+        }
+
+    def count(self, key: KT, operations: DictOperation | None = None) -> dict[str, int]:
         """
         Returns the number of times a key has been accessed.
 
@@ -247,10 +257,16 @@ class MeteredDict(dict[KT, VT_co]):
             operations (DictOperation): The operation of tracking to check.
 
         """
-        return {
-            o.repr_name: self._metering[o][key].count
-            for o in (self.operations if operations is None else self._atomic_operations(operations))
-        }
+        return self._invoke(lambda ts: ts.count, key, operations)
+
+    def counts(self, operations: DictOperation | None = None) -> dict[KT, dict[str, int]]:
+        """
+        Returns a summary of access counts for all keys in the dictionary.
+
+        Returns:
+            dict[KT, dict[str, int]]: A dictionary containing access counts for each key.
+        """
+        return {k: self.count(k, operations) for k in self}
 
     def frequency(self, key: KT, operations: DictOperation | None = None) -> dict[str, float]:
         """
@@ -263,29 +279,7 @@ class MeteredDict(dict[KT, VT_co]):
         Returns:
             float: The frequency of access for the key.
         """
-        return {
-            o.repr_name: self._metering[o][key].frequency()
-            for o in (self.operations if operations is None else self._atomic_operations(operations))
-        }
-
-    def summary(self, key: KT, operations: DictOperation | None = None) -> dict[str, Any]:
-        """
-        Returns a summary of access information for each k in the dictionary.
-
-        Returns:
-            dict[KT, dict[str, Any]]: A dictionary containing access information for each k.
-        """
-        return {o.repr_name: self._metering[o][key].summary()
-                for o in (self.operations if operations is None else self._atomic_operations(operations))}
-
-    def counts(self, operations: DictOperation | None = None) -> dict[KT, dict[str, int]]:
-        """
-        Returns a summary of access counts for all keys in the dictionary.
-
-        Returns:
-            dict[KT, dict[str, int]]: A dictionary containing access counts for each key.
-        """
-        return {k: self.count(k, operations) for k in self}
+        return self._invoke(lambda ts: ts.frequency(), key, operations)
 
     def frequencies(self, operations: DictOperation | None = None) -> dict[KT, dict[str, float]]:
         """
@@ -296,6 +290,15 @@ class MeteredDict(dict[KT, VT_co]):
         """
         return {k: self.frequency(k, operations) for k in self}
 
+    def summary(self, key: KT, operations: DictOperation | None = None) -> dict[str, Any]:
+        """
+        Returns a summary of access information for each k in the dictionary.
+
+        Returns:
+            dict[KT, dict[str, Any]]: A dictionary containing access information for each k.
+        """
+        return self._invoke(lambda ts: ts.summary(), key, operations)
+
     def summaries(self, operations: DictOperation | None = None) -> dict[KT, dict[str, Any]]:
         """
         Returns a summary of access information for all keys in the dictionary.
@@ -304,6 +307,15 @@ class MeteredDict(dict[KT, VT_co]):
             dict[KT, dict[str, Any]]: A dictionary containing access information for each key.
         """
         return {k: self.summary(k, operations) for k in self}
+
+    def filter_keys(self,
+                    predicate: Callable[[KT, DictOperation], bool],
+                    operations: DictOperation | None = None) -> list[KT]:
+        return [
+            k for k in self
+            for o in (self.operations if operations is None else self._atomic_operations(operations))
+            if predicate(k, o)
+        ]
 
     def used_keys(
             self,
@@ -333,13 +345,14 @@ class MeteredDict(dict[KT, VT_co]):
             list[KT]: A list of keys that have been accessed.
         """
 
-        return [
-            k for k in self for o in self._atomic_operations(operations)
-            if max_count > self._metering[o][k].count > min_count
-               and max_frequency >= self._metering[o][k].frequency() >= min_frequency
-               and (before is None or self._metering[o][k].last < before)
-               and (after is None or self._metering[o][k].first > after)
-        ]
+        def _predicate(k: KT, o: DictOperation) -> bool:
+            ts = self._metering[o][k]
+            return (min_count < ts.count < max_count
+                    and min_frequency <= ts.frequency() <= max_frequency
+                    and (before is None or ts.last < before)
+                    and (after is None or ts.first > after))
+
+        return self.filter_keys(_predicate, operations)
 
     def unused_keys(
             self,
@@ -354,9 +367,12 @@ class MeteredDict(dict[KT, VT_co]):
         Returns:
             list[KT]: A list of keys that have never been accessed.
         """
-        return [k for k in self
-                for o in self._atomic_operations(operations)
-                if self._metering[o][k].count == 0]
+
+        def _predicate(k: KT, o: DictOperation) -> bool:
+            ts = self._metering[o][k]
+            return ts.count == 0
+
+        return self.filter_keys(_predicate, operations)
 
     def _reset(self, key: KT, operation: DictOperation):
         """Resets the tracking information for the specified operation and key."""
