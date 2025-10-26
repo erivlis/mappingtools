@@ -1,10 +1,11 @@
 import functools
 from collections import defaultdict, deque
 from collections.abc import Callable
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from enum import Flag, auto
 from typing import Any, Self
 
+from mappingtools._compat import UTC
 from mappingtools.typing import KT, VT_co
 
 

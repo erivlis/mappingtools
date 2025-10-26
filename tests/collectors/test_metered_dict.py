@@ -1,8 +1,9 @@
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 
 import pytest
 
+from mappingtools._compat import UTC
 from mappingtools.collectors import DictOperation, MeteredDict
 from mappingtools.collectors.metered_dict import TimeSeries
 
