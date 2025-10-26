@@ -199,7 +199,7 @@ _ = metered_dict['a']
 
 metered_dict
 # output: {'a': 1, 'b': 2}
-
+ 
 metered_dict.summaries()
 # output: {'a': {'get': {'count': 1, 'first': datetime.datetime(2025, 10, 26, 9, 3, 52, 347825, tzinfo=datetime.timezone.utc), 'last': datetime.datetime(2025, 10, 26, 9, 3, 52, 347825, tzinfo=datetime.timezone.utc), 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'get_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set': {'count': 1, 'first': datetime.datetime(2025, 10, 26, 9, 3, 52, 347806, tzinfo=datetime.timezone.utc), 'last': datetime.datetime(2025, 10, 26, 9, 3, 52, 347806, tzinfo=datetime.timezone.utc), 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'pop': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}}, 'b': {'get': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'get_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set': {'count': 1, 'first': datetime.datetime(2025, 10, 26, 9, 3, 52, 347820, tzinfo=datetime.timezone.utc), 'last': datetime.datetime(2025, 10, 26, 9, 3, 52, 347820, tzinfo=datetime.timezone.utc), 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'pop': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}}}
 ```
@@ -555,6 +555,19 @@ print(result)
 # output: "[1, 2, 3]"
 ```
 
+## Compatibility
+
+This project exposes `mappingtools._compat.UTC` as a stable UTC tzinfo object that works across Python versions. On Python 3.11+ it maps to `datetime.UTC`; on earlier versions it maps to `datetime.timezone.utc`.
+
+Use it in your code or tests when you need a timezone-aware UTC datetime:
+
+```python
+from mappingtools._compat import UTC
+from datetime import datetime
+
+dt = datetime.now(tz=UTC)
+```
+
 ## Development
 
 ### Ruff
@@ -578,4 +591,3 @@ python -m pytest tests -n auto --cov=src --cov-branch --doctest-modules --cov-re
 ```shell
 python -m pytest tests -n auto --cov=src --cov-branch --doctest-modules --cov-report=html
 ```
-
