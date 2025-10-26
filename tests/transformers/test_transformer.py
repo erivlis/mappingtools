@@ -9,22 +9,18 @@ def test_transformer_circular_detection_and_default_handler():
     def default_handler(obj):
         return f"def:{obj}"
 
-    t = Transformer(mapping_handler=mapping_handler, default_handler=default_handler)
-
-    class C:
-        def __init__(self):
-            self.x = 1
+    transformer = Transformer(mapping_handler=mapping_handler, default_handler=default_handler)
 
     # Act
     # Transform a mapping
     m = {'a': 1}
-    out1 = t(m)
-    out2 = t(m)  # second call should return stored object (not None)
+    out1 = transformer(m)
+    out2 = transformer(m)  # second call should return stored object (not None)
 
     # Circular: pass same object twice via call chain
     lst = []
     lst.append(lst)
-    res = t(lst)
+    res = transformer(lst)
 
     # Assert
     assert out1 == {'a': 1}
