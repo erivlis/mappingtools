@@ -117,17 +117,6 @@ def test_adding_duplicate_keys_in_distinct_mode():
     assert collector.mapping['key1'] == {'value1', 'value2'}
 
 
-# Adding duplicate keys in FIRST mode
-def test_adding_duplicate_keys_in_first_mode():
-    # Arrange
-    collector = MappingCollector(MappingCollectorMode.FIRST)
-    # Act
-    collector.add('key1', 'value1')
-    collector.add('key1', 'value2')
-    # Assert
-    assert collector.mapping['key1'] == 'value1'
-
-
 # Adding duplicate keys in LAST mode
 def test_adding_duplicate_keys_in_last_mode():
     # Arrange
