@@ -200,7 +200,7 @@ _ = metered_dict['a']
 metered_dict
 # output: {'a': 1, 'b': 2}
 
-metered_dict.summary()
+metered_dict.summaries()
 # output: {'a': {'get': {'count': 1, 'first': datetime.datetime(2025, 10, 26, 9, 3, 52, 347825, tzinfo=datetime.timezone.utc), 'last': datetime.datetime(2025, 10, 26, 9, 3, 52, 347825, tzinfo=datetime.timezone.utc), 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'get_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set': {'count': 1, 'first': datetime.datetime(2025, 10, 26, 9, 3, 52, 347806, tzinfo=datetime.timezone.utc), 'last': datetime.datetime(2025, 10, 26, 9, 3, 52, 347806, tzinfo=datetime.timezone.utc), 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'pop': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}}, 'b': {'get': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'get_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set': {'count': 1, 'first': datetime.datetime(2025, 10, 26, 9, 3, 52, 347820, tzinfo=datetime.timezone.utc), 'last': datetime.datetime(2025, 10, 26, 9, 3, 52, 347820, tzinfo=datetime.timezone.utc), 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'set_default': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}, 'pop': {'count': 0, 'first': None, 'last': None, 'duration': datetime.timedelta(0), 'frequency': 0.0}}}
 ```
 
