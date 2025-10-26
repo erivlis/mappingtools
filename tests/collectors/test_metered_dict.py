@@ -16,8 +16,8 @@ def test_metered_dict_basic_get_set():
 
     # Assert
     assert result == 1
-    assert set_count == 1
-    assert get_count == 1
+    assert set_count == {'set': 1}
+    assert get_count == {'get': 1}
 
 
 def test_metered_dict_get_default():
@@ -30,7 +30,7 @@ def test_metered_dict_get_default():
 
     # Assert
     assert result == 42
-    assert get_default_count == 1
+    assert get_default_count == {'get_default': 1}
 
 
 def test_metered_dict_setdefault():
@@ -44,7 +44,7 @@ def test_metered_dict_setdefault():
 
     # Assert
     assert result == 99
-    assert set_default_count == 1
+    assert set_default_count == {'set_default': 1}
 
 
 def test_metered_dict_multiple_accesses():
@@ -60,8 +60,8 @@ def test_metered_dict_multiple_accesses():
     get_count = d.count('x', DictOperation.GET)
 
     # Assert
-    assert set_count == 2
-    assert get_count == 2
+    assert set_count == {'set': 2}
+    assert get_count == {'get': 2}
 
 
 def test_metered_dict_frequency_and_summary():
@@ -78,14 +78,14 @@ def test_metered_dict_frequency_and_summary():
     set_freq = d.frequency('k', operation)
     set_count = d.count('k', operation)
     get_count = d.count('k', DictOperation.GET)
-    summary = d.summary()
+    summaries = d.summaries()
 
     # Assert
     assert set_freq.get(operation.repr_name) > 0
-    assert operation.repr_name in summary['k']
-    assert set_count == 2
-    assert get_count == 1
-    assert 'k' in summary
+    assert operation.repr_name in summaries['k']
+    assert set_count == {operation.repr_name: 2}
+    assert get_count == {DictOperation.GET.repr_name: 1}
+    assert 'k' in summaries
 
 
 def test_metered_dict_used_and_unused_keys():
@@ -96,7 +96,7 @@ def test_metered_dict_used_and_unused_keys():
 
     # Act
     _ = d['a']
-    used = d.used_keys(DictOperation.GET)
+    used = d.used_keys(operations=DictOperation.GET)
     unused = d.unused_keys(DictOperation.GET)
 
     # Assert
@@ -114,7 +114,7 @@ def test_metered_dict_used_keys_filters():
     _ = d['a']
     _ = d['a']
     before = datetime.now(tz=UTC) + timedelta(minutes=1)
-    used = d.used_keys(DictOperation.GET, min_count=1, before=before)
+    used = d.used_keys(min_count=1, before=before, operations=DictOperation.GET)
 
     # Assert
     assert 'a' in used
@@ -133,8 +133,8 @@ def test_metered_dict_reset():
     count_after_reset = d.count('x', DictOperation.GET)
 
     # Assert
-    assert count_before_reset == 1
-    assert count_after_reset == 0
+    assert count_before_reset == {'get': 1}
+    assert count_after_reset == {'get': 0}
 
 
 def test_metered_dict_rest_category():
@@ -151,10 +151,10 @@ def test_metered_dict_rest_category():
     set_count_after_reset = d.count('y', DictOperation.SET)
 
     # Assert
-    assert get_count_before_reset == 1
-    assert set_count_before_reset == 1
-    assert get_count_after_reset == 0
-    assert set_count_after_reset == 1
+    assert get_count_before_reset == {'get': 1}
+    assert set_count_before_reset == {'set': 1}
+    assert get_count_after_reset == {'get': 0}
+    assert set_count_after_reset == {'set': 1}
 
 
 def test_metered_dict_reset_key():
@@ -171,10 +171,10 @@ def test_metered_dict_reset_key():
     set_count_after_reset = d.count('z', DictOperation.SET)
 
     # Assert
-    assert get_count_before_reset == 1
-    assert set_count_before_reset == 1
-    assert get_count_after_reset == 0
-    assert set_count_after_reset == 0
+    assert get_count_before_reset == {'get': 1}
+    assert set_count_before_reset == {'set': 1}
+    assert get_count_after_reset == {'get': 0}
+    assert set_count_after_reset == {'set': 0}
 
 
 def test_metered_dict_reset_category_key():
@@ -189,18 +189,18 @@ def test_metered_dict_reset_category_key():
     get_b_count_before_reset = d.count('b', DictOperation.GET)
     set_a_count_before_reset = d.count('a', DictOperation.SET)
     set_b_count_before_reset = d.count('b', DictOperation.SET)
-    d.reset(operations=DictOperation.GET, key='a')
+    d.reset(key='a', operations=DictOperation.GET)
     get_a_count_after_reset = d.count('a', DictOperation.GET)
     get_b_count_after_reset = d.count('b', DictOperation.GET)
     set_a_count_after_reset = d.count('a', DictOperation.SET)
     set_b_count_after_reset = d.count('b', DictOperation.SET)
 
     # Assert
-    assert get_a_count_before_reset == 1
-    assert get_b_count_before_reset == 0
-    assert set_a_count_before_reset == 1
-    assert set_b_count_before_reset == 1
-    assert get_a_count_after_reset == 0
-    assert get_b_count_after_reset == 0
-    assert set_a_count_after_reset == 1
-    assert set_b_count_after_reset == 1
+    assert get_a_count_before_reset == {'get': 1}
+    assert get_b_count_before_reset == {'get': 0}
+    assert set_a_count_before_reset == {'set': 1}
+    assert set_b_count_before_reset == {'set': 1}
+    assert get_a_count_after_reset == {'get': 0}
+    assert get_b_count_after_reset == {'get': 0}
+    assert set_a_count_after_reset == {'set': 1}
+    assert set_b_count_after_reset == {'set': 1}

@@ -238,27 +238,27 @@ class MeteredDict(dict[KT, VT_co]):
 
         return default
 
-    def count(self, key: KT, operations: DictOperation) -> int:
+    def count(self, key: KT, operations: DictOperation | None = None):
         """
         Returns the number of times a key has been accessed.
 
         Args:
-            operations (DictOperation): The operation of tracking to check.
             key (KT): The key to check access count for.
+            operations (DictOperation): The operation of tracking to check.
 
-        Returns:
-            int: The number of times the key has been accessed.
         """
-
-        return self._metering[operations][key].count
+        return {
+            o.repr_name: self._metering[o][key].count
+            for o in (self.operations if operations is None else self._atomic_operations(operations))
+        }
 
     def frequency(self, key: KT, operations: DictOperation | None = None) -> dict[str, float]:
         """
         Returns the frequency of access for a key.
 
         Args:
-            operations (DictOperation): The operation to check.
             key (KT): The key to check access frequency for.
+            operations (DictOperation | None): The operation to check. If None, checks all operations.
 
         Returns:
             float: The frequency of access for the key.
@@ -268,35 +268,57 @@ class MeteredDict(dict[KT, VT_co]):
             for o in (self.operations if operations is None else self._atomic_operations(operations))
         }
 
-    def summary(self) -> dict[KT, dict[str, Any]]:
+    def summary(self, key: KT, operations: DictOperation | None = None) -> dict[str, Any]:
         """
         Returns a summary of access information for each k in the dictionary.
 
         Returns:
             dict[KT, dict[str, Any]]: A dictionary containing access information for each k.
         """
-        output = {
-            k: {c.repr_name: self._metering[c][k].summary() for c in self._metering}
-            for k in self
-        }
+        return {o.repr_name: self._metering[o][key].summary()
+                for o in (self.operations if operations is None else self._atomic_operations(operations))}
 
-        return output
+    def counts(self, operations: DictOperation | None = None) -> dict[KT, dict[str, int]]:
+        """
+        Returns a summary of access counts for all keys in the dictionary.
+
+        Returns:
+            dict[KT, dict[str, int]]: A dictionary containing access counts for each key.
+        """
+        return {k: self.count(k, operations) for k in self}
+
+    def frequencies(self, operations: DictOperation | None = None) -> dict[KT, dict[str, float]]:
+        """
+        Returns a summary of access frequencies for all keys in the dictionary.
+
+        Returns:
+            dict[KT, dict[str, float]]: A dictionary containing access frequencies for each key.
+        """
+        return {k: self.frequency(k, operations) for k in self}
+
+    def summaries(self, operations: DictOperation | None = None) -> dict[KT, dict[str, Any]]:
+        """
+        Returns a summary of access information for all keys in the dictionary.
+
+        Returns:
+            dict[KT, dict[str, Any]]: A dictionary containing access information for each key.
+        """
+        return {k: self.summary(k, operations) for k in self}
 
     def used_keys(
             self,
-            operations: DictOperation | None = None,
             min_count: int = 0,
             max_count: int = float('inf'),
             min_frequency: float = 0.0,
             max_frequency: float = float('inf'),
             before: datetime | None = None,
-            after: datetime | None = None
+            after: datetime | None = None,
+            operations: DictOperation | None = None
     ) -> list[KT]:
         """
         Returns a list of keys that have been accessed at least once.
 
         Args:
-            operations (DictOperation): The operation to check.
             min_count (int): Minimum number of accesses for the key to be included (default is 0).
             max_count (int): Maximum number of accesses for the key to be included (default is float('inf')).
             min_frequency (float): Minimum frequency of access for the key to be included (default is 0.0).
@@ -305,6 +327,7 @@ class MeteredDict(dict[KT, VT_co]):
                 If specified, only keys accessed before this datetime will be included (default is None).
             after (datetime | None):
                 If specified, only keys accessed after this datetime will be included (default is None).
+            operations (DictOperation | None): The operation to check. If None, checks all operations.
 
         Returns:
             list[KT]: A list of keys that have been accessed.
@@ -325,6 +348,9 @@ class MeteredDict(dict[KT, VT_co]):
         """
         Returns a list of keys that have never been accessed.
 
+        Args:
+            operations (DictOperation | None): The operation to check. If None, checks all operations.
+
         Returns:
             list[KT]: A list of keys that have never been accessed.
         """
@@ -332,17 +358,17 @@ class MeteredDict(dict[KT, VT_co]):
                 for o in self._atomic_operations(operations)
                 if self._metering[o][k].count == 0]
 
-    def _reset(self, operation: DictOperation, key: KT):
+    def _reset(self, key: KT, operation: DictOperation):
         """Resets the tracking information for the specified operation and key."""
         self._metering.get(operation, {})[key].reset()
 
-    def reset(self, operations: DictOperation | None = None, key: KT | None = None):
+    def reset(self, key: KT | None = None, operations: DictOperation | None = None):
         """
         Resets the tracking information for the specified operation and key.
 
         Args:
-            operations (DictOperation | None): The operations to reset (default is None, which resets all).
             key (KT | None): The key to reset tracking information for (default is None, which resets all keys).
+            operations (DictOperation | None): The operations to reset (default is None, which resets all).
 
         Returns:
             None
@@ -350,6 +376,6 @@ class MeteredDict(dict[KT, VT_co]):
         for o in self._atomic_operations(operations) if operations else self.operations:
             if key is None:
                 for k in self._metering[o]:
-                    self._reset(o, k)
+                    self._reset(k, o)
             else:
-                self._reset(o, key)
+                self._reset(key, o)
