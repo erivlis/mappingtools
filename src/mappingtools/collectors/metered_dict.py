@@ -3,7 +3,7 @@ from collections import defaultdict, deque
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from enum import Flag, auto
-from typing import Any, Self
+from typing import Any
 
 from mappingtools._compat import UTC
 from mappingtools.typing import KT, VT_co
@@ -24,7 +24,7 @@ class DictOperation(Flag):
         return (self.name or '').casefold()
 
     @classmethod
-    def atomic_operations(cls, operations: Self) -> list[Self]:
+    def atomic_operations(cls, operations: 'DictOperation') -> list['DictOperation']:
         return [o for o in DictOperation if o & operations]
 
 
