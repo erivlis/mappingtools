@@ -35,8 +35,9 @@ keywords = ['Mapping', 'manipulate', 'mutate', 'transform']
 
 [dependency-groups]
 dev = [
+    "commitizen>=4.10.0",
     "ruff",
-    "uv"
+    "uv",
 ]
 test = [
     "pytest",
