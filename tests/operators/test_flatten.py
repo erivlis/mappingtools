@@ -3,20 +3,24 @@ import random
 
 import pytest
 
-from mappingtools.operators import flattened
+from mappingtools.operators import flatten
+
+flatten_cases = [
+    ({}, {}, {}),
+    ({'a': {'b': {'c': 1}, 'd': 2}}, {('a', 'b', 'c'): 1, ('a', 'd'): 2}, {'a.b.c': 1, 'a.d': 2})
+]
 
 
 # Flatten a nested dictionary into a single-level dictionary with tuple keys
-def test_flatten_nested_dict():
-    # Arrange
-    nested_dict = {'a': {'b': {'c': 1}}}
-    expected = {('a', 'b', 'c'): 1}
-
+@pytest.mark.parametrize(('nested_dict', 'expected_tuple_keys', 'expected_str_keys'), flatten_cases)
+def test_flatten_nested_dict(nested_dict, expected_tuple_keys, expected_str_keys):
     # Act
-    result = flattened(nested_dict)
+    actual_tuple_keys = flatten(nested_dict)
+    actual_str_keys = flatten(nested_dict, '.')
 
     # Assert
-    assert result == expected
+    assert actual_tuple_keys == expected_tuple_keys
+    assert actual_str_keys == expected_str_keys
 
 
 # Handle dictionaries with varying depths of nesting
@@ -26,7 +30,7 @@ def test_varying_depths():
     expected = {('a', 'b'): 2, ('c', 'd', 'e'): 3}
 
     # Act
-    result = flattened(nested_dict)
+    result = flatten(nested_dict)
 
     # Assert
     assert result == expected
@@ -39,7 +43,7 @@ def test_non_string_keys():
     expected = {(1, 2, 3): 'value'}
 
     # Act
-    result = flattened(nested_dict)
+    result = flatten(nested_dict)
 
     # Assert
     assert result == expected
@@ -52,7 +56,7 @@ def test_empty_dictionary():
     expected = {}
 
     # Act
-    result = flattened(nested_dict)
+    result = flatten(nested_dict)
 
     # Assert
     assert result == expected
@@ -65,7 +69,7 @@ def test_maintain_order():
     expected = {('a', 'b'): 1, ('c', 'd'): 2}
 
     # Act
-    result = flattened(nested_dict)
+    result = flatten(nested_dict)
 
     # Assert
     assert list(result.keys()) == list(expected.keys())
@@ -79,7 +83,7 @@ def test_circular_references():
 
     # Act & Assert
     with pytest.raises(RecursionError):
-        flattened(nested_dict)
+        flatten(nested_dict)
 
 
 # Process dictionaries with mixed data types as values
@@ -89,7 +93,7 @@ def test_mixed_data_types():
     expected = {('a', 'b'): 1, ('a', 'c'): [2, 3], ('a', 'd'): None}
 
     # Act
-    result = flattened(nested_dict)
+    result = flatten(nested_dict)
 
     # Assert
     assert result == expected
@@ -102,7 +106,7 @@ def test_non_hashable_keys():
     expected = {('a', 'b'): 1}
 
     # Act
-    result = flattened(nested_dict)
+    result = flatten(nested_dict)
 
     # Assert
     assert result == expected
@@ -117,7 +121,7 @@ def test_large_data_size():
 
     # Act & Assert (no exception should be raised)
     try:
-        actual = flattened(large_dict)
+        actual = flatten(large_dict)
         assert actual is not None
         assert len(actual) == range_2 * range_1
         assert actual[(0, 0)] == 0
@@ -134,7 +138,7 @@ def test_deeply_nested_structures():
     expected = {('a', 'b', 'c', 'd', 'e'): 5}
 
     # Act
-    result = flattened(nested_dict)
+    result = flatten(nested_dict)
 
     # Assert
     assert result == expected
@@ -146,8 +150,8 @@ def test_idempotency():
     nested_dict = {'a': {'b': 1}}
 
     # Act
-    first_result = flattened(nested_dict)
-    second_result = flattened(first_result)
+    first_result = flatten(nested_dict)
+    second_result = flatten(first_result)
 
     # Assert
     assert first_result == second_result
@@ -160,7 +164,7 @@ def test_special_characters_in_keys():
     expected = (('a!@#', 'b$%^'), 1)
 
     # Act
-    result = flattened(nested_dict)
+    result = flatten(nested_dict)
 
     # Assert
     assert next(iter(result.items())) == expected

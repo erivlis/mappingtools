@@ -8,7 +8,7 @@ from mappingtools.typing import K
 
 __all__ = [
     'distinct',
-    'flattened',
+    'flatten',
     'inverse',
     'keep',
     'remove',
@@ -107,23 +107,32 @@ def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
     return dd
 
 
-def flattened(mapping: Mapping[Any, Any]) -> dict[tuple, Any]:
+def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tuple | str, Any]:
     """
     Flatten a nested mapping structure into a single-level dictionary.
 
-    :param mapping: A nested mapping structure to be flattened.
-    :return: A dictionary representing the flattened structure.
+    Args:
+        mapping (Mapping[Any, Any]): The nested mapping to flatten.
+        delimiter (str | None): Uses this delimiter to join the path parts. If None then return path tuple.
+
+    Returns:
+        dict
     """
 
-    def flatten(key: tuple, value: Any):
+    def _flatten(key: tuple, value: Any):
         if isinstance(value, Mapping):
             for k, v in value.items():
                 new_key = tuple([*key, *k] if _is_strict_iterable(k) else [*key, k])
-                yield from flatten(new_key, v)
+                yield from _flatten(new_key, v)
         else:
             yield key, value
 
-    return dict(flatten((), mapping))
+    flattened = _flatten((), mapping)
+
+    if delimiter is not None:
+        flattened = ((delimiter.join(map(str, k)), v) for k, v in flattened)
+
+    return dict(flattened)
 
 
 def stream(mapping: Mapping, item_factory: Callable[[Any, Any], Any] | None = None) -> Generator[Any, Any, None]:

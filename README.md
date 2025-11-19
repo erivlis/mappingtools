@@ -250,13 +250,13 @@ keys into tuples.
 <!-- name: test_flattened -->
 
 ```python
-from mappingtools.operators import flattened
+from mappingtools.operators import flatten
 
 nested_dict = {
     'a': {'b': 1, 'c': {'d': 2}},
     'e': 3
 }
-flat_dict = flattened(nested_dict)
+flat_dict = flatten(nested_dict)
 print(flat_dict)
 # output: {('a', 'b'): 1, ('a', 'c', 'd'): 2, ('e',): 3}
 ```
