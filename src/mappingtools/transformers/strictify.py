@@ -1,5 +1,5 @@
 import inspect
-from collections.abc import Callable, Mapping, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from typing import Any
 
 from mappingtools.transformers.transformer import Transformer
