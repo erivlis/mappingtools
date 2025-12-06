@@ -1,3 +1,9 @@
+## v0.8.0 (2025-12-07)
+
+### Feat
+
+- **operators**: deprecate several operator functions.
+
 ## v0.7.0 (2025-12-06)
 
 ### Feat
