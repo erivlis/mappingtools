@@ -1,5 +1,5 @@
 import inspect
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Iterable
 from typing import Any
 
 from mappingtools.transformers.transformer import Transformer
@@ -39,6 +39,19 @@ def strictify(obj: Any,
        Returns:
            The object content after applying the conversion.
        """
+
+    if callable(value_converter):
+
+        _value_converter = value_converter
+
+        def value_wrapper(value: Any) -> Any:
+            match value:
+                case Mapping() | Iterable() | str():
+                    return value
+                case _:
+                    return _value_converter(value)
+
+        value_converter = value_wrapper
 
     processor = Transformer(mapping_handler=_strictify_mapping,
                             iterable_handler=_strictify_iterable,
