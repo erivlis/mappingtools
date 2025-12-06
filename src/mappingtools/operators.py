@@ -3,6 +3,11 @@ from collections.abc import Callable, Generator, Iterable, Mapping
 from itertools import chain
 from typing import Any
 
+try:
+    from warnings import deprecated
+except ImportError:
+    from deprecated import deprecated
+
 from mappingtools._tools import _is_strict_iterable
 from mappingtools.typing import K
 
@@ -17,8 +22,13 @@ __all__ = [
 ]
 
 
+@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
 def _take(keys: Iterable[K], mapping: Mapping[K, Any], exclude: bool = False) -> dict[K, Any]:
     """
+    .. deprecated:: 0.8.0
+       Use a dictionary comprehension instead.
+       Will be removed in version 0.9.0
+
     Return a dictionary pertaining to the specified keys and their corresponding values from the mapping.
 
     Args:
@@ -41,8 +51,14 @@ def _take(keys: Iterable[K], mapping: Mapping[K, Any], exclude: bool = False) ->
     return {k: mapping.get(k) for k in keys}
 
 
+@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
 def keep(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K, Any], Any, None]:
     """
+    .. deprecated:: 0.8.0
+       Use a generator expression with a dictionary comprehension instead.
+       Example: `({k: m[k] for k in keys if k in m} for m in mappings)`
+       Will be removed in version 0.9.0
+
     Yield a subset of mappings by keeping only the specified keys.
 
     Args:
@@ -55,8 +71,14 @@ def keep(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K, 
     yield from (_take(keys, mapping) for mapping in mappings)
 
 
+@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
 def remove(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K, Any], Any, None]:
     """
+    .. deprecated:: 0.8.0
+       Use a generator expression with a dictionary comprehension instead.
+       Example: `({k: v for k, v in m.items() if k not in keys} for m in mappings)`
+       Will be removed in version 0.9.0
+
     Yield a subset of mappings by removing the specified keys.
 
     Args:
@@ -67,6 +89,56 @@ def remove(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K
         Generator[Mapping[K, Any], Any, None]: A generator of mappings with specified keys removed.
     """
     yield from (_take(keys, mapping, exclude=True) for mapping in mappings)
+
+
+@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
+def stream(mapping: Mapping, item_factory: Callable[[Any, Any], Any] | None = None) -> Generator[Any, Any, None]:
+    """
+    .. deprecated:: 0.8.0
+       Use `mapping.items()` or a generator comprehension instead.
+       Example: `(item_factory(k, v) for k, v in mapping.items())`
+       Will be removed in version 0.9.0
+
+    Generate a stream of items from a mapping.
+
+    Args:
+        mapping (Mapping): The mapping object to stream items from.
+        item_factory (Callable[[Any, Any], Any], optional): A function that transforms each key-value pair from
+            the mapping. Defaults to None.
+
+    Yields:
+        The streamed items from the mapping.
+    """
+
+    items = mapping.items() if item_factory is None else iter(item_factory(k, v) for k, v in mapping.items())
+    yield from items
+
+
+@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
+def stream_dict_records(mapping: Mapping,
+                        key_name: str = 'key',
+                        value_name: str = 'value') -> Generator[Mapping[str, Any], Any, None]:
+    """
+    .. deprecated:: 0.8.0
+       Use a generator expression with a dictionary literal instead.
+       Example: `({key_name: k, value_name: v} for k, v in mapping.items())`
+       Will be removed in version 0.9.0
+
+    Generate dictionary records from a mapping.
+
+    Args:
+        mapping (Mapping): The input mapping to generate records from.
+        key_name (str): The name to use for the key in the generated records. Defaults to 'key'.
+        value_name (str): The name to use for the value in the generated records. Defaults to 'value'.
+
+    Yields:
+        dictionary records based on the input mapping.
+    """
+
+    def record(k, v):
+        return {key_name: k, value_name: v}
+
+    yield from stream(mapping, record)
 
 
 def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:
@@ -87,24 +159,6 @@ def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:
         if key in mapping and value_type_pair not in distinct_value_type_pairs:
             distinct_value_type_pairs.add(value_type_pair)
             yield value
-
-
-def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
-    """
-    Return a new dictionary with keys and values swapped from the input mapping.
-
-    Args:
-        mapping (Mapping[Any, set]): The input mapping to invert.
-
-    Returns:
-        Mapping: A new Mapping with values as keys and keys as values.
-    """
-    items = chain.from_iterable(((vi, k) for vi in v) for k, v in mapping.items())
-    dd = defaultdict(set)
-    for k, v in items:
-        dd[k].add(v)
-
-    return dd
 
 
 def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tuple | str, Any]:
@@ -135,39 +189,19 @@ def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tu
     return dict(flattened)
 
 
-def stream(mapping: Mapping, item_factory: Callable[[Any, Any], Any] | None = None) -> Generator[Any, Any, None]:
+def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
     """
-    Generate a stream of items from a mapping.
+    Return a new dictionary with keys and values swapped from the input mapping.
 
     Args:
-        mapping (Mapping): The mapping object to stream items from.
-        item_factory (Callable[[Any, Any], Any], optional): A function that transforms each key-value pair from
-            the mapping. Defaults to None.
+        mapping (Mapping[Any, set]): The input mapping to invert.
 
-    Yields:
-        The streamed items from the mapping.
+    Returns:
+        Mapping: A new Mapping with values as keys and keys as values.
     """
+    items = chain.from_iterable(((vi, k) for vi in v) for k, v in mapping.items())
+    dd = defaultdict(set)
+    for k, v in items:
+        dd[k].add(v)
 
-    items = mapping.items() if item_factory is None else iter(item_factory(k, v) for k, v in mapping.items())
-    yield from items
-
-
-def stream_dict_records(mapping: Mapping,
-                        key_name: str = 'key',
-                        value_name: str = 'value') -> Generator[Mapping[str, Any], Any, None]:
-    """
-    Generate dictionary records from a mapping.
-
-    Args:
-        mapping (Mapping): The input mapping to generate records from.
-        key_name (str): The name to use for the key in the generated records. Defaults to 'key'.
-        value_name (str): The name to use for the value in the generated records. Defaults to 'value'.
-
-    Yields:
-        dictionary records based on the input mapping.
-    """
-
-    def record(k, v):
-        return {key_name: k, value_name: v}
-
-    yield from stream(mapping, record)
+    return dd

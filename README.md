@@ -87,10 +87,10 @@ manipulating and transforming data structures. Below is a brief description of t
     - **flattened** - Converts a nested mapping structure into a single-level dictionary by flattening the keys into
       tuples.
     - **inverse** - generates an inverse Mapping by swapping keys and values.
-    - **keep** - Yields subsets of mappings by retaining the specified keys.
-    - **remove** - Yields subsets mappings with the specified keys removed.
-    - **stream** - Generates items from a mapping, optionally applying a factory function to each key-value pair.
-    - **stream_dict_records** - Generates dictionary records from a mapping with customizable key and value names.
+    - **keep** - (Deprecated) Yields subsets of mappings by retaining the specified keys.
+    - **remove** - (Deprecated) Yields subsets mappings with the specified keys removed.
+    - **stream** - (Deprecated) Generates items from a mapping, optionally applying a factory function to each key-value pair.
+    - **stream_dict_records** - (Deprecated) Generates dictionary records from a mapping with customizable key and value names.
 - **transformers** - This namespace includes functions that reshape objects while maintaining the consistency of their
   structure.
     - **listify** - Transforms complex objects into a list of dictionaries with key and value pairs.
@@ -277,6 +277,8 @@ print(inverted_mapping)
 ```
 
 #### keep
+> [!WARNING]
+> Deprecated since version 0.8.0. Use a generator expression with a dictionary comprehension instead. See docstring for an example.
 
 Yields subsets of mappings by retaining only the specified keys.
 
@@ -296,6 +298,8 @@ print(output)
 ```
 
 #### remove
+> [!WARNING]
+> Deprecated since version 0.8.0. Use a generator expression with a dictionary comprehension instead. See docstring for an example.
 
 Yields mappings with specified keys removed. It takes an iterable of keys and multiple mappings, and returns a generator
 of mappings with those keys excluded.
@@ -316,6 +320,8 @@ print(output)
 ```
 
 #### stream
+> [!WARNING]
+> Deprecated since version 0.8.0. Use `mapping.items()` or a generator comprehension instead. See docstring for an example.
 
 Takes a mapping and an optional item factory function, and generates items from the mapping.
 If the item factory is provided, it applies the factory to each key-value pair before yielding.
@@ -368,6 +374,8 @@ for item in stream(data, record):
 ```
 
 #### stream_dict_records
+> [!WARNING]
+> Deprecated since version 0.8.0. Use a generator expression with a dictionary literal instead. See docstring for an example.
 
 generates dictionary records from a given mapping, where each record contains a key-value pair from the mapping with
 customizable key and value names.
