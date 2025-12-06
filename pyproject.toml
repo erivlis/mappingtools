@@ -63,6 +63,7 @@ testpaths = ["tests"]
 
 
 [tool.coverage.report]
+show_missing = true
 exclude_also = [
     # Don't complain about missing debug-only code:
     "def __repr__",
@@ -89,7 +90,7 @@ omit = [
 ]
 
 [tool.coverage.run]
-branch = false
+branch = true
 relative_files = false
 omit = [
     # omit anything in a .venv directory anywhere
