@@ -4,7 +4,7 @@ from mappingtools.transformers.strictify import strictify
 
 
 def simplify(obj: Any) -> Any:
-    """Dictify recursively the given object.
+    """Simplify recursively the given object.
 
     Args:
         obj (Any): The object to be simplified.
