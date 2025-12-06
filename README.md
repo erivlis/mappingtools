@@ -547,9 +547,59 @@ print(result)
 ```python
 from mappingtools.transformers import strictify
 
+data = [
+    {
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'age': 30,
+        'address': {
+            'street': '123 Main St',
+            'city': 'New York',
+            'state': 'CA'
+        }
+    },
+    {
+        'first_name': 'Jane',
+        'last_name': 'Smith',
+        'age': 25,
+        'address': {
+            'street': '456 Rodeo Dr',
+            'city': 'Los Angeles',
+            'state': 'CA'
+        }
+    }
+]
 
 
+def key_converter(key):
+    return key.replace('_', ' ').title().replace(' ', '')
 
+
+result = strictify(data, key_converter=key_converter)
+print(result)
+# output: 
+# [
+#     {
+#         'FirstName': 'John',
+#         'LastName': 'Doe',
+#         'Age': 30,
+#         'Address': {
+#             'Street': '123 Main St',
+#             'City': 'New York',
+#             'State': 'CA'
+#         }
+#     },
+#     {
+#         'FirstName': 'Jane',
+#         'LastName': 'Smith',
+#         'Age': 25,
+#         'Address': {
+#             'Street': '456 Rodeo Dr',
+#             'City': 'Los Angeles',
+#             'State': 'CA'
+#         }
+#     }
+# ]
 ```
 
 #### stringify
