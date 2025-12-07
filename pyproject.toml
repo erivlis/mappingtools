@@ -43,6 +43,10 @@ dev = [
     "ruff",
     "uv",
 ]
+docs = [
+    "zensical",
+    "mkdocstrings-python"
+]
 test = [
     "pytest",
     "pytest-cov",
