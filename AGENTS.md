@@ -34,3 +34,19 @@ To run the test suite:
 ```shell
 python -m pytest tests --cov=src --cov-branch --doctest-modules --cov-report=term
 ```
+
+## Analysis (v0.8.0)
+
+### Code Quality
+- **Coverage**: 100% test coverage (`pytest tests --cov=src`).
+- **Linting**: Passes `ruff check` with no issues.
+- **Typing**: Fully typed.
+
+### Deprecations
+Significant deprecations exist in `src/mappingtools/operators.py` (scheduled for removal in v0.9.0):
+- `keep`
+- `remove`
+- `stream`
+- `stream_dict_records`
+
+Tests covering these functions generate numerous `DeprecationWarning`s.
