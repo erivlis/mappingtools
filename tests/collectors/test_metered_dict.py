@@ -302,7 +302,7 @@ def test_timeseries_add_none_and_reset_and_empty_duration_frequency_summary():
 
     # Act / Assert: duration on empty series
     assert ts.duration() == timedelta()
-    assert ts.frequency() == 0.0
+    assert ts.frequency() == pytest.approx(0.0)
 
     # Act: add with None should use current UTC time
     ts.add()
@@ -320,7 +320,7 @@ def test_timeseries_add_none_and_reset_and_empty_duration_frequency_summary():
     s = ts.summary()
     assert s['count'] == 0
     assert s['duration'] == timedelta()
-    assert s['frequency'] == 0.0
+    assert s['frequency'] == pytest.approx(0.0)
 
 
 def test_duration_cma_returns_zero_when_durations_none():
@@ -329,7 +329,7 @@ def test_duration_cma_returns_zero_when_durations_none():
     ts._durations = None
 
     # Act / Assert
-    assert ts.duration_cma(None) == 0.0
+    assert ts.duration_cma(None) == pytest.approx(0.0)
 
 
 def test_pop_missing_key_still_records_pop():
@@ -437,7 +437,7 @@ def test_duration_cma_with_samples2_and_durations_none():
     ts._durations = None
 
     # Act / Assert
-    assert ts.duration_cma(None) == 0.0
+    assert ts.duration_cma(None) == pytest.approx(0.0)
 
 
 def test__add_no_metering_for_operation_is_noop():

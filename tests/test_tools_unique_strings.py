@@ -224,7 +224,6 @@ def test_performance_degradation():
 
     # The ratio should be roughly proportional to the difference in combinations
     # (len(large_alphabet)/len(small_alphabet))^length
-    expected_ratio = (len(large_alphabet) / len(small_alphabet)) ** length  # noqa: F841
     actual_ratio = large_time / small_time if small_time > 0 else float('inf')
 
     # Allow for some variance in timing

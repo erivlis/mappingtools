@@ -101,7 +101,7 @@ def test_uniform_distribution_and_weighted_distribution_behaviour():
     # According to implementation: total_weight=3, uniform=1/2 -> 3*(1/2)*1 = 1.5
     assert weighted('B') == pytest.approx(1.5)
     # missing key returns 0.0
-    assert weighted('C') == 0.0
+    assert weighted('C') == pytest.approx(0.0)
 
     # Act / Assert: total weight <= 0 should raise
     with pytest.raises(ValueError):
@@ -213,5 +213,5 @@ def test_probabilities_with_only_distribution_provided():
     probs = list(probabilities(1, alphabet='AB', distribution=dist))
 
     # Assert
-    assert probs[0] == 0.7
-    assert probs[1] == 0.3
+    assert probs[0] == pytest.approx(0.7)
+    assert probs[1] == pytest.approx(0.3)
