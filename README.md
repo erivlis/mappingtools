@@ -46,7 +46,7 @@ and unwrapping complex objects.
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/test.yml"><img alt="Test" src="https://github.com/erivlis/mappingtools/actions/workflows/test.yml/badge.svg"></a>
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/test-beta.yml"><img alt="Publish" src="https://github.com/erivlis/mappingtools/actions/workflows/test-beta.yml/badge.svg"></a>
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml"><img alt="Publish" src="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml/badge.svg"></a>
-      <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml"><img alt="Publish Docs" src="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml/badge.svg"></a>
+      <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml"><img alt="Publish Docs" src="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yml/badge.svg"></a>
     </td>
   </tr>
   <tr>
