@@ -35,6 +35,17 @@ Below is a brief description of the main namespaces within the library:
     | **stream** `Deprecated`              | Generates items from a mapping, optionally applying a factory function to each key-value pair.         |
     | **stream_dict_records** `Deprecated` | Generates dictionary records from a mapping with customizable key and value names.                     |
 
+=== ":lucide-square-code: Structures"
+
+    This namespace provides advanced, dictionary-like data structures that act as proxies or containers for collections of objects.
+
+    | Class             | Description                                                                                                                                                                      |
+    |-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | **Dictifier**     | A strict, type-safe container that proxies method calls and attribute access to a collection of objects. It requires an explicit type and enables deep proxying with type hints. For convenience, it offers an `auto()` factory method to enable type inference. |
+    | **LazyDictifier** | A lazy version of `Dictifier` that defers execution until results are accessed. Ideal for large datasets or streaming pipelines where memory efficiency is critical.                 |
+    | **dictify**       | A class decorator that transforms a class definition into a specialized `Dictifier` collection, providing a declarative way to define object collections with optimized performance. |
+    | **map_objects**   | A factory function that provides a unified entry point for creating `Dictifier` or `LazyDictifier` instances based on the desired behavior (strict, auto, or lazy).                |
+
 === ":lucide-square-function: Transformers"
 
     This namespace includes functions that reshape objects while maintaining the consistency of their structure.
@@ -46,3 +57,4 @@ Below is a brief description of the main namespaces within the library:
     | **simplify**  | Converts objects to strictly structured dictionaries.                                              |
     | **strictify** | Applies a strict structural conversion to an object using optional converters for keys and values. |
     | **stringify** | Converts an object into a string representation by recursively processing it based on its type.    |
+

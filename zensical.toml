@@ -19,6 +19,7 @@ nav = [
     { Examples = [
         "examples/collectors.md",
         "examples/operators.md",
+        "examples/structures.md",
         "examples/transformers.md"
     ] },
     { Development = [

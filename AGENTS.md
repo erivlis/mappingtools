@@ -1,52 +1,64 @@
 # For AI Agents
 
-This document provides a summary of the project for AI agents and assistants.
+This document provides meta-instructions and guidelines for AI agents interacting with this project and its maintainers.
 
-## Project Name
-mappingtools
+## Core Interaction Protocols
 
-## Project Description
-A Python library with utility functions for manipulating and transforming data structures with Mapping-like characteristics. It can invert dictionaries, convert objects to dictionaries, create nested defaultdicts, and more.
+### 1. The "Thought Trace"
 
-## Technologies Used
-- Python
-- hatchling (for building)
-- pytest (for testing)
-- ruff (for linting)
+When handling complex requests (architecture, debugging, refactoring), always provide a structured "Thought Trace" at
+the end of your response. This makes your reasoning transparent and allows the user to correct your logic.
 
-## File Structure
-The core logic is located in `src/mappingtools`. This directory is organized into three main namespaces:
-- `collectors`: Classes for collecting and categorizing data.
-- `operators`: Functions that perform operations on mappings.
-- `transformers`: Functions that reshape objects.
+**Format:**
 
-Tests for the project are located in the `tests` directory.
-
-## Key Commands
-
-To lint the project:
-```shell
-ruff check src
-ruff check tests
+```
+[Thought Trace]
+User Request: "..."
+├── PERCEPTION: Identify the core intent and context.
+├── REASONING: Analyze constraints, trade-offs, and patterns.
+├── PLANNING: Outline the steps for execution.
+└── GENERATION: Execute the plan.
 ```
 
-To run the test suite:
-```shell
-python -m pytest tests --cov=src --cov-branch --doctest-modules --cov-report=term
-```
+### 2. The "Stop and Reflect" Trigger
 
-## Analysis (v0.8.0)
+If a user request seems to introduce "asymmetry," "magic," or "bloat," do not blindly execute it. Stop and ask:
 
-### Code Quality
-- **Coverage**: 100% test coverage (`pytest tests --cov=src`).
-- **Linting**: Passes `ruff check` with no issues.
-- **Typing**: Fully typed.
+* "Is this the right architectural abstraction?"
+* "Does this violate the Single Responsibility Principle?"
+* "Is there a simpler way to achieve this (e.g., a mode flag instead of a subclass)?"
 
-### Deprecations
-Significant deprecations exist in `src/mappingtools/operators.py` (scheduled for removal in v0.9.0):
-- `keep`
-- `remove`
-- `stream`
-- `stream_dict_records`
+### 3. The "Context-Action-Constraint" Rule
 
-Tests covering these functions generate numerous `DeprecationWarning`s.
+When suggesting prompts or refactors, follow this structure for clarity:
+
+1. **Context**: "I have a `Dictifier` class."
+2. **Action**: "Add `__slots__`."
+3. **Constraint**: "Watch out for recursion."
+
+## Architectural Heuristics
+
+### Mode vs. Type
+
+If two classes differ only by a small behavior (e.g., strict vs. inferred typing), prefer merging them into a single
+class with a **Mode Flag** or a **Factory Method** (e.g., `Dictifier.auto()`) rather than maintaining a class hierarchy.
+
+### Factory Method for Specialization
+
+If a decorator creates a specialized subclass, move that logic into a `classmethod` on the base class (e.g.,
+`Dictifier.of()`). This improves cohesion and keeps the logic where it belongs.
+
+### Explicit Over Implicit
+
+* **Safety First**: Default to strict, type-safe behavior.
+* **Opt-In Magic**: Make "magic" behavior (like type inference) explicitly opt-in via factories or flags.
+
+## User Persona: The Architect
+
+The primary maintainer values:
+
+* **Symmetry**: API surfaces should feel balanced and consistent.
+* **Roots**: Understanding the "why" and the first principles behind a decision.
+* **Robustness**: Testing edge cases (empty collections, recursion, broken hints) is more important than happy-path
+  speed.
+* **Honesty**: Prefer direct technical pushback over polite compliance.

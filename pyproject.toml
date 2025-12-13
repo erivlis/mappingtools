@@ -1,6 +1,6 @@
 [project]
 name = "mappingtools"
-version = "0.8.0"
+version = "0.8.1"
 authors = [
     { name = "Eran Rivlis", email = "eran@rivlis.info" },
 ]
@@ -49,6 +49,7 @@ docs = [
 ]
 test = [
     "pytest",
+    "pytest-asyncio",
     "pytest-cov",
     "pytest-randomly",
     "pytest-xdist"
