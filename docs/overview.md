@@ -46,3 +46,15 @@ Below is a brief description of the main namespaces within the library:
     | **simplify**  | Converts objects to strictly structured dictionaries.                                              |
     | **strictify** | Applies a strict structural conversion to an object using optional converters for keys and values. |
     | **stringify** | Converts an object into a string representation by recursively processing it based on its type.    |
+
+=== ":lucide-braces: Structures"
+
+    This namespace provides advanced, dictionary-like data structures that act as proxies or containers for collections of objects.
+
+    | Class           | Description                                                                                                                                                             |
+    |-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | **Dictifier**   | A strict, type-safe container that proxies method calls and attribute access to a collection of objects. It requires an explicit type and enables deep proxying with type hints. |
+    | **AutoDictifier** | A flexible subclass of `Dictifier` that automatically infers the type of its contents. Ideal for interactive use and as a fallback for un-hinted code during chaining. |
+    | **dictify**     | A class decorator that transforms a class definition into a specialized `Dictifier` collection, providing a declarative way to define object collections.                 |
+
+For detailed usage and examples, see the [Examples](./examples) page.

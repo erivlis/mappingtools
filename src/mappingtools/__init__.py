@@ -1,7 +1,8 @@
-from mappingtools import collectors, operators, transformers
+from mappingtools import collectors, operators, structures, transformers
 
 __all__ = (
     'collectors',
     'operators',
-    'transformers'
+    'structures',
+    'transformers',
 )
