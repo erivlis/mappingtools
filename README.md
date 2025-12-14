@@ -74,12 +74,13 @@ and unwrapping complex objects.
 
 Built for developers who need more than just standard dictionaries.
 
-| Problem                 | Solution                                                                                             |
-|:------------------------|:-----------------------------------------------------------------------------------------------------|
-| **Deep JSON Diffing**   | Use `flattened()` to collapse nested JSON into single-layer paths for easy comparison.               |
-| **Data Collisions**     | Use `inverse()` to swap keys/values without losing data (automatically creates sets for duplicates). |
-| **Slow Config Loading** | Use `MeteredDict` to profile exactly how many times your app reads specific config keys.             |
-| **Quick Serialization** | Use `simplify()` to instantly convert Dataclasses, DateTime, and custom objects into pure Dicts.     |
+| Problem                   | Solution                                                                                                        |
+|:--------------------------|:----------------------------------------------------------------------------------------------------------------|
+| **Boilerplate Reduction** | Use `Dictifier` to broadcast method calls to a collection of objects (`users.greet()` instead of a `for` loop). |
+| **Deep JSON Diffing**     | Use `flattened()` to collapse nested JSON into single-layer paths for easy comparison.                          |
+| **Data Collisions**       | Use `inverse()` to swap keys/values without losing data (automatically creates sets for duplicates).            |
+| **Slow Config Loading**   | Use `MeteredDict` to profile exactly how many times your app reads specific config keys.                        |
+| **Quick Serialization**   | Use `simplify()` to instantly convert Dataclasses, DateTime, and custom objects into pure Dicts.                |
 
 ## Documentation
 
