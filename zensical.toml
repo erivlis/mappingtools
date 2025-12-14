@@ -23,6 +23,8 @@ nav = [
         "examples/transformers.md"
     ] },
     { Development = [
+        "design_decisions.md",
+        "development_guide.md",
         "contributing.md",
         "acknowledgements.md"
     ] }

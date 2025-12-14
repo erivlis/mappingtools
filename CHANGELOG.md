@@ -1,3 +1,9 @@
+## v0.9.0 (2025-12-15)
+
+### Feat
+
+- add `Dictifier` and `LazyDictifier` and factories.
+
 ## v0.8.1 (2025-12-13)
 
 ### Fix
