@@ -170,3 +170,43 @@ def test_dictify_broken_hints():
     assert method_result._auto is True
     assert isinstance(prop_result, Dictifier)
     assert prop_result._auto is True
+
+
+def test_dictify_class_with_unresolvable_hints():
+    """Test that @dictify does not crash on a class where get_type_hints fails."""
+    # Arrange
+    try:
+        # This class will cause get_type_hints to raise a NameError
+        @dictify
+        class BrokenClass:
+            x: "SomeNonExistentType" = "Value" # noqa: F821
+
+            def greet(self) -> str:
+                return "Hello"
+
+        # Act
+        items = BrokenClass({"a": BrokenClass.Item()})
+
+        # 1. Method call should still work and be strict (because method hint is valid)
+        greet_result = items.greet()
+        assert isinstance(greet_result, Dictifier)
+        assert greet_result._auto is False
+        assert greet_result == {"a": "Hello"}
+
+        # 2. Field access should fall back to auto (because class hint fails)
+        field_result = items.x
+        assert isinstance(field_result, Dictifier)
+        assert field_result._auto is True
+        assert field_result == {"a": "Value"}
+
+    except NameError:
+        pytest.fail("dictify should not raise NameError on unresolvable type hints")
+
+
+def test_dictify_validation_error():
+    """Test that @dictify raises TypeError if applied to a non-class."""
+    # Act & Assert
+    with pytest.raises(TypeError) as excinfo:
+        dictify("not a class")
+
+    assert "Dictifier.of() expects a class" in str(excinfo.value)

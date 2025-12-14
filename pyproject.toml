@@ -52,7 +52,8 @@ test = [
     "pytest-asyncio",
     "pytest-cov",
     "pytest-randomly",
-    "pytest-xdist"
+    "pytest-xdist",
+    "markdown-pytest"
 ]
 
 [build-system]
