@@ -2,6 +2,8 @@
 graph TD
     A[src/mappingtools] --> B[__init__.py]
     A --> C[operators.py]
+    A --> CA[aggregation.py]
+    A --> CB[enums.py]
     A --> D[typing.py]
     A --> E[_compat.py]
     A --> F[_tools.py]

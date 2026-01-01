@@ -3,19 +3,23 @@ classDiagram
     class MappingCollector {
         <<Service>>
         -Mapping _mapping
-        +MappingCollectorMode mode
+        +Aggregation aggregation
         +add(key, value)
         +collect(iterable)
         +mapping() Mapping
     }
 
-    class MappingCollectorMode {
+    class Aggregation {
         <<Enumeration>>
         ALL
         COUNT
         DISTINCT
         FIRST
         LAST
+        SUM
+        MAX
+        MIN
+        RUNNING_AVERAGE
     }
 
     class MeteredDict {
@@ -68,7 +72,7 @@ classDiagram
         +__call__(obj)
     }
 
-    MappingCollector o-- MappingCollectorMode
+    MappingCollector o-- Aggregation
     MeteredDict o-- DictOperation
     MeteredDict o-- TimeSeries
 ```

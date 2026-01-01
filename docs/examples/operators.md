@@ -91,6 +91,97 @@ Yields subsets of mappings by retaining only the specified keys.
     Use a generator expression with a dictionary comprehension instead.
     See docstring for an example.
 
+## pivot
+
+Reshapes a list of mappings into a nested dictionary based on index and column keys.
+Supports different aggregation modes via `Aggregation`.
+
+!!! Example
+
+    <!-- name: test_pivot -->
+    
+    ```python linenums="1"
+    from mappingtools.operators import pivot
+    from mappingtools.aggregation import Aggregation
+    
+    data = [
+        {"city": "NYC", "month": "Jan", "temp": 10},
+        {"city": "NYC", "month": "Feb", "temp": 12},
+        {"city": "LON", "month": "Jan", "temp": 5},
+        {"city": "NYC", "month": "Jan", "temp": 20}, # Duplicate
+    ]
+    
+    # Default mode (LAST wins)
+    result = pivot(data, index="city", columns="month", values="temp")
+    print(result)
+    # output: {'NYC': {'Jan': 20, 'Feb': 12}, 'LON': {'Jan': 5}}
+    
+    # Aggregation mode: ALL (collect list)
+    result_all = pivot(data, index="city", columns="month", values="temp", mode=Aggregation.ALL)
+    print(result_all["NYC"]["Jan"])
+    # output: [10, 20]
+    ```
+
+## rekey
+
+Transforms keys of a mapping based on a factory function of `(key, value)`. 
+This allows "re-indexing" a mapping where the new key depends on the content 
+of the value or a combination of the old key and value. Collisions are 
+handled according to the specified aggregation.
+
+!!! Example
+
+    <!-- name: test_rekey -->
+    
+    ```python linenums="1"
+    from mappingtools.operators import rekey
+    from mappingtools.aggregation import Aggregation
+    
+    mapping = {
+        "alice": {"dept": "IT", "id": 1},
+        "bob": {"dept": "HR", "id": 2},
+        "charlie": {"dept": "IT", "id": 3},
+    }
+    
+    # Re-index by 'id'
+    by_id = rekey(mapping, lambda k, v: v["id"])
+    print(by_id[1])
+    # output: {'dept': 'IT', 'id': 1}
+    
+    # Group by 'dept' using Aggregation.ALL
+    by_dept = rekey(mapping, lambda k, v: v["dept"], aggregation=Aggregation.ALL)
+    print(list(by_dept.keys()))
+    # output: ['IT', 'HR']
+    print(len(by_dept["IT"]))
+    # output: 2
+    ```
+
+## rename
+
+Renames keys in a mapping based on a mapper (Mapping or Callable).
+If a key is not present in the mapper, it remains unchanged. Collisions 
+are handled according to the specified aggregation.
+
+!!! Example
+
+    <!-- name: test_rename -->
+    
+    ```python linenums="1"
+    from mappingtools.operators import rename
+    
+    data = {"usr_id": 1, "usr_name": "Alice", "email": "alice@example.com"}
+    
+    # Using a mapping
+    renamed = rename(data, {"usr_id": "id", "usr_name": "name"})
+    print(list(renamed.keys()))
+    # output: ['id', 'name', 'email']
+    
+    # Using a callable
+    renamed_upper = rename(data, str.upper)
+    print(list(renamed_upper.keys()))
+    # output: ['USR_ID', 'USR_NAME', 'EMAIL']
+    ```
+
 ## remove
 
 Yields mappings with the specified keys removed.

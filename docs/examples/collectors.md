@@ -68,16 +68,16 @@ print(counter)
 
 ## MappingCollector
 
-A class designed to collect key-value pairs into an internal mapping based on different modes.
-It supports modes like ALL, COUNT, DISTINCT, FIRST, and LAST, each dictating how key-value pairs are
-collected.
+A class designed to collect key-value pairs into an internal mapping based on different aggregation modes.
+It supports modes like `ALL`, `COUNT`, `DISTINCT`, `FIRST`, `LAST`, and more via the `Aggregation` enum.
 
 <!-- name: test_mapping_collector -->
 
 ```python linenums="1"
-from mappingtools.collectors import MappingCollector, MappingCollectorMode
+from mappingtools.collectors import MappingCollector
+from mappingtools.aggregation import Aggregation
 
-collector = MappingCollector(MappingCollectorMode.ALL)
+collector = MappingCollector(aggregation=Aggregation.ALL)
 collector.add('a', 1)
 collector.add('a', 2)
 collector.collect([('b', 3), ('b', 4)])

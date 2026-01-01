@@ -19,9 +19,11 @@ nav = [
     { Examples = [
         "examples/collectors.md",
         "examples/operators.md",
+        "examples/optics.md",
         "examples/structures.md",
         "examples/transformers.md"
     ] },
+    { Reference = "reference.md" },
     { Development = [
         "design_decisions.md",
         "development_guide.md",
@@ -47,7 +49,7 @@ features = [
     "navigation.instant.progress",
     "navigation.path",
     "navigation.sections",
-#    "navigation.tabs",
+    #    "navigation.tabs",
     "navigation.top",
     "navigation.tracking",
     "toc.follow",
@@ -109,7 +111,6 @@ paths = ["src"]
 docstring_style = "google"
 inherited_members = true
 show_source = false
-
 
 [project.markdown_extensions.abbr]
 [project.markdown_extensions.admonition]

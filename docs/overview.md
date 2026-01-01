@@ -31,20 +31,39 @@ Below is a brief description of the main namespaces within the library:
     | **flatten**                          | Converts a nested mapping structure into a single-level dictionary by flattening the keys into tuples. |
     | **inverse**                          | Generates an inverse Mapping by swapping keys and values.                                              |
     | **keep** `Deprecated`                | Yields subsets of mappings by retaining the specified keys.                                            |
+    | **pivot**                            | Reshapes a list of mappings into a nested dictionary based on index and column keys.                   |
+    | **rekey**                            | Transforms keys based on a function of (key, value). Supports aggregation.                              |
     | **remove** `Deprecated`              | Yields subsets mappings with the specified keys removed.                                               |
+    | **rename**                           | Renames keys based on a mapping or callable. Supports aggregation.                                     |
     | **stream** `Deprecated`              | Generates items from a mapping, optionally applying a factory function to each key-value pair.         |
     | **stream_dict_records** `Deprecated` | Generates dictionary records from a mapping with customizable key and value names.                     |
+
+=== ":lucide-square-dot: Optics"
+
+    This namespace provides functional, immutable tools for accessing and modifying deeply nested data structures.
+
+    | Class             | Description                                                                                                                                                                                                                                                      |
+    |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | **Lens**          | A functional optic for immutable access and modification of nested data structures. Supports composition via `/`.                                                                                                                                                |
+
+    | Function          | Description                                                                                                                                                                                                                                                      |
+    |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | **patch**         | Applies a set of changes to a data structure immutably using dot-separated paths or Lenses.                                                                                                                                                                      |
+    | **project**       | Projects a data structure into a new dictionary shape based on a schema of dot-separated paths or Lenses.                                                                                                                                                        |
 
 === ":lucide-square-code: Structures"
 
     This namespace provides advanced, dictionary-like data structures that act as proxies or containers for collections of objects.
 
-    | Class             | Description                                                                                                                                                                      |
-    |-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | Class             | Description                                                                                                                                                                                                                                                      |
+    |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | **Dictifier**     | A strict, type-safe container that proxies method calls and attribute access to a collection of objects. It requires an explicit type and enables deep proxying with type hints. For convenience, it offers an `auto()` factory method to enable type inference. |
-    | **LazyDictifier** | A lazy version of `Dictifier` that defers execution until results are accessed. Ideal for large datasets or streaming pipelines where memory efficiency is critical.                 |
-    | **dictify**       | A class decorator that transforms a class definition into a specialized `Dictifier` collection, providing a declarative way to define object collections with optimized performance. |
-    | **map_objects**   | A factory function that provides a unified entry point for creating `Dictifier` or `LazyDictifier` instances based on the desired behavior (strict, auto, or lazy).                |
+    | **LazyDictifier** | A lazy version of `Dictifier` that defers execution until results are accessed. Ideal for large datasets or streaming pipelines where memory efficiency is critical.                                                                                             |
+
+    | Function          | Description                                                                                                                                                                                                                                                      |
+    |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | **dictify**       | A class decorator that transforms a class definition into a specialized `Dictifier` collection, providing a declarative way to define object collections with optimized performance.                                                                             |
+    | **map_objects**   | A factory function that provides a unified entry point for creating `Dictifier` or `LazyDictifier` instances based on the desired behavior (strict, auto, or lazy).                                                                                              |
 
 === ":lucide-square-function: Transformers"
 
