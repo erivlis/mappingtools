@@ -96,3 +96,8 @@ def test_reshape_deep_access_with_callable():
 
     assert result["US"]["A"] == 100
     assert result["UK"]["B"] == 200
+
+def test_reshape_no_keys():
+    """Test that providing no keys returns an empty dictionary."""
+    data = [{"a": 1}]
+    assert reshape(data, keys=[], value="a") == {}
