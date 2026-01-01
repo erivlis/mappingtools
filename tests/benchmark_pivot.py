@@ -148,11 +148,16 @@ def benchmark():
 
     for mode in Aggregation:
         t_old = timeit.timeit(
-            lambda: pivot_old_logic(data, index="city", columns="month", values="temp", mode=mode), number=100
+            lambda: pivot_old_logic(data, index="city", columns="month", values="temp", mode=mode),
+            number=100
         )
-        t_new = timeit.timeit(lambda: pivot(data, index="city", columns="month", values="temp", mode=mode), number=100)
+        t_new = timeit.timeit(
+            lambda: pivot(data, index="city", columns="month", values="temp", aggregation=mode),
+                              number=100
+        )
         t_hyper = timeit.timeit(
-            lambda: pivot_hyper_opt(data, index="city", columns="month", values="temp", mode=mode), number=100
+            lambda: pivot_hyper_opt(data, index="city", columns="month", values="temp", mode=mode),
+            number=100
         )
 
         diff_new = (t_new - t_old) / t_old * 100

@@ -31,7 +31,7 @@ def test_pivot_last_wins():
     ]
 
     # Act
-    result = pivot(data, index="city", columns="month", values="temp", mode=Aggregation.LAST)
+    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.LAST)
 
     # Assert
     assert result["NYC"]["Jan"] == 20
@@ -45,7 +45,7 @@ def test_pivot_first_wins():
     ]
 
     # Act
-    result = pivot(data, index="city", columns="month", values="temp", mode=Aggregation.FIRST)
+    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.FIRST)
 
     # Assert
     assert result["NYC"]["Jan"] == 10
@@ -59,7 +59,7 @@ def test_pivot_all():
     ]
 
     # Act
-    result = pivot(data, index="city", columns="month", values="temp", mode=Aggregation.ALL)
+    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.ALL)
 
     # Assert
     assert result["NYC"]["Jan"] == [10, 20]
@@ -74,7 +74,7 @@ def test_pivot_distinct():
     ]
 
     # Act
-    result = pivot(data, index="city", columns="month", values="temp", mode=Aggregation.DISTINCT)
+    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.DISTINCT)
 
     # Assert
     assert result["NYC"]["Jan"] == {10, 20}
@@ -89,7 +89,7 @@ def test_pivot_count():
     ]
 
     # Act
-    result = pivot(data, index="city", columns="month", values="temp", mode=Aggregation.COUNT)
+    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.COUNT)
 
     # Assert
     assert result["NYC"]["Jan"] == Counter({10: 2, 20: 1})
@@ -129,7 +129,7 @@ def test_pivot_sum():
     data = [dict(d, col="fixed") for d in data]
 
     # Act
-    result = pivot(data, index="item", columns="col", values="val", mode=Aggregation.SUM)
+    result = pivot(data, index="item", columns="col", values="val", aggregation=Aggregation.SUM)
 
     # Assert
     assert result == {"A": {"fixed": 30.0}, "B": {"fixed": 5.0}}
@@ -145,7 +145,7 @@ def test_pivot_max():
     data = [dict(d, col="fixed") for d in data]
 
     # Act
-    result = pivot(data, index="item", columns="col", values="val", mode=Aggregation.MAX)
+    result = pivot(data, index="item", columns="col", values="val", aggregation=Aggregation.MAX)
 
     # Assert
     assert result == {"A": {"fixed": 20.0}, "B": {"fixed": 5.0}}
@@ -161,7 +161,7 @@ def test_pivot_min():
     data = [dict(d, col="fixed") for d in data]
 
     # Act
-    result = pivot(data, index="item", columns="col", values="val", mode=Aggregation.MIN)
+    result = pivot(data, index="item", columns="col", values="val", aggregation=Aggregation.MIN)
 
     # Assert
     assert result == {"A": {"fixed": 10.0}, "B": {"fixed": 5.0}}
@@ -176,7 +176,7 @@ def test_pivot_running_average():
     data = [dict(d, col="fixed") for d in data]
 
     # Act
-    result = pivot(data, index="item", columns="col", values="val", mode=Aggregation.RUNNING_AVERAGE)
+    result = pivot(data, index="item", columns="col", values="val", aggregation=Aggregation.RUNNING_AVERAGE)
 
     # Assert
     # The current implementation uses: (avg + value) / 2
