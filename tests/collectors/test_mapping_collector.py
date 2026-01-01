@@ -11,7 +11,7 @@ def test_initialization_with_default_mode():
     # Arrange & Act
     collector = MappingCollector()
     # Assert
-    assert collector.mode == MappingCollectorMode.ALL
+    assert collector.aggregation == MappingCollectorMode.ALL
     assert isinstance(collector._mapping, defaultdict)
 
 
@@ -81,7 +81,7 @@ def test_adding_key_value_pairs_in_first_mode():
 # Initialization with invalid mode
 def test_initialization_with_invalid_mode():
     # Arrange & Act & Assert
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         MappingCollector("INVALID_MODE")
 
 

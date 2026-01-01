@@ -6,7 +6,7 @@ from mappingtools.collectors import MappingCollector, MappingCollectorMode
 
 # Collects key-value pairs from a list of tuples
 def test_collect_from_list_of_tuples():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = [('a', 1), ('b', 2)]
     collector.collect(data)
     assert collector.mapping == {'a': [1], 'b': [2]}
@@ -14,7 +14,7 @@ def test_collect_from_list_of_tuples():
 
 # Adds collected pairs to the internal mapping
 def test_adds_collected_pairs_to_internal_mapping():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = [('a', 1), ('b', 2)]
     collector.collect(data)
     assert 'a' in collector.mapping
@@ -23,7 +23,7 @@ def test_adds_collected_pairs_to_internal_mapping():
 
 # Works with different iterable types like lists, sets, and generators
 def test_works_with_different_iterable_types():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data_list = [('a', 1), ('b', 2)]
     data_set = {('c', 3), ('d', 4)}
     data_gen = (x for x in [('e', 5), ('f', 6)])
@@ -35,7 +35,7 @@ def test_works_with_different_iterable_types():
 
 # Handles empty iterables without errors
 def test_handles_empty_iterables():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = []
     collector.collect(data)
     assert collector.mapping == {}
@@ -43,7 +43,7 @@ def test_handles_empty_iterables():
 
 # Collects from an iterable with duplicate keys
 def test_collects_from_iterable_with_duplicate_keys():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = [('a', 1), ('a', 2)]
     collector.collect(data)
     assert collector.mapping == {'a': [1, 2]}
@@ -51,7 +51,7 @@ def test_collects_from_iterable_with_duplicate_keys():
 
 # Collects from an iterable with mixed data types
 def test_collects_from_iterable_with_mixed_data_types():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = [('a', 1), ('b', 'string'), ('c', 3.14)]
     collector.collect(data)
     assert collector.mapping == {'a': [1], 'b': ['string'], 'c': [3.14]}
@@ -59,7 +59,7 @@ def test_collects_from_iterable_with_mixed_data_types():
 
 # Collects from an iterable with None values
 def test_collects_from_iterable_with_none_values():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = [('a', None), ('b', None)]
     collector.collect(data)
     assert collector.mapping == {'a': [None], 'b': [None]}
@@ -67,7 +67,7 @@ def test_collects_from_iterable_with_none_values():
 
 # Collects from an iterable with very large data sets
 def test_collects_from_iterable_with_large_data_sets():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = [(str(i), i) for i in range(10000)]
     collector.collect(data)
     assert len(collector.mapping) == 10000
@@ -75,7 +75,7 @@ def test_collects_from_iterable_with_large_data_sets():
 
 # Collects from an iterable with invalid data types
 def test_collects_from_iterable_with_invalid_data_types():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = ['a', 1, 0.05]
 
     with pytest.raises(ValueError):
@@ -84,7 +84,7 @@ def test_collects_from_iterable_with_invalid_data_types():
 
 # Collects from an iterable with nested iterables
 def test_collects_from_iterable_with_nested_iterables():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = [('a', (1, 2)), ('b', [3, 4])]
     collector.collect(data)
     assert collector.mapping == {'a': [(1, 2)], 'b': [[3, 4]]}
@@ -92,7 +92,7 @@ def test_collects_from_iterable_with_nested_iterables():
 
 # Collects from an iterable with special characters in keys or values
 def test_collects_from_iterable_with_special_characters():
-    collector = MappingCollector(mode=MappingCollectorMode.ALL)
+    collector = MappingCollector(aggregation=MappingCollectorMode.ALL)
     data = [('!@#$', '%^&*'), ('()_+', '{}|')]
     collector.collect(data)
     assert collector.mapping == {'!@#$': ['%^&*'], '()_+': ['{}|']}

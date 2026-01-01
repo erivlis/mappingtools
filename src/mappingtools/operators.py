@@ -9,20 +9,25 @@ except ImportError:
     from deprecated import deprecated
 
 from mappingtools._tools import _is_strict_iterable
+from mappingtools.aggregation import Aggregation
+from mappingtools.collectors.mapping_collector import MappingCollector
 from mappingtools.typing import K
 
 __all__ = [
-    'distinct',
-    'flatten',
-    'inverse',
-    'keep',
-    'remove',
-    'stream',
-    'stream_dict_records',
+    "distinct",
+    "flatten",
+    "inverse",
+    "keep",
+    "pivot",
+    "rekey",
+    "remove",
+    "rename",
+    "stream",
+    "stream_dict_records",
 ]
 
 
-@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
+@deprecated("Can be easily replaced with a Python comprehension expression. See DocString for more info.")
 def _take(keys: Iterable[K], mapping: Mapping[K, Any], exclude: bool = False) -> dict[K, Any]:
     """
     .. deprecated:: 0.8.0
@@ -51,7 +56,7 @@ def _take(keys: Iterable[K], mapping: Mapping[K, Any], exclude: bool = False) ->
     return {k: mapping.get(k) for k in keys}
 
 
-@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
+@deprecated("Can be easily replaced with a Python comprehension expression. See DocString for more info.")
 def keep(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K, Any], Any, None]:
     """
     .. deprecated:: 0.8.0
@@ -71,7 +76,7 @@ def keep(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K, 
     yield from (_take(keys, mapping) for mapping in mappings)
 
 
-@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
+@deprecated("Can be easily replaced with a Python comprehension expression. See DocString for more info.")
 def remove(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K, Any], Any, None]:
     """
     .. deprecated:: 0.8.0
@@ -91,7 +96,7 @@ def remove(keys: Iterable[K], *mappings: Mapping[K, Any]) -> Generator[Mapping[K
     yield from (_take(keys, mapping, exclude=True) for mapping in mappings)
 
 
-@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
+@deprecated("Can be easily replaced with a Python comprehension expression. See DocString for more info.")
 def stream(mapping: Mapping, item_factory: Callable[[Any, Any], Any] | None = None) -> Generator[Any, Any, None]:
     """
     .. deprecated:: 0.8.0
@@ -114,10 +119,10 @@ def stream(mapping: Mapping, item_factory: Callable[[Any, Any], Any] | None = No
     yield from items
 
 
-@deprecated('Can be easily replaced with a Python comprehension expression. See DocString for more info.')
-def stream_dict_records(mapping: Mapping,
-                        key_name: str = 'key',
-                        value_name: str = 'value') -> Generator[Mapping[str, Any], Any, None]:
+@deprecated("Can be easily replaced with a Python comprehension expression. See DocString for more info.")
+def stream_dict_records(
+    mapping: Mapping, key_name: str = "key", value_name: str = "value"
+) -> Generator[Mapping[str, Any], Any, None]:
     """
     .. deprecated:: 0.8.0
        Use a generator expression with a dictionary literal instead.
@@ -205,3 +210,119 @@ def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
         dd[k].add(v)
 
     return dd
+
+
+def pivot(
+    iterable: Iterable[Mapping],
+    *,
+    index: str,
+    columns: str,
+    values: str,
+    mode: Aggregation = Aggregation.LAST,
+) -> dict[Any, dict[Any, Any]]:
+    """
+    Reshape data (produce a "pivot" table) based on column values.
+
+    Args:
+        iterable: An iterable of mappings (e.g., list of dicts).
+        index: The key to use for the row labels.
+        columns: The key to use for the column labels.
+        values: The key to use for the values.
+        mode: The aggregation mode to use for values. Defaults to Aggregation.LAST.
+
+    Returns:
+        A nested dictionary: {index_value: {column_value: aggregated_value}}.
+    """
+    # Initialize inner collectors based on mode
+    # We use a functional primitive to determine the collection type
+    ctype = mode.collection_type
+    result = (
+        defaultdict(lambda: defaultdict(ctype))
+        if ctype
+        else defaultdict(dict)
+    )
+
+    # Optimization: Bind a specialized aggregator function to the local scope
+    aggregate = mode.aggregator
+
+    for item in iterable:
+        # Skip items that don't have the required keys
+        if index not in item or columns not in item or values not in item:
+            continue
+
+        row_key = item[index]
+        col_key = item[columns]
+        val = item[values]
+
+        aggregate(result[row_key], col_key, val)
+
+    # Convert defaultdicts to regular dicts for clean output
+    # This is a deep conversion
+    final_result = {}
+    for row_k, row_v in result.items():
+        final_result[row_k] = dict(row_v)
+
+    return final_result
+
+
+def rename(
+    mapping: Mapping[K, Any],
+    mapper: Mapping[K, K] | Callable[[K], K],
+    *,
+    aggregation: Aggregation = Aggregation.LAST,
+) -> dict[K, Any]:
+    """
+    Rename keys in a mapping based on a mapper (Mapping or Callable).
+
+    This operator creates a new dictionary with renamed keys. If a key is not
+    present in the mapper, it remains unchanged. Collisions (when multiple
+    original keys map to the same new key) are handled according to the
+    specified aggregation.
+
+    Args:
+        mapping: The source mapping.
+        mapper: A dictionary mapping old keys to new keys, or a function that transforms keys.
+        aggregation: How to handle key collisions. Defaults to Aggregation.LAST.
+
+    Returns:
+        A new dictionary with renamed keys and aggregated values.
+    """
+
+    def key_factory(k: K, _: Any) -> K:
+        if isinstance(mapper, Mapping):
+            return mapper.get(k, k)
+        return mapper(k)
+
+    return rekey(mapping, key_factory, aggregation=aggregation)
+
+
+def rekey(
+    mapping: Mapping[Any, Any],
+    key_factory: Callable[[Any, Any], K],
+    *,
+    aggregation: Aggregation = Aggregation.LAST,
+) -> dict[K, Any]:
+    """
+    Transform keys of a mapping based on a factory function of (key, value).
+
+    This allows "re-indexing" a mapping where the new key depends on the content
+    of the value or a combination of the old key and value. Collisions are
+    handled according to the specified aggregation.
+
+    Args:
+        mapping: The source mapping.
+        key_factory: A callable that takes (key, value) and returns the new key.
+        aggregation: How to handle key collisions. Defaults to Aggregation.LAST.
+
+    Returns:
+        A new dictionary with keys generated by the factory and aggregated values.
+    """
+    collector = MappingCollector(aggregation=aggregation)
+    # Optimization: Bind the aggregator to a local variable
+    aggregate = aggregation.aggregator
+    target = collector._mapping
+
+    for k, v in mapping.items():
+        aggregate(target, key_factory(k, v), v)
+
+    return collector.mapping

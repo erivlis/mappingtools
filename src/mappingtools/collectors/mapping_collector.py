@@ -1,67 +1,48 @@
-from collections import Counter, defaultdict
+from collections import defaultdict
 from collections.abc import Iterable, Mapping
-from enum import Enum, auto
+from typing import Generic
 
+from mappingtools.aggregation import Aggregation
 from mappingtools.typing import KT, VT, VT_co
 
-
-class MappingCollectorMode(Enum):
-    """
-    Define an enumeration class for mapping collector modes.
-
-    Attributes:
-        ALL: Collect all values for each key.
-        COUNT: Count the occurrences of each value for each key.
-        DISTINCT: Collect distinct values for each key.
-        FIRST: Collect the first value for each key.
-        LAST: Collect the last value for each key.
+# Alias for backward compatibility
+MappingCollectorMode = Aggregation
 
 
-    """
-    ALL = auto()
-    COUNT = auto()
-    DISTINCT = auto()
-    FIRST = auto()
-    LAST = auto()
-
-
-class MappingCollector:
-
-    def __init__(self, mode: MappingCollectorMode = MappingCollectorMode.ALL, **kwargs):
+class MappingCollector(Generic[KT, VT_co]):
+    def __init__(self, aggregation: Aggregation = Aggregation.ALL, **kwargs):
         """
         Initialize the MappingCollector with the specified mode.
 
         Args:
-            mode (MappingCollectorMode): The mode for collecting mappings.
+            aggregation (Aggregation): The mode for collecting mappings.
             *args: Variable positional arguments used to initialize the internal mapping.
             **kwargs: Variable keyword arguments used to initialize the internal mapping.
         """
         self._mapping: Mapping[KT, VT_co]
 
-        self.mode = mode
+        if not isinstance(aggregation, Aggregation):
+            raise TypeError(f"Invalid mode type: {type(aggregation)}. Expected Aggregation.")
 
-        match self.mode:
-            case MappingCollectorMode.ALL:
-                self._mapping = defaultdict(list, **kwargs)
-            case MappingCollectorMode.COUNT:
-                self._mapping = defaultdict(Counter, **kwargs)
-            case MappingCollectorMode.DISTINCT:
-                self._mapping = defaultdict(set, **kwargs)
-            case MappingCollectorMode.FIRST | MappingCollectorMode.LAST:
-                self._mapping = dict(**kwargs)
-            case _:
-                raise ValueError("Invalid mode")
+        self.aggregation = aggregation
+        self._aggregator = self.aggregation.aggregator
+        aggregation_collection_type = self.aggregation.collection_type
+
+        if aggregation_collection_type:
+            self._mapping = defaultdict(aggregation_collection_type, **kwargs)
+        else:
+            self._mapping = dict(**kwargs)
 
     def __repr__(self):
-        return f'MappingCollector(mode={self.mode}, mapping={self.mapping})'
+        return f"MappingCollector(aggregation={self.aggregation}, mapping={self.mapping})"
 
     @property
-    def mapping(self) -> Mapping[KT, VT_co]:
+    def mapping(self) -> dict[KT, VT_co]:
         """
         Return a shallow copy of the internal mapping.
 
         Returns:
-            Mapping[KT, VT_co]: A shallow copy of the internal mapping.
+            dict[KT, VT_co]: A shallow copy of the internal mapping.
         """
         return dict(self._mapping)
 
@@ -76,17 +57,7 @@ class MappingCollector:
         Returns:
             None
         """
-        match self.mode:
-            case MappingCollectorMode.ALL:
-                self._mapping[key].append(value)
-            case MappingCollectorMode.COUNT:
-                self._mapping[key].update({value: 1})
-            case MappingCollectorMode.DISTINCT:
-                self._mapping[key].add(value)
-            case MappingCollectorMode.FIRST if key not in self.mapping:
-                self._mapping[key] = value
-            case MappingCollectorMode.LAST:
-                self._mapping[key] = value
+        self._aggregator(self._mapping, key, value)
 
     def collect(self, iterable: Iterable[tuple[KT, VT]]):
         """
