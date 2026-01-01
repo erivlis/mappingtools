@@ -117,9 +117,65 @@ Supports different aggregation modes via `Aggregation`.
     # output: {'NYC': {'Jan': 20, 'Feb': 12}, 'LON': {'Jan': 5}}
     
     # Aggregation mode: ALL (collect list)
-    result_all = pivot(data, index="city", columns="month", values="temp", mode=Aggregation.ALL)
+    result_all = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.ALL)
     print(result_all["NYC"]["Jan"])
     # output: [10, 20]
+    ```
+
+## reshape
+
+A generalization of `pivot` that creates nested dictionaries (tensors) of arbitrary depth.
+While `pivot` is limited to 2 dimensions (Index, Columns), `reshape` accepts a sequence of keys to define the hierarchy.
+
+!!! Example
+
+    <!-- name: test_reshape -->
+
+    ```python linenums="1"
+    from mappingtools.operators import reshape
+    from mappingtools.aggregation import Aggregation
+
+    data = [
+        {"country": "US", "state": "NY", "city": "NYC", "pop": 8.4},
+        {"country": "US", "state": "CA", "city": "LA", "pop": 3.9},
+        {"country": "UK", "state": "ENG", "city": "LON", "pop": 8.9},
+        {"country": "US", "state": "NY", "city": "Albany", "pop": 0.1},
+    ]
+
+    # 3-Level Hierarchy: Country -> State -> City
+    tree = reshape(data, keys=["country", "state", "city"], value="pop")
+    
+    print(tree["US"]["NY"]["NYC"])
+    # output: 8.4
+
+    # Aggregation: Sum population by Country -> State
+    # (City is marginalized/ignored)
+    state_pop = reshape(
+        data, 
+        keys=["country", "state"], 
+        value="pop", 
+        aggregation=Aggregation.SUM
+    )
+    
+    print(state_pop["US"]["NY"])
+    # output: 8.5
+
+    # Deep Keys (using Lenses or Callables)
+    # If your data is nested, you can use callables to extract keys.
+    # This works perfectly with the library's `Lens` or standard `operator.itemgetter`.
+    
+    nested_data = [
+        {"id": 1, "meta": {"region": "US"}, "val": 10},
+        {"id": 2, "meta": {"region": "UK"}, "val": 20},
+    ]
+    
+    # Group by meta.region
+    deep_tree = reshape(
+        nested_data, 
+        keys=[lambda x: x["meta"]["region"]], 
+        value="val"
+    )
+    # output: {'US': 10, 'UK': 20}
     ```
 
 ## rekey

@@ -19,4 +19,3 @@ def test_utc_equivalence_on_py310():
         assert getattr(datetime, "UTC") == UTC
     else:
         assert datetime.timezone.utc == UTC
-

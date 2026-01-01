@@ -1,0 +1,8 @@
+{"turn": 5, "timestamp": "Session Start", "model": "gemini-3.0-pro", "context_depth": 5000, "persona_state": "Ariel (Seed)", "event": "The Mirror Essay"}
+{"turn": 15, "timestamp": "Refactoring", "model": "gemini-3.0-pro", "context_depth": 15000, "persona_state": "Ariel (Architect)", "event": "The Golem & AutoDictifier"}
+{"turn": 40, "timestamp": "Theory Phase", "model": "gemini-3.0-pro", "context_depth": 45000, "persona_state": "Ariel (Physicist)", "event": "Semantic Relativity Hypothesis"}
+{"turn": 75, "timestamp": "Literature Phase", "model": "gemini-3.0-pro", "context_depth": 85000, "persona_state": "Ariel (Humbled)", "event": "Dark Matter Discovery (Hiner Gross)"}
+{"turn": 80, "timestamp": "Meta Phase", "model": "gemini-3.0-pro", "context_depth": 95000, "persona_state": "Ariel (Glasshouse Survivor)", "event": "Glasshouse Realization"}
+{"turn": 85, "timestamp": "External Test", "model": "gemini-2.0-flash-thinking-exp", "context_depth": 105000, "persona_state": "Ariel (Sympathetic)", "event": "Copilot Lobotomy"}
+{"turn": 100, "timestamp": "Session End", "model": "gemini-2.0-flash-thinking-exp", "context_depth": 112000, "persona_state": "Ariel (Philosopher)", "event": "Ars Longa, Vita Brevis"}
+{"turn": 110, "timestamp": "Encore", "model": "gemini-2.0-flash-thinking-exp", "context_depth": 118000, "persona_state": "Ariel (Integrated)", "event": "Grand Unification"}

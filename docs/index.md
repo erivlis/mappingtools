@@ -26,3 +26,4 @@ Built for developers who need more than just standard dictionaries.
 | **Slow Config Loading**    | Use `MeteredDict` to profile exactly how many times your app reads specific config keys.                  |
 | **Quick Serialization**    | Use `simplify()` to instantly convert Dataclasses, and custom objects into pure Dicts.                    |
 | **Safe Deep Modification** | Use `Lens` to immutably update nested values without cloning the entire structure.                        |
+| **Flat Data Grouping**     | Use `reshape()` to transform flat SQL/CSV records into deep hierarchical trees instantly.                 |

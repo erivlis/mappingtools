@@ -1,5 +1,5 @@
 from collections import defaultdict
-from collections.abc import Callable, Generator, Iterable, Mapping
+from collections.abc import Callable, Generator, Iterable, Mapping, Sequence
 from itertools import chain
 from typing import Any
 
@@ -21,6 +21,7 @@ __all__ = [
     "rekey",
     "remove",
     "rename",
+    "reshape",
     "stream",
     "stream_dict_records",
 ]
@@ -208,7 +209,64 @@ def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
     for k, v in items:
         dd[k].add(v)
 
-    return dd
+    return dict(dd)
+
+
+def reshape(
+    iterable: Iterable[Mapping],
+    keys: Sequence[str | Callable[[Mapping], Any]],
+    value: str | Callable[[Mapping], Any],
+    aggregation: Aggregation = Aggregation.LAST,
+) -> dict[Any, Any]:
+    """
+    Reshape a stream of mappings into a nested dictionary (tensor) of arbitrary depth.
+
+    This is a generalization of `pivot` that supports N-dimensional nesting.
+
+    Args:
+        iterable: An iterable of mappings (records).
+        keys: A sequence of keys (or callables) to use for the nesting hierarchy.
+        value: The key (or callable) to use for the leaf values.
+        aggregation: The aggregation mode to use for collisions at the leaf.
+
+    Returns:
+        A nested dictionary where the depth equals len(keys).
+    """
+    if not keys:
+        return {}
+
+    # The root of our tensor
+    result = {}
+
+    # Optimization: Bind the aggregator
+    aggregate = aggregation.aggregator
+    ctype = aggregation.collection_type
+
+    # Optimization: Pre-calculate slice indices
+    path_keys = keys[:-1]
+    leaf_key = keys[-1]
+
+    for item in iterable:
+        # Navigate/Build the tree structure
+        current = result
+        for k in path_keys:
+            key_val = k(item) if callable(k) else item.get(k)
+
+            if key_val not in current:
+                current[key_val] = {}
+
+            current = current[key_val]
+
+        leaf_val = leaf_key(item) if callable(leaf_key) else item.get(leaf_key)
+        value_val = value(item) if callable(value) else item.get(value)
+
+        # Apply aggregation at the leaf
+        if ctype and leaf_val not in current:
+            current[item.get(leaf_key)] = ctype()
+
+        aggregate(current, leaf_val, value_val)
+
+    return result
 
 
 def pivot(

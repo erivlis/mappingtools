@@ -1,5 +1,5 @@
 from collections import defaultdict
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, MutableMapping
 from typing import Generic
 
 from mappingtools.aggregation import Aggregation
@@ -19,7 +19,7 @@ class MappingCollector(Generic[KT, VT_co]):
             *args: Variable positional arguments used to initialize the internal mapping.
             **kwargs: Variable keyword arguments used to initialize the internal mapping.
         """
-        self._mapping: Mapping[KT, VT_co]
+        self._mapping: MutableMapping[KT, VT_co]
 
         if not isinstance(aggregation, Aggregation):
             raise TypeError(f"Invalid mode type: {type(aggregation)}. Expected Aggregation.")

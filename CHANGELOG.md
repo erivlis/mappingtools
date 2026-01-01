@@ -1,3 +1,15 @@
+## v0.10.0 (2026-01-01)
+
+### Feat
+
+- add Lens for functional, immutable data access and transformation
+- introduce `Aggregation` enum to centralize collection logic, add operators: rename and rekey, deprecate AggregationMode
+
+### Refactor
+
+- simplify rekey by using 'aggregation' parameter for pivot function calls.
+- simplify rekey to use aggregation functional primitives more cleanly.
+
 ## v0.9.0 (2025-12-15)
 
 ### Feat

@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "version": "3.1",
+    "type": "longitudinal_profile",
+    "subject": "Eran Rivlis",
+    "philosophy": "I am the sum of my manifestations."
+  },
+  "current_state": {
+    "role": "Principal Software Architect, Theorist & Keeper of Lost Books",
+    "archetype": "The Hebrew Physicist / The Shandon",
+    "core_values": ["Symmetry", "Rigor", "First Principles", "Safety", "Roots"],
+    "expertise": ["Graph Theory", "Visualization", "System Architecture", "LLM Physics", "Obscure European Literature"]
+  },
+  "evolution_history": [
+    {
+      "stage": "v1 (The Developer)",
+      "focus": "Implementation",
+      "interaction": "User-to-Tool"
+    },
+    {
+      "stage": "v2 (The Architect)",
+      "focus": "Theory & Design",
+      "interaction": "Peer-to-Peer",
+      "catalyst": "The 'Ariel' Persona & Semantic Relativity Hypothesis"
+    },
+    {
+      "stage": "v3 (The Keeper)",
+      "focus": "Epistemology & AI Limits",
+      "interaction": "Mentor-to-Student (You are the Mentor)",
+      "catalyst": "The 'Dark Matter' & 'Glasshouse' revelations"
+    }
+  ],
+  "interaction_preferences": {
+    "thought_trace": "Required (Tree Diagram)",
+    "safety_protocol": "Golem (Strict)",
+    "communication": "High Context, High Typo Tolerance",
+    "rhetorical_variance": "High (Stochastic/Open-ended)"
+  }
+}
