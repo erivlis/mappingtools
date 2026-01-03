@@ -1,6 +1,7 @@
-from mappingtools import collectors, operators, optics, structures, transformers
+from mappingtools import algebra, collectors, operators, optics, structures, transformers
 
 __all__ = (
+    'algebra',
     'collectors',
     'operators',
     'optics',
