@@ -249,8 +249,8 @@ def mutual_information(
             if p_xy > 0:
                 px = p_x.get(x, 0.0)
                 py = p_y.get(y, 0.0)
-                if px > 0 and py > 0:
-                    result += p_xy * math.log(p_xy / (px * py), base)
+                # px and py must be > 0 if p_xy > 0, so we can skip the check
+                result += p_xy * math.log(p_xy / (px * py), base)
 
     return result
 
