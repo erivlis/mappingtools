@@ -95,7 +95,7 @@ def box_counting_dimension(
     cov_xy = sum((log_inv_s[i] - mean_x) * (log_n[i] - mean_y) for i in range(n_points))
     var_x = sum((log_inv_s[i] - mean_x) ** 2 for i in range(n_points))
 
-    if var_x == 0:
+    if abs(var_x) < 1e-9:
         return 0.0
 
     return cov_xy / var_x
@@ -297,12 +297,12 @@ def lorentz_boost(
 
     result = dict(vector)
 
-    if t_prime != 0:
+    if abs(t_prime) > 1e-9:
         result[0] = t_prime
     elif 0 in result:
         del result[0]
 
-    if x_prime != 0:
+    if abs(x_prime) > 1e-9:
         result[axis] = x_prime
     elif axis in result:
         del result[axis]
