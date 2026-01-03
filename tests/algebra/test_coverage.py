@@ -334,13 +334,13 @@ def test_kl_divergence_empty():
 
 def test_markov_steady_state_convergence():
     # Already steady
-    P = {0: {0: 1.0}}
+    P = {0: {0: 1.0}}  # noqa: N806
     ss = markov_steady_state(P)
     assert ss == {0: 1.0}
 
 
 def test_markov_steady_state_zero_iterations():
-    P = {0: {0: 1.0}}
+    P = {0: {0: 1.0}}  # noqa: N806
     ss = markov_steady_state(P, iterations=0)
     # Should return initial uniform
     assert ss == {0: 1.0}
@@ -348,7 +348,7 @@ def test_markov_steady_state_zero_iterations():
 
 def test_markov_steady_state_no_convergence():
     # Periodic 0 <-> 1
-    P = {0: {1: 1.0}, 1: {0: 1.0}}
+    P = {0: {1: 1.0}, 1: {0: 1.0}}  # noqa: N806
     # It will oscillate and never converge (diff=2.0)
     # Should run for 'iterations' and return last state
     ss = markov_steady_state(P, iterations=2, tolerance=0.1)
@@ -358,7 +358,8 @@ def test_markov_steady_state_no_convergence():
     # Start: {0: 1.0}
     # But markov_steady_state initializes to uniform!
     # So it will converge immediately for this graph.
-    pass
+    assert ss[0] == pytest.approx(0.5)
+    assert ss[1] == pytest.approx(0.5)
 
 
 def test_mutual_information_zeros():

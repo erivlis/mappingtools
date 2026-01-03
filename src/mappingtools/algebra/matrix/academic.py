@@ -1,10 +1,9 @@
-import math
 import warnings
 from collections import defaultdict
 from collections.abc import Mapping
 from typing import TypeVar
 
-from mappingtools.algebra.matrix.core import transpose
+from mappingtools.algebra.matrix.core import mat_vec, transpose
 
 K = TypeVar("K")
 N = TypeVar("N", int, float)
@@ -87,9 +86,17 @@ def cofactor(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
 
             # We need to construct the minor such that determinant() sees it as a square matrix
             # of size N-1.
-            # We re-map the keys of the minor to 0..N-2.
+            # determinant() infers size from the union of keys.
+            # If we just filter, we get keys K \ {r_key} and K \ {c_key}.
+            # If r_key != c_key, these sets are different, so union size is N (or N-1 if overlap).
+            # We must re-map the keys of the minor to 0..N-2.
 
             minor_mapped = defaultdict(dict)
+
+            # Mapping for the minor:
+            # Original index k -> New index k'
+            # If k < excluded_index, k' = k
+            # If k > excluded_index, k' = k - 1
 
             for r, row in matrix.items():
                 if r == r_key:
@@ -113,7 +120,7 @@ def cofactor(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
                 # Pass explicit size n-1 to ensure correct dimension inference
                 det = determinant(minor_mapped, n=n - 1)
 
-            if not math.isclose(det, 0, abs_tol=1e-9):
+            if det != 0:
                 sign = 1 if (i + j) % 2 == 0 else -1
                 result[r_key][c_key] = sign * det
 
@@ -167,10 +174,10 @@ def determinant(matrix: Mapping[K, Mapping[K, N]], n: int | None = None) -> N:
         # Find pivot
         pivot = m[i].get(i, 0)
 
-        # Swap rows if pivot is close to zero
-        if math.isclose(pivot, 0, abs_tol=1e-9):
+        # Swap rows if pivot is zero
+        if pivot == 0:
             for j in range(i + 1, n):
-                if not math.isclose(m[j].get(i, 0), 0, abs_tol=1e-9):
+                if m[j].get(i, 0) != 0:
                     m[i], m[j] = m[j], m[i]
                     sign *= -1
                     pivot = m[i].get(i, 0)
@@ -181,7 +188,7 @@ def determinant(matrix: Mapping[K, Mapping[K, N]], n: int | None = None) -> N:
         # Eliminate rows below
         for j in range(i + 1, n):
             factor = m[j].get(i, 0)
-            if not math.isclose(factor, 0, abs_tol=1e-9):
+            if factor != 0:
                 multiplier = factor / pivot
                 # Row operation: R[j] = R[j] - multiplier * R[i]
                 # Optimization: Only iterate over non-zero elements of R[i]
@@ -225,18 +232,13 @@ def eigen_centrality(
     for _ in range(iterations):
         # v_new = M * v_old (Note: usually defined as v M for row vectors, or M v for col vectors)
         # Here we treat 'vector' as a column vector, so we do M * v
-        # We need to import mat_vec from core. It is not imported in this file scope?
-        # Ah, I need to import it. It was imported in previous versions.
-        # Let's check imports.
-        from mappingtools.algebra.matrix.core import mat_vec
-
         new_vector = mat_vec(matrix, vector)
 
         # Normalize
         # (L2 norm or Sum norm? Centrality usually uses L2, but simple power iteration often just normalizes max or sum)
         # Let's use Euclidean norm (L2) to keep it standard for eigenvectors
         norm = sum(x * x for x in new_vector.values()) ** 0.5
-        if math.isclose(norm, 0, abs_tol=1e-9):
+        if norm == 0:
             return vector  # Matrix is likely zero
 
         new_vector = {k: v / norm for k, v in new_vector.items()}
@@ -276,7 +278,7 @@ def inverse(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", PerformanceWarning)
         det = determinant(matrix)
-        if math.isclose(det, 0, abs_tol=1e-9):
+        if det == 0:
             raise ValueError("Matrix is singular (determinant is 0)")
 
         adj = adjoint(matrix)

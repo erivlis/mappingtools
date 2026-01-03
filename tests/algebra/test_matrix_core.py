@@ -58,8 +58,8 @@ def test_trace():
 
 
 def test_inner():
-    v1 = {'a': 2, 'b': 3}
-    v2 = {'b': 4, 'c': 5}
+    v1 = {"a": 2, "b": 3}
+    v2 = {"b": 4, "c": 5}
     # 2*0 + 3*4 + 0*5 = 12
     assert inner(v1, v2) == 12
 
@@ -88,7 +88,7 @@ def test_vec_mat_cancellation():
     #     [-1 ]
     # res = 1*1 + 1*(-1) = 0
     v = {0: 1, 1: 1}
-    M = {0: {0: 1}, 1: {0: -1}}
+    M = {0: {0: 1}, 1: {0: -1}}  # noqa: N806
     assert vec_mat(v, M) == {}
 
 
