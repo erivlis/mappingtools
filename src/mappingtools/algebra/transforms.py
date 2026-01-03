@@ -95,7 +95,7 @@ def box_counting_dimension(
     cov_xy = sum((log_inv_s[i] - mean_x) * (log_n[i] - mean_y) for i in range(n_points))
     var_x = sum((log_inv_s[i] - mean_x) ** 2 for i in range(n_points))
 
-    if var_x == 0:
+    if math.isclose(var_x, 0, abs_tol=1e-9):
         return 0.0
 
     return cov_xy / var_x
@@ -166,7 +166,7 @@ def dft(
             # exp is expensive, but unavoidable for DFT
             val += x_m * cmath.exp(coef * k * m)
 
-        if abs(val) > 1e-9:
+        if not math.isclose(abs(val), 0, abs_tol=1e-9):
             result[k] = val
 
     return result
@@ -211,17 +211,15 @@ def hilbert(
     # N/2+1..N-1: Negative freq (multiply by 0)
 
     new_spectrum = {}
-    
+
     # Correct logic for both even and odd N
     # Positive frequencies are 1 ... ceil(N/2) - 1
     # Nyquist is N/2 (only if N is even)
-    
+
     limit = (n + 1) // 2
 
     for k, val in spectrum.items():
-        if k == 0:
-            new_spectrum[k] = val
-        elif n % 2 == 0 and k == n // 2:
+        if k == 0 or (n % 2 == 0 and k == n // 2):
             new_spectrum[k] = val
         elif 0 < k < limit:
             # Positive frequencies
@@ -263,7 +261,7 @@ def idft(
             val += X_k * cmath.exp(coef * k * m)
 
         val *= norm
-        if abs(val) > 1e-9:
+        if not math.isclose(abs(val), 0, abs_tol=1e-9):
             result[m] = val
 
     return result
@@ -299,12 +297,12 @@ def lorentz_boost(
 
     result = dict(vector)
 
-    if t_prime != 0:
+    if not math.isclose(t_prime, 0, abs_tol=1e-9):
         result[0] = t_prime
     elif 0 in result:
         del result[0]
 
-    if x_prime != 0:
+    if not math.isclose(x_prime, 0, abs_tol=1e-9):
         result[axis] = x_prime
     elif axis in result:
         del result[axis]

@@ -64,7 +64,13 @@ def test_z_transform():
     # 1 + 2*(1/2) = 2
     sig = {0: 1, 1: 2}
     val = z_transform(sig, z=2)
-    assert val == 2.0
+    assert val == pytest.approx(2.0)
+
+def test_z_transform_negative_index():
+    # x[-1] should be ignored
+    signal = {-1: 1, 0: 1}
+    # Z-transform of delta(n) is 1. delta(n+1) is ignored by unilateral ZT.
+    assert z_transform(signal, 2) == pytest.approx(1)
 
 def test_lorentz():
     # Rest frame (t=1, x=0)
@@ -73,8 +79,8 @@ def test_lorentz():
     # x' = 1.25 * (0 - 0.6*1) = -0.75
     vec = {0: 1.0, 1: 0.0}
     boosted = lorentz_boost(vec, beta=0.6)
-    assert boosted[0] == 1.25
-    assert boosted[1] == -0.75
+    assert boosted[0] == pytest.approx(1.25)
+    assert boosted[1] == pytest.approx(-0.75)
 
 def test_lorentz_invalid_beta():
     with pytest.raises(ValueError):
@@ -101,11 +107,23 @@ def test_fractal():
     assert dim == pytest.approx(1.0, 0.1)
 
 def test_fractal_empty():
-    assert box_counting_dimension({}) == 0.0
-    assert box_counting_dimension({}, min_box_size=1) == 0.0
+    assert box_counting_dimension({}) == pytest.approx(0.0)
+    assert box_counting_dimension({}, min_box_size=1) == pytest.approx(0.0)
 
 def test_fractal_single_point():
     # 1 point -> dim 0
     points = {(0,): 1}
     dim = box_counting_dimension(points)
-    assert dim == 0.0
+    assert dim == pytest.approx(0.0)
+
+def test_box_counting_dimension_edge_cases():
+    # Not enough points
+    assert box_counting_dimension({}) == pytest.approx(0.0)
+    assert box_counting_dimension({(0,): 1.0}) == pytest.approx(0.0)
+
+    # Not enough sizes (min_box_size > extent)
+    # points: (0,), (1,) extent=1. max_box=0 (if None).
+    # If we force max_box_size
+    points = {(0,): 1.0, (10,): 1.0}
+    # min_box_size=100, max_box_size=200 -> only one size?
+    assert box_counting_dimension(points, min_box_size=100) == pytest.approx(0.0)

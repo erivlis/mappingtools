@@ -15,26 +15,38 @@ def test_determinant_2x2():
     # |3 4|
     m = {0: {0: 1, 1: 2}, 1: {0: 3, 1: 4}}
     with pytest.warns(PerformanceWarning):
-        assert determinant(m) == -2
+        assert determinant(m) == pytest.approx(-2)
 
 
 def test_determinant_3x3():
     # Identity
     m = {0: {0: 1}, 1: {1: 1}, 2: {2: 1}}
     with pytest.warns(PerformanceWarning):
-        assert determinant(m) == 1
+        assert determinant(m) == pytest.approx(1)
 
 
 def test_determinant_singular():
     # Row 0 is zero
     m = {0: {}, 1: {1: 1}}
     with pytest.warns(PerformanceWarning):
-        assert determinant(m) == 0
+        assert determinant(m) == pytest.approx(0)
+
+
+def test_determinant_row_swap():
+    # Matrix requiring row swap
+    # | 0 1 |  (pivot at 0,0 is 0)
+    # | 1 0 |
+    # Swap -> - | 1 0 | -> det = -(-1) = 1? No.
+    #           | 0 1 |
+    # Det = -1.
+    m = {0: {0: 0, 1: 1}, 1: {0: 1, 1: 0}}
+    with pytest.warns(PerformanceWarning):
+        assert determinant(m) == pytest.approx(-1)
 
 
 def test_determinant_empty():
     with pytest.warns(PerformanceWarning):
-        assert determinant({}) == 1
+        assert determinant({}) == pytest.approx(1)
 
 
 def test_inverse():
@@ -44,10 +56,10 @@ def test_inverse():
     with pytest.warns(PerformanceWarning):
         inv = inverse(m)
 
-    assert inv[0][0] == 0.6
-    assert inv[0][1] == -0.7
-    assert inv[1][0] == -0.2
-    assert inv[1][1] == 0.4
+    assert inv[0][0] == pytest.approx(0.6)
+    assert inv[0][1] == pytest.approx(-0.7)
+    assert inv[1][0] == pytest.approx(-0.2)
+    assert inv[1][1] == pytest.approx(0.4)
 
 
 def test_inverse_singular_raises():
@@ -105,5 +117,5 @@ def test_eigen_centrality_zero_matrix():
     m = {0: {}, 1: {}}
     ec = eigen_centrality(m)
     # Should return initial uniform vector if norm becomes 0
-    assert ec[0] == 0.5
-    assert ec[1] == 0.5
+    assert ec[0] == pytest.approx(0.5)
+    assert ec[1] == pytest.approx(0.5)
