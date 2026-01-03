@@ -1,3 +1,4 @@
+import math
 import warnings
 from collections import defaultdict
 from collections.abc import Mapping
@@ -112,7 +113,7 @@ def cofactor(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
                 # Pass explicit size n-1 to ensure correct dimension inference
                 det = determinant(minor_mapped, n=n - 1)
 
-            if abs(det) > 1e-9:
+            if not math.isclose(det, 0, abs_tol=1e-9):
                 sign = 1 if (i + j) % 2 == 0 else -1
                 result[r_key][c_key] = sign * det
 
@@ -167,9 +168,9 @@ def determinant(matrix: Mapping[K, Mapping[K, N]], n: int | None = None) -> N:
         pivot = m[i].get(i, 0)
 
         # Swap rows if pivot is close to zero
-        if abs(pivot) < 1e-9:
+        if math.isclose(pivot, 0, abs_tol=1e-9):
             for j in range(i + 1, n):
-                if abs(m[j].get(i, 0)) > 1e-9:
+                if not math.isclose(m[j].get(i, 0), 0, abs_tol=1e-9):
                     m[i], m[j] = m[j], m[i]
                     sign *= -1
                     pivot = m[i].get(i, 0)
@@ -180,7 +181,7 @@ def determinant(matrix: Mapping[K, Mapping[K, N]], n: int | None = None) -> N:
         # Eliminate rows below
         for j in range(i + 1, n):
             factor = m[j].get(i, 0)
-            if abs(factor) > 1e-9:
+            if not math.isclose(factor, 0, abs_tol=1e-9):
                 multiplier = factor / pivot
                 # Row operation: R[j] = R[j] - multiplier * R[i]
                 # Optimization: Only iterate over non-zero elements of R[i]
@@ -235,7 +236,7 @@ def eigen_centrality(
         # (L2 norm or Sum norm? Centrality usually uses L2, but simple power iteration often just normalizes max or sum)
         # Let's use Euclidean norm (L2) to keep it standard for eigenvectors
         norm = sum(x * x for x in new_vector.values()) ** 0.5
-        if norm < 1e-9:
+        if math.isclose(norm, 0, abs_tol=1e-9):
             return vector  # Matrix is likely zero
 
         new_vector = {k: v / norm for k, v in new_vector.items()}
@@ -275,7 +276,7 @@ def inverse(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", PerformanceWarning)
         det = determinant(matrix)
-        if abs(det) < 1e-9:
+        if math.isclose(det, 0, abs_tol=1e-9):
             raise ValueError("Matrix is singular (determinant is 0)")
 
         adj = adjoint(matrix)
