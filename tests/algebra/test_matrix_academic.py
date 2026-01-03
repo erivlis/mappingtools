@@ -32,6 +32,18 @@ def test_determinant_singular():
         assert determinant(m) == 0
 
 
+def test_determinant_row_swap():
+    # Matrix requiring row swap
+    # | 0 1 |  (pivot at 0,0 is 0)
+    # | 1 0 |
+    # Swap -> - | 1 0 | -> det = -(-1) = 1? No.
+    #           | 0 1 |
+    # Det = -1.
+    m = {0: {0: 0, 1: 1}, 1: {0: 1, 1: 0}}
+    with pytest.warns(PerformanceWarning):
+        assert determinant(m) == -1
+
+
 def test_determinant_empty():
     with pytest.warns(PerformanceWarning):
         assert determinant({}) == 1

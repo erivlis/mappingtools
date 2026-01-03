@@ -85,6 +85,11 @@ def test_cross_entropy():
     q2 = {'a': 0.0} # log(0)
     assert cross_entropy(p2, q2) == float('inf')
 
+def test_cross_entropy_inf():
+    p = {0: 0.5}
+    q = {0: 0.0} # q(x) is 0 where p(x) > 0
+    assert cross_entropy(p, q) == float("inf")
+
 def test_kl_divergence():
     p = {'a': 0.5, 'b': 0.5}
     q = {'a': 0.25, 'b': 0.75}
@@ -98,6 +103,12 @@ def test_kl_divergence_infinite():
     p = {'a': 0.5}
     q = {'a': 0.0}
     assert kl_divergence(p, q) == float('inf')
+
+def test_kl_divergence_inf_coverage():
+    # Duplicate of above but ensures explicit coverage if slightly different paths exist
+    p = {0: 0.5}
+    q = {0: 0.0}
+    assert kl_divergence(p, q) == float("inf")
 
 def test_mutual_information():
     # Independent X, Y -> MI = 0
@@ -126,6 +137,16 @@ def test_markov():
     ss = markov_steady_state(transition)
     assert ss[0] == pytest.approx(0.5)
     assert ss[1] == pytest.approx(0.5)
+
+def test_markov_steady_state_convergence():
+    # Simple case that converges quickly
+    # 0 -> 1, 1 -> 0
+    P = {0: {1: 1.0}, 1: {0: 1.0}}
+    # Steady state is 0.5, 0.5
+    # This should hit the tolerance break
+    steady = markov_steady_state(P, iterations=100, tolerance=1e-5)
+    assert steady[0] == pytest.approx(0.5)
+    assert steady[1] == pytest.approx(0.5)
 
 def test_markov_steady_state_empty():
     assert markov_steady_state({}) == {}

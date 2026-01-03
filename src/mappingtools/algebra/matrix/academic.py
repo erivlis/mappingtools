@@ -76,34 +76,34 @@ def cofactor(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
 
     # Map keys to indices 0..n-1 for consistent ordering
     key_map = {k: i for i, k in enumerate(keys)}
-    
+
     result = defaultdict(dict)
 
     for i, r_key in enumerate(keys):
         for j, c_key in enumerate(keys):
             # Compute minor for element (r_key, c_key)
             # Exclude row r_key and column c_key
-            
+
             # We need to construct the minor such that determinant() sees it as a square matrix
             # of size N-1.
             # We re-map the keys of the minor to 0..N-2.
-            
+
             minor_mapped = defaultdict(dict)
-            
+
             for r, row in matrix.items():
                 if r == r_key:
                     continue
-                
+
                 r_idx = key_map[r]
                 new_r_idx = r_idx if r_idx < i else r_idx - 1
-                
+
                 for c, val in row.items():
                     if c == c_key:
                         continue
-                    
+
                     c_idx = key_map[c]
                     new_c_idx = c_idx if c_idx < j else c_idx - 1
-                    
+
                     minor_mapped[new_r_idx][new_c_idx] = val
 
             # We suppress the warning for the inner determinant call to avoid spamming
@@ -139,7 +139,7 @@ def determinant(matrix: Mapping[K, Mapping[K, N]], n: int | None = None) -> N:
         PerformanceWarning,
         stacklevel=2,
     )
-    
+
     if n is None:
         # Identify the universe of keys
         keys = sorted(set(matrix.keys()) | {k for row in matrix.values() for k in row}, key=str)

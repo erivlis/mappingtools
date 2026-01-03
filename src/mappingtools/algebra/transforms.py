@@ -211,17 +211,15 @@ def hilbert(
     # N/2+1..N-1: Negative freq (multiply by 0)
 
     new_spectrum = {}
-    
+
     # Correct logic for both even and odd N
     # Positive frequencies are 1 ... ceil(N/2) - 1
     # Nyquist is N/2 (only if N is even)
-    
+
     limit = (n + 1) // 2
 
     for k, val in spectrum.items():
-        if k == 0:
-            new_spectrum[k] = val
-        elif n % 2 == 0 and k == n // 2:
+        if k == 0 or (n % 2 == 0 and k == n // 2):
             new_spectrum[k] = val
         elif 0 < k < limit:
             # Positive frequencies
