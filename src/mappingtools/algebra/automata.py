@@ -1,16 +1,13 @@
 from collections import defaultdict
 from collections.abc import Mapping
-from typing import TypeVar
 
-K = TypeVar("K")
-S = TypeVar("S")  # State
-A = TypeVar("A")  # Alphabet/Symbol
+from mappingtools.algebra.typing import A, S
 
 __all__ = [
-    "dfa_step",
-    "nfa_step",
-    "simulate_dfa",
-    "simulate_nfa",
+    'dfa_step',
+    'nfa_step',
+    'simulate_dfa',
+    'simulate_nfa',
 ]
 
 

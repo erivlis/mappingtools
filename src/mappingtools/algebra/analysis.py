@@ -1,23 +1,19 @@
 import math
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
-from typing import TypeVar
 
-K = TypeVar("K")
-N = TypeVar("N", int, float)
+from mappingtools.algebra.typing import K, N, SparseMatrix, SparseVector
 
 __all__ = [
-    "divergence",
-    "gaussian_kernel",
-    "gradient",
-    "laplacian",
-    "ollivier_ricci_curvature",
+    'divergence',
+    'gaussian_kernel',
+    'gradient',
+    'laplacian',
+    'ollivier_ricci_curvature',
 ]
 
 
-def divergence(
-    flow: Mapping[K, Mapping[K, N]],
-) -> dict[K, N]:
+def divergence(flow: SparseMatrix) -> SparseVector:
     """
     Compute the discrete divergence of a 1-form (flow/edge signals).
     Maps edges (matrix) to nodes (vector).
@@ -50,11 +46,7 @@ def divergence(
     return dict(result)
 
 
-def gaussian_kernel(
-    distance_matrix: Mapping[K, Mapping[K, N]],
-    sigma: float = 1.0,
-    threshold: float = 1e-6,
-) -> dict[K, dict[K, float]]:
+def gaussian_kernel(distance_matrix: SparseMatrix, sigma: float = 1.0, threshold: float = 1e-6) -> SparseMatrix:
     """
     Compute the Gaussian (RBF) kernel from a distance matrix.
     K_ij = exp(-d_ij^2 / (2 * sigma^2))
@@ -85,10 +77,7 @@ def gaussian_kernel(
     return result
 
 
-def gradient(
-    field: Mapping[K, N],
-    graph: Mapping[K, Iterable[K]],
-) -> dict[K, dict[K, N]]:
+def gradient(field: SparseVector, graph: Mapping[K, Iterable[K]]) -> SparseMatrix:
     """
     Compute the discrete gradient (exterior derivative d0) of a 0-form (node signals).
     Maps nodes (vector) to edges (matrix).
@@ -118,10 +107,7 @@ def gradient(
     return result
 
 
-def laplacian(
-    field: Mapping[K, N],
-    graph: Mapping[K, Mapping[K, N]],
-) -> dict[K, N]:
+def laplacian(field: SparseVector, graph: SparseMatrix) -> SparseVector:
     """
     Compute the combinatorial Laplacian of a scalar field.
     L = D - A (for unweighted) or L f = div(grad f).
@@ -160,10 +146,7 @@ def laplacian(
     return dict(result)
 
 
-def ollivier_ricci_curvature(
-    graph: Mapping[K, Mapping[K, N]],
-    alpha: float = 0.5,
-) -> dict[tuple[K, K], float]:
+def ollivier_ricci_curvature(graph: SparseMatrix) -> dict[tuple[K, K], float]:
     """
     Compute the Ollivier-Ricci Curvature for edges in a graph.
     Ric(xy) = 1 - W_1(m_x, m_y) / d(x, y)
@@ -186,7 +169,6 @@ def ollivier_ricci_curvature(
 
     Args:
         graph: Adjacency matrix (weighted).
-        alpha: (Unused in Forman version, kept for API compatibility).
 
     Returns:
         A dictionary mapping edges (u, v) to their curvature values.

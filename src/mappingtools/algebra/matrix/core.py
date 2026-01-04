@@ -1,25 +1,27 @@
 from collections import defaultdict
-from collections.abc import Mapping
-from typing import TypeVar
+from collections.abc import Iterable, Mapping, Sequence
 
-K = TypeVar("K")
-N = TypeVar("N", int, float)
-V = TypeVar("V")
+from mappingtools.algebra.typing import K, N, SparseMatrix, SparseVector, V
 
 __all__ = [
-    "add",
-    "dot",
-    "inner",
-    "kronecker_delta",
-    "mat_vec",
-    "power",
-    "trace",
-    "transpose",
-    "vec_mat",
+    'add',
+    'block',
+    'block_diag',
+    'dot',
+    'hstack',
+    'inner',
+    'kronecker_delta',
+    'mat_vec',
+    'power',
+    'slice_matrix',
+    'trace',
+    'transpose',
+    'vec_mat',
+    'vstack',
 ]
 
 
-def add(m1: Mapping[K, Mapping[K, N]], m2: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
+def add(m1: SparseMatrix[K, N], m2: SparseMatrix[K, N]) -> SparseMatrix[K, N]:
     """
     Perform element-wise addition of two sparse matrices (nested mappings).
 
@@ -46,7 +48,107 @@ def add(m1: Mapping[K, Mapping[K, N]], m2: Mapping[K, Mapping[K, N]]) -> dict[K,
     return result
 
 
-def dot(m1: Mapping[K, Mapping[K, N]], m2: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
+def block(
+    matrix: SparseMatrix[int, V],
+    rows: slice | range,
+    cols: slice | range,
+) -> SparseMatrix[int, V]:
+    """
+    Extract a sub-matrix (block) from a sparse matrix.
+    Indices are re-based to 0 in the result.
+
+    Args:
+        matrix: The input sparse matrix (must have integer keys).
+        rows: The range of rows to extract.
+        cols: The range of columns to extract.
+
+    Returns:
+        A new sparse matrix containing the block.
+    """
+    result = {}
+
+    # Convert slice to range if needed (assuming reasonable bounds or step)
+    # If slice has no stop, we need to know max size?
+    # For sparse matrices, we can just iterate the matrix keys and check membership.
+    # But re-basing requires a start.
+
+    r_start = rows.start if rows.start is not None else 0
+    r_stop = rows.stop
+    r_step = rows.step if rows.step is not None else 1
+
+    c_start = cols.start if cols.start is not None else 0
+    c_stop = cols.stop
+    c_step = cols.step if cols.step is not None else 1
+
+    for r, row in matrix.items():
+        # Check row bounds
+        if r < r_start:
+            continue
+        if r_stop is not None and r >= r_stop:
+            continue
+        if (r - r_start) % r_step != 0:
+            continue
+
+        new_r = (r - r_start) // r_step
+        new_row = {}
+
+        for c, val in row.items():
+            # Check col bounds
+            if c < c_start:
+                continue
+            if c_stop is not None and c >= c_stop:
+                continue
+            if (c - c_start) % c_step != 0:
+                continue
+
+            new_c = (c - c_start) // c_step
+            new_row[new_c] = val
+
+        if new_row:
+            result[new_r] = new_row
+
+    return result
+
+
+def block_diag(matrices: Sequence[SparseMatrix[int, V]]) -> SparseMatrix[int, V]:
+    """
+    Construct a block diagonal matrix from a sequence of matrices.
+
+    Args:
+        matrices: A sequence of sparse matrices.
+
+    Returns:
+        A new sparse matrix with the inputs on the diagonal.
+    """
+    result = {}
+    r_offset = 0
+    c_offset = 0
+
+    for m in matrices:
+        if not m:
+            continue
+
+        # Find dimensions of current matrix to update offsets
+        max_r = max(m.keys())
+        max_c = 0
+        for row in m.values():
+            if row:
+                max_c = max(max_c, max(row.keys()))
+
+        # Copy with offset
+        for r, row in m.items():
+            new_row = {}
+            for c, val in row.items():
+                new_row[c + c_offset] = val
+            result[r + r_offset] = new_row
+
+        r_offset += max_r + 1
+        c_offset += max_c + 1
+
+    return result
+
+
+def dot(m1: SparseMatrix[K, N], m2: SparseMatrix[K, N]) -> SparseMatrix[K, N]:
     """
     Perform matrix multiplication (dot product) of two sparse matrices.
 
@@ -72,7 +174,35 @@ def dot(m1: Mapping[K, Mapping[K, N]], m2: Mapping[K, Mapping[K, N]]) -> dict[K,
     return result
 
 
-def inner(v1: Mapping[K, N], v2: Mapping[K, N]) -> N:
+def hstack(matrices: Sequence[SparseMatrix[int, V]]) -> SparseMatrix[int, V]:
+    """
+    Stack sparse matrices horizontally (column-wise).
+
+    Args:
+        matrices: A sequence of sparse matrices.
+
+    Returns:
+        A new sparse matrix.
+    """
+    result = defaultdict(dict)
+    c_offset = 0
+
+    for m in matrices:
+        if not m:
+            continue
+
+        current_max_c = 0
+        for r, row in m.items():
+            for c, val in row.items():
+                result[r][c + c_offset] = val
+                current_max_c = max(current_max_c, c)
+
+        c_offset += current_max_c + 1
+
+    return dict(result)
+
+
+def inner(v1: SparseVector[K, N], v2: SparseVector[K, N]) -> N:
     """
     Compute the inner product (dot product) of two vectors.
 
@@ -102,7 +232,7 @@ def kronecker_delta(i: K, j: K) -> int:
     return 1 if i == j else 0
 
 
-def mat_vec(matrix: Mapping[K, Mapping[K, N]], vector: Mapping[K, N]) -> dict[K, N]:
+def mat_vec(matrix: SparseMatrix[K, N], vector: SparseVector[K, N]) -> SparseVector[K, N]:
     """
     Multiply a matrix by a vector (M * v).
 
@@ -122,7 +252,7 @@ def mat_vec(matrix: Mapping[K, Mapping[K, N]], vector: Mapping[K, N]) -> dict[K,
     return result
 
 
-def power(matrix: Mapping[K, Mapping[K, N]], n: int) -> dict[K, dict[K, N]]:
+def power(matrix: SparseMatrix[K, N], n: int) -> SparseMatrix[K, N]:
     """
     Compute the n-th power of a square matrix using binary exponentiation.
 
@@ -134,7 +264,7 @@ def power(matrix: Mapping[K, Mapping[K, N]], n: int) -> dict[K, dict[K, N]]:
         The result of matrix ** n.
     """
     if n < 0:
-        raise ValueError("Exponent must be non-negative.")
+        raise ValueError('Exponent must be non-negative.')
 
     # Identity matrix construction
     keys = set(matrix.keys()) | {k for row in matrix.values() for k in row}
@@ -149,7 +279,37 @@ def power(matrix: Mapping[K, Mapping[K, N]], n: int) -> dict[K, dict[K, N]]:
     return result
 
 
-def trace(matrix: Mapping[K, Mapping[K, N]]) -> N:
+def slice_matrix(
+    matrix: SparseMatrix[K, V],
+    rows: Iterable[K],
+    cols: Iterable[K],
+) -> SparseMatrix[K, V]:
+    """
+    Extract a sub-matrix using explicit row and column keys.
+    Does NOT re-base indices (preserves original keys).
+
+    Args:
+        matrix: The input sparse matrix.
+        rows: Iterable of row keys to keep.
+        cols: Iterable of column keys to keep.
+
+    Returns:
+        A new sparse matrix containing only the intersection.
+    """
+    row_set = set(rows)
+    col_set = set(cols)
+    result = {}
+
+    for r in row_set:
+        if r in matrix:
+            new_row = {c: v for c, v in matrix[r].items() if c in col_set}
+            if new_row:
+                result[r] = new_row
+
+    return result
+
+
+def trace(matrix: SparseMatrix[K, N]) -> N:
     """
     Calculate the trace of a matrix (sum of diagonal elements).
 
@@ -181,7 +341,7 @@ def transpose(matrix: Mapping[K, Mapping[K, V]]) -> dict[K, dict[K, V]]:
     return {k: dict(v) for k, v in result.items()}
 
 
-def vec_mat(vector: Mapping[K, N], matrix: Mapping[K, Mapping[K, N]]) -> dict[K, N]:
+def vec_mat(vector: SparseVector[K, N], matrix: SparseMatrix[K, N]) -> SparseVector[K, N]:
     """
     Multiply a vector by a matrix (v * M).
 
@@ -198,3 +358,30 @@ def vec_mat(vector: Mapping[K, N], matrix: Mapping[K, Mapping[K, N]]) -> dict[K,
             for c, m_val in matrix[k].items():
                 result[c] += val * m_val
     return {k: v for k, v in result.items() if v != 0}
+
+
+def vstack(matrices: Sequence[SparseMatrix[int, V]]) -> SparseMatrix[int, V]:
+    """
+    Stack sparse matrices vertically (row-wise).
+
+    Args:
+        matrices: A sequence of sparse matrices.
+
+    Returns:
+        A new sparse matrix.
+    """
+    result = {}
+    r_offset = 0
+
+    for m in matrices:
+        if not m:
+            continue
+
+        max_r = max(m.keys())
+
+        for r, row in m.items():
+            result[r + r_offset] = dict(row)
+
+        r_offset += max_r + 1
+
+    return result

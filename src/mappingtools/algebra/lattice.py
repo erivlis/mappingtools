@@ -1,23 +1,22 @@
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
-from typing import TypeVar
+from typing import Any
 
-K = TypeVar("K")
-N = TypeVar("N", int, float)
+from mappingtools.algebra.typing import K, N, V
 
 __all__ = [
-    "average",
-    "combine",
-    "difference",
-    "exclude",
-    "exclusive",
-    "geometric_mean",
-    "harmonic_mean",
-    "join",
-    "mask",
-    "meet",
-    "product",
-    "ratio",
-    "symmetric_difference",
+    'average',
+    'combine',
+    'difference',
+    'exclude',
+    'exclusive',
+    'geometric_mean',
+    'harmonic_mean',
+    'join',
+    'mask',
+    'meet',
+    'product',
+    'ratio',
+    'symmetric_difference',
 ]
 
 
@@ -41,16 +40,23 @@ def average(
 
 
 def combine(
-    m1: Mapping[K, N],
-    m2: Mapping[K, N],
-    op: Callable[[N, N], N],
-    default: N = 0,
+    m1: Mapping[K, V],
+    m2: Mapping[K, V],
+    op: Callable[[V, V], V],
+    default: Any = 0,
     domain: Iterable[K] | Callable[[set[K], set[K]], Iterable[K]] | None = None,
-) -> dict[K, N]:
+) -> dict[K, V]:
     """
     Combine two mappings using an element-wise binary operation.
     Automatically handles sparsity by removing zero results.
     Optimized to avoid set creation for standard set operations.
+
+    Note on `default`:
+        The default value for missing keys is `0`. This aligns with the library's
+        focus on sparse algebra where missing elements are treated as the additive
+        identity. If you are using `combine` for non-numeric types (e.g., strings
+        or objects), you should explicitly pass `default=None` or another appropriate
+        value to avoid TypeErrors or unexpected behavior.
 
     Args:
         m1: The first mapping.
@@ -86,17 +92,17 @@ def combine(
     result = {}
     for k in keys:
         val = op(m1.get(k, default), m2.get(k, default))
-        if val != 0:
+        if val != 0 and val is not None:
             result[k] = val
     return result
 
 
 def _combine_union(
-    m1: Mapping[K, N],
-    m2: Mapping[K, N],
-    op: Callable[[N, N], N],
-    default: N,
-) -> dict[K, N]:
+    m1: Mapping[K, V],
+    m2: Mapping[K, V],
+    op: Callable[[V, V], V],
+    default: V,
+) -> dict[K, V]:
     """Helper for union combination strategy."""
     result = {}
     _update_union_left(result, m1, m2, op, default)
@@ -105,10 +111,10 @@ def _combine_union(
 
 
 def _combine_intersection(
-    m1: Mapping[K, N],
-    m2: Mapping[K, N],
-    op: Callable[[N, N], N],
-) -> dict[K, N]:
+    m1: Mapping[K, V],
+    m2: Mapping[K, V],
+    op: Callable[[V, V], V],
+) -> dict[K, V]:
     """Helper for intersection combination strategy."""
     result = {}
     if len(m1) <= len(m2):
@@ -119,11 +125,11 @@ def _combine_intersection(
 
 
 def _combine_difference(
-    m1: Mapping[K, N],
-    m2: Mapping[K, N],
-    op: Callable[[N, N], N],
-    default: N,
-) -> dict[K, N]:
+    m1: Mapping[K, V],
+    m2: Mapping[K, V],
+    op: Callable[[V, V], V],
+    default: V,
+) -> dict[K, V]:
     """Helper for difference combination strategy."""
     result = {}
     _update_difference(result, m1, m2, op, default, swap_args=False)
@@ -131,11 +137,11 @@ def _combine_difference(
 
 
 def _combine_symmetric_difference(
-    m1: Mapping[K, N],
-    m2: Mapping[K, N],
-    op: Callable[[N, N], N],
-    default: N,
-) -> dict[K, N]:
+    m1: Mapping[K, V],
+    m2: Mapping[K, V],
+    op: Callable[[V, V], V],
+    default: V,
+) -> dict[K, V]:
     """Helper for symmetric difference combination strategy."""
     result = {}
     _update_difference(result, m1, m2, op, default, swap_args=False)
@@ -144,47 +150,47 @@ def _combine_symmetric_difference(
 
 
 def _update_difference(
-    result: MutableMapping[K, N],
-    source: Mapping[K, N],
-    exclude: Mapping[K, N],
-    op: Callable[[N, N], N],
-    default: N,
+    result: MutableMapping[K, V],
+    source: Mapping[K, V],
+    exclude: Mapping[K, V],
+    op: Callable[[V, V], V],
+    default: V,
     swap_args: bool,
 ) -> None:
     """Update result with keys from source that are NOT in exclude."""
     for k, v in source.items():
         if k not in exclude:
             val = op(default, v) if swap_args else op(v, default)
-            if val != 0:
+            if val != 0 and val is not None:
                 result[k] = val
 
 
 def _update_intersection(
-    result: MutableMapping[K, N],
-    source: Mapping[K, N],
-    target: Mapping[K, N],
-    op: Callable[[N, N], N],
+    result: MutableMapping[K, V],
+    source: Mapping[K, V],
+    target: Mapping[K, V],
+    op: Callable[[V, V], V],
     swap_args: bool,
 ) -> None:
     """Update result with keys from source that ARE in target."""
     for k, v in source.items():
         if k in target:
             val = op(target[k], v) if swap_args else op(v, target[k])
-            if val != 0:
+            if val != 0 and val is not None:
                 result[k] = val
 
 
 def _update_union_left(
-    result: MutableMapping[K, N],
-    m1: Mapping[K, N],
-    m2: Mapping[K, N],
-    op: Callable[[N, N], N],
-    default: N,
+    result: MutableMapping[K, V],
+    m1: Mapping[K, V],
+    m2: Mapping[K, V],
+    op: Callable[[V, V], V],
+    default: V,
 ) -> None:
     """Update result with all keys from m1, combining with m2 if present."""
     for k, v1 in m1.items():
         val = op(v1, m2.get(k, default))
-        if val != 0:
+        if val != 0 and val is not None:
             result[k] = val
 
 
@@ -208,10 +214,10 @@ def difference(
 
 
 def exclude(
-    m1: Mapping[K, N],
-    m2: Mapping[K, N],
-    default: N = 0,
-) -> dict[K, N]:
+    m1: Mapping[K, V],
+    m2: Mapping[K, V],
+    default: Any = 0,
+) -> dict[K, V]:
     """
     Return m1 restricted to keys NOT in m2 (Set Difference).
     Values from m1 are preserved.
@@ -228,10 +234,10 @@ def exclude(
 
 
 def exclusive(
-    m1: Mapping[K, N],
-    m2: Mapping[K, N],
-    default: N = 0,
-) -> dict[K, N]:
+    m1: Mapping[K, V],
+    m2: Mapping[K, V],
+    default: Any = 0,
+) -> dict[K, V]:
     """
     Return the union of m1 and m2 restricted to keys NOT in both (Symmetric Difference).
     Values are preserved from whichever mapping has the key.
@@ -246,9 +252,7 @@ def exclusive(
     """
     # Since keys are mutually exclusive, one value is always 'default'.
     # We return the non-default value.
-    return combine(
-        m1, m2, lambda a, b: a if b == default else b, default=default, domain=set.symmetric_difference
-    )
+    return combine(m1, m2, lambda a, b: a if b == default else b, default=default, domain=set.symmetric_difference)
 
 
 def geometric_mean(
@@ -296,7 +300,7 @@ def harmonic_mean(
     return combine(m1, m2, _harmonic, default=default)
 
 
-def join(m1: Mapping[K, N], m2: Mapping[K, N]) -> dict[K, N]:
+def join(m1: Mapping[K, V], m2: Mapping[K, V]) -> dict[K, V]:
     """
     Compute the join (element-wise maximum) of two mappings.
     Useful for fuzzy union.
@@ -312,10 +316,10 @@ def join(m1: Mapping[K, N], m2: Mapping[K, N]) -> dict[K, N]:
 
 
 def mask(
-    m1: Mapping[K, N],
-    m2: Mapping[K, N],
-    default: N = 0,
-) -> dict[K, N]:
+    m1: Mapping[K, V],
+    m2: Mapping[K, V],
+    default: Any = 0,
+) -> dict[K, V]:
     """
     Return m1 restricted to keys IN m2 (Set Intersection).
     Values from m1 are preserved.
@@ -331,7 +335,7 @@ def mask(
     return combine(m1, m2, lambda a, b: a, default=default, domain=set.intersection)
 
 
-def meet(m1: Mapping[K, N], m2: Mapping[K, N]) -> dict[K, N]:
+def meet(m1: Mapping[K, V], m2: Mapping[K, V]) -> dict[K, V]:
     """
     Compute the meet (element-wise minimum) of two mappings.
     Useful for fuzzy intersection.

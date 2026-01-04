@@ -1,32 +1,28 @@
 import math
 from collections import defaultdict
-from collections.abc import Mapping
-from typing import TypeVar
 
 from mappingtools.algebra.lattice import product
 from mappingtools.algebra.matrix.core import vec_mat
-
-K = TypeVar("K")
-N = TypeVar("N", int, float)
+from mappingtools.algebra.typing import K, N, SparseMatrix, SparseVector
 
 __all__ = [
-    "bayes_update",
-    "cross_entropy",
-    "entropy",
-    "kl_divergence",
-    "marginalize",
-    "markov_steady_state",
-    "markov_step",
-    "mutual_information",
-    "normalize",
+    'bayes_update',
+    'cross_entropy',
+    'entropy',
+    'kl_divergence',
+    'marginalize',
+    'markov_steady_state',
+    'markov_step',
+    'mutual_information',
+    'normalize',
 ]
 
 
 def bayes_update(
-    prior: Mapping[K, float],
-    likelihood: Mapping[K, float],
+    prior: SparseVector[K, float],
+    likelihood: SparseVector[K, float],
     evidence: float | None = None,
-) -> dict[K, float]:
+) -> SparseVector[K, float]:
     """
     Perform a Bayesian update of a probability distribution.
     Posterior(H) = Likelihood(D|H) * Prior(H) / Evidence(D)
@@ -53,8 +49,8 @@ def bayes_update(
 
 
 def cross_entropy(
-    p: Mapping[K, float],
-    q: Mapping[K, float],
+    p: SparseVector[K, float],
+    q: SparseVector[K, float],
     base: float = 2.0,
 ) -> float:
     """
@@ -76,12 +72,12 @@ def cross_entropy(
             if prob_q > 0:
                 result -= prob_p * math.log(prob_q, base)
             else:
-                return float("inf")
+                return float('inf')
     return result
 
 
 def entropy(
-    distribution: Mapping[K, float],
+    distribution: SparseVector[K, float],
     base: float = 2.0,
 ) -> float:
     """
@@ -103,8 +99,8 @@ def entropy(
 
 
 def kl_divergence(
-    p: Mapping[K, float],
-    q: Mapping[K, float],
+    p: SparseVector[K, float],
+    q: SparseVector[K, float],
     base: float = 2.0,
 ) -> float:
     """
@@ -126,11 +122,11 @@ def kl_divergence(
             if prob_q > 0:
                 result += prob_p * math.log(prob_p / prob_q, base)
             else:
-                return float("inf")
+                return float('inf')
     return result
 
 
-def marginalize(matrix: Mapping[K, Mapping[K, N]], axis: int = 0) -> dict[K, N]:
+def marginalize(matrix: SparseMatrix[K, N], axis: int = 0) -> SparseVector[K, N]:
     """
     Marginalize a matrix by summing over an axis.
 
@@ -153,14 +149,14 @@ def marginalize(matrix: Mapping[K, Mapping[K, N]], axis: int = 0) -> dict[K, N]:
                 result[c] += val
         return dict(result)
     else:
-        raise ValueError("Axis must be 0 or 1")
+        raise ValueError('Axis must be 0 or 1')
 
 
 def markov_steady_state(
-    transition_matrix: Mapping[K, Mapping[K, float]],
+    transition_matrix: SparseMatrix[K, float],
     iterations: int = 100,
     tolerance: float = 1e-6,
-) -> dict[K, float]:
+) -> SparseVector[K, float]:
     """
     Compute the steady-state distribution of a Markov chain using Power Iteration.
     pi = pi * P
@@ -198,10 +194,10 @@ def markov_steady_state(
 
 
 def markov_step(
-    state: Mapping[K, float],
-    transition_matrix: Mapping[K, Mapping[K, float]],
+    state: SparseVector[K, float],
+    transition_matrix: SparseMatrix[K, float],
     steps: int = 1,
-) -> dict[K, float]:
+) -> SparseVector[K, float]:
     """
     Advance a probability distribution by n steps in a Markov chain.
     state_new = state * P^n
@@ -223,7 +219,7 @@ def markov_step(
 
 
 def mutual_information(
-    joint: Mapping[K, Mapping[K, float]],
+    joint: SparseMatrix[K, float],
     base: float = 2.0,
 ) -> float:
     """
@@ -255,7 +251,7 @@ def mutual_information(
     return result
 
 
-def normalize(mapping: Mapping[K, N]) -> dict[K, float]:
+def normalize(mapping: SparseVector[K, N]) -> SparseVector[K, float]:
     """
     Normalize a mapping (probability distribution) so values sum to 1.
 
@@ -270,5 +266,5 @@ def normalize(mapping: Mapping[K, N]) -> dict[K, float]:
     """
     total = sum(mapping.values())
     if total == 0:
-        raise ValueError("Cannot normalize a mapping with zero sum.")
+        raise ValueError('Cannot normalize a mapping with zero sum.')
     return {k: v / total for k, v in mapping.items()}

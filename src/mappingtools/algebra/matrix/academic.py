@@ -1,20 +1,16 @@
 import warnings
 from collections import defaultdict
-from collections.abc import Mapping
-from typing import TypeVar
 
 from mappingtools.algebra.matrix.core import mat_vec, transpose
-
-K = TypeVar("K")
-N = TypeVar("N", int, float)
+from mappingtools.algebra.typing import K, N, SparseMatrix, SparseVector
 
 __all__ = [
-    "PerformanceWarning",
-    "adjoint",
-    "cofactor",
-    "determinant",
-    "eigen_centrality",
-    "inverse",
+    'PerformanceWarning',
+    'adjoint',
+    'cofactor',
+    'determinant',
+    'eigen_centrality',
+    'inverse',
 ]
 
 
@@ -22,7 +18,7 @@ class PerformanceWarning(UserWarning):
     """Warning for computationally expensive academic operations."""
 
 
-def adjoint(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
+def adjoint(matrix: SparseMatrix[K, N]) -> SparseMatrix[K, N]:
     """
     Compute the adjugate (classical adjoint) matrix.
     Defined as the transpose of the cofactor matrix.
@@ -38,17 +34,17 @@ def adjoint(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
         The adjugate matrix.
     """
     warnings.warn(
-        "adjoint() is O(N^5) and intended for academic demonstration only.",
+        'adjoint() is O(N^5) and intended for academic demonstration only.',
         PerformanceWarning,
         stacklevel=2,
     )
     # Suppress internal warnings to avoid duplicate alerts
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore", PerformanceWarning)
+        warnings.simplefilter('ignore', PerformanceWarning)
         return transpose(cofactor(matrix))
 
 
-def cofactor(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
+def cofactor(matrix: SparseMatrix[K, N]) -> SparseMatrix[K, N]:
     """
     Compute the cofactor matrix.
     C[i, j] = (-1)^(i+j) * det(Minor(i, j))
@@ -63,7 +59,7 @@ def cofactor(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
         The cofactor matrix.
     """
     warnings.warn(
-        "cofactor() is O(N^5) and intended for academic demonstration only.",
+        'cofactor() is O(N^5) and intended for academic demonstration only.',
         PerformanceWarning,
         stacklevel=2,
     )
@@ -116,8 +112,7 @@ def cofactor(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
 
             # We suppress the warning for the inner determinant call to avoid spamming
             with warnings.catch_warnings():
-                warnings.simplefilter("ignore", PerformanceWarning)
-                # Pass explicit size n-1 to ensure correct dimension inference
+                warnings.simplefilter('ignore', PerformanceWarning)
                 det = determinant(minor_mapped, n=n - 1)
 
             if det != 0:
@@ -127,7 +122,7 @@ def cofactor(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
     return {k: dict(v) for k, v in result.items()}
 
 
-def determinant(matrix: Mapping[K, Mapping[K, N]], n: int | None = None) -> N:
+def determinant(matrix: SparseMatrix[K, N], n: int | None = None) -> N:
     """
     Compute the determinant of a square matrix using Gaussian elimination.
 
@@ -143,7 +138,7 @@ def determinant(matrix: Mapping[K, Mapping[K, N]], n: int | None = None) -> N:
         The determinant value.
     """
     warnings.warn(
-        "determinant() is O(N^3) and intended for academic demonstration only.",
+        'determinant() is O(N^3) and intended for academic demonstration only.',
         PerformanceWarning,
         stacklevel=2,
     )
@@ -205,10 +200,10 @@ def determinant(matrix: Mapping[K, Mapping[K, N]], n: int | None = None) -> N:
 
 
 def eigen_centrality(
-    matrix: Mapping[K, Mapping[K, N]],
+    matrix: SparseMatrix[K, N],
     iterations: int = 100,
     tolerance: float = 1e-6,
-) -> dict[K, float]:
+) -> SparseVector[K, float]:
     """
     Compute the eigenvector centrality (principal eigenvector) using the Power Iteration method.
     This is useful for ranking nodes in a graph (like PageRank).
@@ -252,7 +247,7 @@ def eigen_centrality(
     return vector
 
 
-def inverse(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
+def inverse(matrix: SparseMatrix[K, N]) -> SparseMatrix[K, N]:
     """
     Compute the multiplicative inverse of a square matrix.
     A^-1 = (1 / det(A)) * adj(A)
@@ -270,16 +265,16 @@ def inverse(matrix: Mapping[K, Mapping[K, N]]) -> dict[K, dict[K, N]]:
         ValueError: If the matrix is singular (determinant is zero).
     """
     warnings.warn(
-        "inverse() is computationally expensive and intended for academic demonstration only.",
+        'inverse() is computationally expensive and intended for academic demonstration only.',
         PerformanceWarning,
         stacklevel=2,
     )
     # Suppress internal warnings to avoid duplicate alerts
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore", PerformanceWarning)
+        warnings.simplefilter('ignore', PerformanceWarning)
         det = determinant(matrix)
         if det == 0:
-            raise ValueError("Matrix is singular (determinant is 0)")
+            raise ValueError('Matrix is singular (determinant is 0)')
 
         adj = adjoint(matrix)
 

@@ -2,19 +2,18 @@ import cmath
 import math
 from collections import defaultdict
 from collections.abc import Callable, Mapping
-from typing import TypeVar
 
-K = TypeVar("K")
-N = TypeVar("N", int, float, complex)
+from mappingtools.algebra.typing import K, N, SparseVector
 
 __all__ = [
-    "box_counting_dimension",
-    "convolve",
-    "dft",
-    "hilbert",
-    "idft",
-    "lorentz_boost",
-    "z_transform",
+    'box_counting_dimension',
+    'convolve',
+    'dft',
+    'hilbert',
+    'idft',
+    'lorentz_boost',
+    'permute_tensor',
+    'z_transform',
 ]
 
 
@@ -132,7 +131,7 @@ def convolve(
 
 
 def dft(
-    signal: Mapping[int, N],
+    signal: SparseVector[int, N],
     n: int | None = None,
 ) -> dict[int, complex]:
     """
@@ -173,7 +172,7 @@ def dft(
 
 
 def hilbert(
-    signal: Mapping[int, float],
+    signal: SparseVector[int, float],
     n: int | None = None,
 ) -> dict[int, complex]:
     """
@@ -257,7 +256,7 @@ def idft(
 
     for m in range(n):
         val = 0j
-        for k, X_k in spectrum.items(): # noqa: N806
+        for k, X_k in spectrum.items():  # noqa: N806
             val += X_k * cmath.exp(coef * k * m)
 
         val *= norm
@@ -268,10 +267,10 @@ def idft(
 
 
 def lorentz_boost(
-    vector: Mapping[int, float],
+    vector: SparseVector[int, float],
     beta: float,
     axis: int = 1,
-) -> dict[int, float]:
+) -> SparseVector[int, float]:
     """
     Apply a Lorentz boost to a 4-vector (or D-vector).
     Assumes index 0 is time (t), and indices 1, 2, 3... are spatial.
@@ -285,7 +284,7 @@ def lorentz_boost(
         The transformed vector.
     """
     if abs(beta) >= 1:
-        raise ValueError("Beta must be less than 1 (speed of light).")
+        raise ValueError('Beta must be less than 1 (speed of light).')
 
     gamma = 1.0 / (1.0 - beta**2) ** 0.5
 
@@ -310,8 +309,30 @@ def lorentz_boost(
     return result
 
 
+def permute_tensor(
+    tensor: Mapping[tuple, N],
+    permutation: tuple[int, ...],
+) -> Mapping[tuple, N]:
+    """
+    Permute the dimensions of a sparse tensor.
+    The tensor is represented as a mapping from coordinate tuples to values.
+
+    Args:
+        tensor: The input sparse tensor, e.g., {(0, 1, 0): val}.
+        permutation: A tuple specifying the new order of axes, e.g., (2, 0, 1).
+
+    Returns:
+        A new sparse tensor with permuted dimensions.
+    """
+    result = {}
+    for coords, val in tensor.items():
+        new_coords = tuple(coords[i] for i in permutation)
+        result[new_coords] = val
+    return result
+
+
 def z_transform(
-    signal: Mapping[int, N],
+    signal: SparseVector[int, N],
     z: complex,
 ) -> complex:
     """

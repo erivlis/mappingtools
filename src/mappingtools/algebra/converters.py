@@ -1,21 +1,28 @@
 from collections.abc import Mapping, Sequence
-from typing import TypeVar
+from typing import Any
 
-K = TypeVar("K")
-N = TypeVar("N", int, float)
+from mappingtools.algebra.typing import (
+    DenseMatrix,
+    DenseVector,
+    SparseMatrix,
+    SparseVector,
+    V,
+)
 
 __all__ = [
-    "dense_to_sparse_matrix",
-    "dense_to_sparse_vector",
-    "sparse_to_dense_matrix",
-    "sparse_to_dense_vector",
+    'dense_to_sparse_matrix',
+    'dense_to_sparse_tensor',
+    'dense_to_sparse_vector',
+    'sparse_to_dense_matrix',
+    'sparse_to_dense_tensor',
+    'sparse_to_dense_vector',
 ]
 
 
 def dense_to_sparse_vector(
-    vector: Sequence[N],
-    default: N = 0,
-) -> dict[int, N]:
+    vector: Sequence[V],
+    default: V = 0,
+) -> SparseVector[int, V]:
     """
     Convert a dense vector (sequence) to a sparse vector (mapping).
 
@@ -30,10 +37,10 @@ def dense_to_sparse_vector(
 
 
 def sparse_to_dense_vector(
-    vector: Mapping[int, N],
+    vector: SparseVector[int, V],
     size: int | None = None,
-    default: N = 0,
-) -> list[N]:
+    default: V = 0,
+) -> DenseVector[V]:
     """
     Convert a sparse vector (mapping) to a dense vector (list).
 
@@ -59,9 +66,9 @@ def sparse_to_dense_vector(
 
 
 def dense_to_sparse_matrix(
-    matrix: Sequence[Sequence[N]],
-    default: N = 0,
-) -> dict[int, dict[int, N]]:
+    matrix: Sequence[Sequence[V]],
+    default: V = 0,
+) -> SparseMatrix[int, V]:
     """
     Convert a dense matrix (sequence of sequences) to a sparse matrix (mapping of mappings).
 
@@ -81,10 +88,10 @@ def dense_to_sparse_matrix(
 
 
 def sparse_to_dense_matrix(
-    matrix: Mapping[int, Mapping[int, N]],
+    matrix: SparseMatrix[int, V],
     shape: tuple[int, int] | None = None,
-    default: N = 0,
-) -> list[list[N]]:
+    default: V = 0,
+) -> DenseMatrix[V]:
     """
     Convert a sparse matrix (mapping of mappings) to a dense matrix (list of lists).
 
@@ -117,5 +124,129 @@ def sparse_to_dense_matrix(
             for c, v in row.items():
                 if 0 <= c < cols:
                     result[r][c] = v
+
+    return result
+
+
+def dense_to_sparse_tensor(
+    tensor: Sequence[Any],
+    default: V = 0,
+) -> Any:
+    """
+    Convert a dense tensor (nested sequence) to a sparse tensor (nested mapping).
+    Recursively processes the structure.
+
+    Args:
+        tensor: The dense tensor.
+        default: The value to treat as "empty".
+
+    Returns:
+        A nested dictionary representing the sparse tensor, or the value itself if scalar.
+    """
+    # Base case: not a sequence (scalar) or string (treated as scalar here)
+    if not isinstance(tensor, Sequence) or isinstance(tensor, (str, bytes)):
+        return tensor
+
+    # Recursive case
+    result = {}
+    for i, item in enumerate(tensor):
+        # If item is a scalar equal to default, skip
+        if not isinstance(item, Sequence) and item == default:
+            continue
+
+        # If item is a sequence, recurse
+        if isinstance(item, Sequence) and not isinstance(item, (str, bytes)):
+            sparse_item = dense_to_sparse_tensor(item, default)
+            if sparse_item:  # Only add if sub-structure is not empty
+                result[i] = sparse_item
+        elif item != default:
+            result[i] = item
+
+    return result
+
+
+def sparse_to_dense_tensor(
+    tensor: Mapping[int, Any],
+    shape: tuple[int, ...] | None = None,
+    default: V = 0,
+) -> Any:
+    """
+    Convert a sparse tensor (nested mapping) to a dense tensor (nested list).
+
+    Args:
+        tensor: The sparse tensor.
+        shape: A tuple representing the dimensions (d1, d2, ...).
+               If None, inferred from the keys (assumes rectangular).
+        default: The value to fill for missing entries.
+
+    Returns:
+        A nested list representing the tensor.
+    """
+    # Base case: tensor is not a mapping (scalar)
+    if not isinstance(tensor, Mapping):
+        return tensor
+
+    if shape is None:
+        # Infer shape
+        # This is tricky for irregular tensors. We assume rectangularity based on max keys.
+        # We need to find the depth and max index at each level.
+        # For simplicity, let's infer the shape of the current dimension
+        # and recurse for the rest?
+        # No, we need the full shape upfront to build the dense structure.
+
+        # Helper to find max shape
+        def get_shape(t, current_depth=0):
+            if not isinstance(t, Mapping):
+                return []
+            if not t:
+                return [0]
+
+            max_idx = max(t.keys())
+            dim = max_idx + 1
+
+            # Recurse to find sub-shapes
+            sub_shapes = []
+            for v in t.values():
+                sub_shapes.append(get_shape(v, current_depth + 1))
+
+            # Merge sub-shapes (take max of each dimension)
+            # This assumes all sub-tensors have the same rank.
+            if not sub_shapes:
+                return [dim]
+
+            # Align ranks?
+            max_rank = max(len(s) for s in sub_shapes)
+            merged_sub = [0] * max_rank
+            for s in sub_shapes:
+                for i, val in enumerate(s):
+                    merged_sub[i] = max(merged_sub[i], val)
+
+            return [dim, *merged_sub]
+
+        shape = tuple(get_shape(tensor))
+
+    if not shape:
+        return default
+
+    # Build dense structure
+    dim = shape[0]
+    sub_shape = shape[1:]
+
+    if not sub_shape:
+        # 1D case (Vector)
+        result = [default] * dim
+        for k, v in tensor.items():
+            if 0 <= k < dim:
+                result[k] = v
+        return result
+
+    # Recursive case
+    result = []
+    for i in range(dim):
+        sub_tensor = tensor.get(i, {})
+        # If sub_tensor is missing (empty), we pass empty dict to recurse
+        # which will produce a zero-filled dense substructure.
+        dense_sub = sparse_to_dense_tensor(sub_tensor, shape=sub_shape, default=default)
+        result.append(dense_sub)
 
     return result

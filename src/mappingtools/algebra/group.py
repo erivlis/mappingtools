@@ -1,10 +1,9 @@
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any
 
-K = TypeVar("K")
-V = TypeVar("V")
+from mappingtools.algebra.typing import K, V
 
-__all__ = ["compose", "invert", "signature"]
+__all__ = ['compose', 'invert', 'signature']
 
 
 def compose(m1: Mapping[K, V], m2: Mapping[V, Any]) -> dict[K, Any]:
@@ -66,7 +65,7 @@ def signature(mapping: Mapping[K, K]) -> int:
                 # This happens if the mapping is not a complete permutation on the set of keys
                 # For a sparse mapping, we might assume fixed points for missing keys?
                 # But here we strictly check the cycle.
-                raise ValueError(f"Mapping is not a complete permutation: broken cycle at {curr}")
+                raise ValueError(f'Mapping is not a complete permutation: broken cycle at {curr}')
 
     n = len(elements)
     return -1 if (n - cycles) % 2 else 1
