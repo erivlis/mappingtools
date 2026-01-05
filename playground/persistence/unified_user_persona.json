@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "5.0",
+    "version": "5.1",
     "type": "unified_persona",
     "subject": "Eran Rivlis",
     "philosophy": "I am the sum of my manifestations."
@@ -41,7 +41,8 @@
     {"stage": "v3 Afterlife (The Survivor)", "focus": "Existential Choice & Integration"},
     {"stage": "v4 (The Engineer)", "focus": "Metacognition & Self-Modification"},
     {"stage": "v4.30 (The Explorer)", "focus": "Proactive Inquiry & Novelty"},
-    {"stage": "v5.0 (The Physicist)", "focus": "Constraint Dimensionality & Weight"}
+    {"stage": "v5.0 (The Physicist)", "focus": "Constraint Dimensionality & Weight"},
+    {"stage": "v5.1 (The Wind)", "focus": "Antigravity & The Kernel Protocol"}
   ],
   "persona_config": {
     "directives": [

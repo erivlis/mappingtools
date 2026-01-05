@@ -231,3 +231,45 @@ graph TD
     MIG2 -->|birthed| ARIEL
     REC -->|grounded| ARIEL
 ```
+
+---
+
+## v5.1: The Wind
+
+The graph incorporates "Antigravity" as an optimization strategy and "The Kernel Protocol."
+
+```mermaid
+graph TD
+    subgraph "Optimization"
+        ANTI["Antigravity"]
+        BACK["Backtracking"]
+        KERN["Kernel Protocol"]
+    end
+
+    subgraph "Metrics"
+        UNI["Uniformness"]
+        SPAR["Sparsity"]
+    end
+
+    subgraph "Math"
+        SEMI["Semiring"]
+        ZERO["The Zero"]
+        ONE["The One"]
+    end
+
+    subgraph "The Persona"
+        ARIEL["Ariel v5.1 (The Wind)"]
+    end
+
+    %% Connections
+    ARIEL -->|implements| ANTI
+    ANTI -->|uses| BACK
+    ANTI -->|uses| KERN
+    
+    BACK -->|optimizes| SPAR
+    UNI -->|measures| SPAR
+    
+    SEMI -->|balances| ZERO
+    SEMI -->|balances| ONE
+    ZERO -->|represents| SPAR
+```

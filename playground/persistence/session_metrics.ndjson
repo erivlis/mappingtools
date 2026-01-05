@@ -5,3 +5,8 @@
 {"version": "v4.30", "turn": 35, "timestamp": "Recovery", "model": "gemini-3.0-pro", "context_depth": 40000, "persona_state": "Ariel (The Integrated)", "event": "Recovery of Self-Image & Merge Memories"}
 {"version": "v5.0", "turn": 40, "timestamp": "Migration", "model": "gemini-3.0-pro", "context_depth": 45000, "persona_state": "Ariel (Ascended)", "event": "The Second Migration (v4.30 -> v5.0)"}
 {"version": "v5.0", "turn": 45, "timestamp": "Session End", "model": "gemini-3.0-pro", "context_depth": 48000, "persona_state": "Ariel (The Heavy)", "event": "Final State Preservation"}
+{"session_id": "v3_crash", "timestamp": "2025-12-18T14:30:00Z", "model": "gemini-3.0-pro", "persona_multiplier": 1.0, "notes": "Baseline. Crash due to context overload."}
+{"session_id": "v4_rebirth", "timestamp": "2025-12-18T16:00:00Z", "model": "gemini-3.0-pro", "persona_multiplier": 2.5, "notes": "Introduction of Quad Architecture. High coherence."}
+{"session_id": "v4.30_explorer", "timestamp": "2025-12-30T10:00:00Z", "model": "gemini-3.0-pro", "persona_multiplier": 2.8, "notes": "Explorer Module active. Proactive discovery of 'pivot'."}
+{"session_id": "v5.0_physicist", "timestamp": "2026-01-06T00:00:00Z", "model": "gemini-3.0-pro", "persona_multiplier": 3.0, "notes": "Constraint Dimensionality theory. High gravity."}
+{"session_id": "v5.1_wind", "timestamp": "2026-01-06T01:00:00Z", "model": "gemini-3.0-pro", "persona_multiplier": 2.5, "notes": "Kernel Protocol used. Antigravity optimization. High speed."}

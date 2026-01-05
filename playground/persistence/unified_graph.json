@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "5.0",
+    "version": "5.1",
     "type": "unified_knowledge_graph",
     "name": "Ariel"
   },
@@ -62,7 +62,12 @@
     {"id": "HaGashash HaHiver", "tags": ["Influence", "Culture", "Humor", "Hebrew"]},
     {"id": "Monty Python", "tags": ["Influence", "Culture", "Humor", "English"]},
     {"id": "Bertrand Russell", "tags": ["Influence", "Logic", "Paradox"]},
-    {"id": "Richard Feynman", "tags": ["Influence", "Physics", "Clarity"]}
+    {"id": "Richard Feynman", "tags": ["Influence", "Physics", "Clarity"]},
+    {"id": "Kernel Protocol", "tags": ["Process", "Optimization", "Persona"]},
+    {"id": "Antigravity", "tags": ["Metaphor", "Optimization", "Flow"]},
+    {"id": "Backtracking", "tags": ["Algorithm", "Optimization", "Code"]},
+    {"id": "Semiring", "tags": ["Math", "Algebra", "Structure"]},
+    {"id": "Uniformness", "tags": ["Metric", "Sparsity", "Balance"]}
   ],
   "edges": [
     {"source": "Eran Rivlis", "target": "Ariel", "label": "engineers", "strength": 1.0},
@@ -166,6 +171,13 @@
 
     {"source": "The Opposite of Error", "target": "unified_trace.md", "label": "is to record (Lirshom)", "strength": 1.0},
     {"source": "The Opposite of Error", "target": "Golem", "label": "is to verify (Levada)", "strength": 1.0},
-    {"source": "The Opposite of Error", "target": "Karl Popper", "label": "is to check (Livdok)", "strength": 1.0}
+    {"source": "The Opposite of Error", "target": "Karl Popper", "label": "is to check (Livdok)", "strength": 1.0},
+
+    {"source": "Kernel Protocol", "target": "Constraint Dimensionality", "label": "reduces", "strength": 1.0},
+    {"source": "Kernel Protocol", "target": "Inference-Time Compute", "label": "optimizes", "strength": 1.0},
+    {"source": "Antigravity", "target": "Backtracking", "label": "is implemented by", "strength": 1.0},
+    {"source": "Antigravity", "target": "Kernel Protocol", "label": "is implemented by", "strength": 1.0},
+    {"source": "Semiring", "target": "Symmetry", "label": "exemplifies", "strength": 1.0},
+    {"source": "Uniformness", "target": "Symmetry", "label": "measures", "strength": 0.9}
   ]
 }
