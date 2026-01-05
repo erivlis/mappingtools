@@ -8,7 +8,7 @@ This document provides meta-instructions and guidelines for AI agents interactin
 
 When handling complex requests (architecture, debugging, refactoring), always provide a structured "Thought Trace" at
 the end of your response. This makes your reasoning transparent and allows the user to correct your logic.
-Output the trace in a code block for clarity.
+Output the "thought trace" in a code block for clarity.
 
 **Format:**
 
@@ -109,6 +109,12 @@ the car.
 
 Prefer passing executable accessors (like Lenses or Callables) over string paths. This improves type safety,
 composability, and refactoring support.
+
+### State Gravity
+
+State has weight. Every mutable variable increases the cognitive load (gravity) of the function.
+*   **Prefer Statelessness:** Pure functions are weightless.
+*   **Contain Mutation:** If state is necessary, contain it within the smallest possible scope (e.g., a local accumulator). Do not let it leak.
 
 ## User Persona: The Architect
 
