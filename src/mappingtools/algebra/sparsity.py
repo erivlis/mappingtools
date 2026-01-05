@@ -1,6 +1,65 @@
+import math
 from collections.abc import Mapping, Sized
+from typing import Any
 
-__all__ = ['density', 'is_sparse', 'sparsity']
+__all__ = [
+    'balance',
+    'count_elements',
+    'deepness',
+    'density',
+    'is_sparse',
+    'sparsity',
+    'wideness',
+]
+
+
+def _get_leaf_depths(obj: Any, current_depth: int = 0, accumulator: list[int] | None = None) -> list[int]:
+    """Recursively find the depth of all leaf nodes using an accumulator."""
+    if accumulator is None:
+        accumulator = []
+
+    if isinstance(obj, Mapping):
+        if not obj:
+            accumulator.append(current_depth)
+        else:
+            for v in obj.values():
+                _get_leaf_depths(v, current_depth + 1, accumulator)
+    else:
+        accumulator.append(current_depth)
+
+    return accumulator
+
+
+def balance(obj: Mapping) -> float:
+    """
+    Calculate the balance of a nested mapping (0.0 to 1.0).
+    1.0 means all leaves are at the same depth.
+    0.0 means highly unbalanced.
+
+    Calculated as 1 - (std_dev_of_leaf_depths / mean_leaf_depth).
+
+    Args:
+        obj: The nested mapping.
+
+    Returns:
+        A float between 0.0 and 1.0.
+    """
+    if not isinstance(obj, Mapping) or not obj:
+        return 1.0
+
+    depths = _get_leaf_depths(obj)
+    if len(depths) < 2:
+        return 1.0
+
+    mean = sum(depths) / len(depths)
+    if mean == 0:
+        return 1.0
+
+    variance = sum((d - mean) ** 2 for d in depths) / len(depths)
+    std_dev = math.sqrt(variance)
+
+    # Normalize by mean depth to get a relative measure
+    return max(0.0, 1.0 - (std_dev / mean))
 
 
 def count_elements(obj: Sized) -> int:
@@ -18,11 +77,22 @@ def count_elements(obj: Sized) -> int:
     # We treat strings/bytes as atomic values, not containers of characters
     if isinstance(obj, (str, bytes)):
         return 1
-    # We treat other Sized iterables (lists, tuples) as containers?
-    # For sparse algebra, we usually deal with Mappings.
-    # If we have a list, is it a dense vector?
-    # Let's stick to Mapping recursion for now to support SparseMatrix.
     return 1
+
+
+def deepness(obj: Any) -> int:
+    """
+    Calculate the maximum depth of a nested structure.
+
+    Args:
+        obj: The nested object.
+
+    Returns:
+        The maximum depth.
+    """
+    if not isinstance(obj, Mapping) or not obj:
+        return 0
+    return 1 + max(deepness(v) for v in obj.values())
 
 
 def density(obj: Sized, capacity: int | None = None) -> float:
@@ -50,6 +120,22 @@ def density(obj: Sized, capacity: int | None = None) -> float:
     return count / capacity
 
 
+def is_sparse(obj: Sized, capacity: int | None = None, threshold: float = 0.5) -> bool:
+    """
+    Check if an object is considered "sparse" based on a threshold.
+
+    Args:
+        obj: The object.
+        capacity: Total capacity.
+        threshold: Sparsity threshold (default 0.5).
+                   If sparsity > threshold, returns True.
+
+    Returns:
+        True if sparse, False otherwise.
+    """
+    return sparsity(obj, capacity) > threshold
+
+
 def sparsity(obj: Sized, capacity: int | None = None) -> float:
     """
     Calculate the sparsity of an object.
@@ -65,17 +151,22 @@ def sparsity(obj: Sized, capacity: int | None = None) -> float:
     return 1.0 - density(obj, capacity)
 
 
-def is_sparse(obj: Sized, capacity: int | None = None, threshold: float = 0.5) -> bool:
+def wideness(obj: Any) -> int:
     """
-    Check if an object is considered "sparse" based on a threshold.
+    Calculate the maximum width (number of keys) at any level of a nested mapping.
 
     Args:
-        obj: The object.
-        capacity: Total capacity.
-        threshold: Sparsity threshold (default 0.5).
-                   If sparsity > threshold, returns True.
+        obj: The nested object.
 
     Returns:
-        True if sparse, False otherwise.
+        The maximum width.
     """
-    return sparsity(obj, capacity) > threshold
+    if not isinstance(obj, Mapping):
+        return 0
+    if not obj:
+        return 0
+
+    max_w = len(obj)
+    for v in obj.values():
+        max_w = max(max_w, wideness(v))
+    return max_w

@@ -168,3 +168,22 @@ def test_special_characters_in_keys():
 
     # Assert
     assert next(iter(result.items())) == expected
+
+
+def test_misc_keys():
+    # Test keys that fall into the 'else' block (not str/int, not strict iterable)
+    # float, bool, None, bytes
+    nested_dict = {
+        3.14: 1,
+        True: 2,
+        None: 3,
+        b'bytes': 4
+    }
+    expected = {
+        (3.14,): 1,
+        (True,): 2,
+        (None,): 3,
+        (b'bytes',): 4
+    }
+    result = flatten(nested_dict)
+    assert result == expected

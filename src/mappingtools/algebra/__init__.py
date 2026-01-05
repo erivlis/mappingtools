@@ -45,8 +45,8 @@ Definitions & Criteria
     *   *Criterion*: Density > 0.5 (50%).
 *   **Lightweight**: Minimal memory overhead and startup time.
     *   *Criterion*: Import time < 10ms; Memory overhead < 1KB per object (beyond data).
-*   **Symbolic**: Keys represent semantic entities (e.g., "User_123", "Product_X") rather than
-                  contiguous memory offsets (0, 1, 2).
+*   **Symbolic**: Keys represent semantic entities (e.g., "User_123", "Product_X") rather than contiguous memory
+    offsets (0, 1, 2).
 
 Modules
 -------
@@ -136,7 +136,14 @@ from mappingtools.algebra.semiring import (
     TropicalSemiring,
     ViterbiSemiring,
 )
-from mappingtools.algebra.sparsity import density, is_sparse, sparsity
+from mappingtools.algebra.sparsity import (
+    balance,
+    deepness,
+    density,
+    is_sparse,
+    sparsity,
+    wideness,
+)
 from mappingtools.algebra.transforms import (
     box_counting_dimension,
     convolve,
@@ -172,6 +179,7 @@ __all__ = [
     'add',
     'adjoint',
     'average',
+    'balance',
     'bayes_update',
     'box_counting_dimension',
     'cofactor',
@@ -179,6 +187,7 @@ __all__ = [
     'compose',
     'convolve',
     'cross_entropy',
+    'deepness',
     'dense_to_sparse_matrix',
     'dense_to_sparse_vector',
     'density',
@@ -230,5 +239,6 @@ __all__ = [
     'trace',
     'transpose',
     'vec_mat',
+    'wideness',
     'z_transform',
 ]

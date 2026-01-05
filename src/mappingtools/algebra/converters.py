@@ -368,13 +368,16 @@ def nested_to_flat(
         A flat dictionary.
     """
     result = {}
+    path = []
 
-    def _recurse(current, path):
+    def _recurse(current):
         if isinstance(current, Mapping):
             for k, v in current.items():
-                _recurse(v, (*path, k))
+                path.append(k)
+                _recurse(v)
+                path.pop()
         else:
-            result[path] = current
+            result[tuple(path)] = current
 
-    _recurse(nested, ())
+    _recurse(nested)
     return result

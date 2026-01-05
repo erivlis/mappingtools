@@ -1,4 +1,11 @@
-from mappingtools.algebra.sparsity import density, is_sparse, sparsity
+from mappingtools.algebra.sparsity import (
+    balance,
+    deepness,
+    density,
+    is_sparse,
+    sparsity,
+    wideness,
+)
 
 
 def test_density_vector():
@@ -52,3 +59,50 @@ def test_sparsity_string_value():
     # Bytes
     obj_bytes = {0: b'hello'}
     assert density(obj_bytes, capacity=10) == 0.1
+
+
+def test_deepness():
+    # Depth 0 (empty)
+    assert deepness({}) == 0
+    # Depth 1 (flat)
+    assert deepness({1: 1}) == 1
+    # Depth 2 (nested)
+    assert deepness({1: {2: 2}}) == 2
+    # Depth 3
+    assert deepness({1: {2: {3: 3}}}) == 3
+    # Mixed depth (max wins)
+    assert deepness({1: 1, 2: {3: 3}}) == 2
+
+
+def test_wideness():
+    # Width 0
+    assert wideness({}) == 0
+    # Width 2
+    assert wideness({1: 1, 2: 2}) == 2
+    # Nested width
+    # Root has 1 child. Child has 3 children. Max width is 3.
+    assert wideness({1: {2: 2, 3: 3, 4: 4}}) == 3
+    # Mixed
+    assert wideness({1: {2: 2}, 3: {4: 4, 5: 5}}) == 2
+
+
+def test_balance():
+    # Perfectly balanced (all leaves at depth 1)
+    assert balance({1: 1, 2: 2}) == 1.0
+
+    # Perfectly balanced (all leaves at depth 2)
+    assert balance({1: {2: 2}, 3: {4: 4}}) == 1.0
+
+    # Unbalanced
+    # Leaf 1 at depth 1. Leaf 3 at depth 2.
+    # Depths: [1, 2]. Mean: 1.5.
+    # Variance: ((1-1.5)^2 + (2-1.5)^2) / 2 = (0.25 + 0.25) / 2 = 0.25.
+    # StdDev: 0.5.
+    # Balanceness: 1 - (0.5 / 1.5) = 1 - 0.333 = 0.666
+    obj = {1: 1, 2: {3: 3}}
+    b = balance(obj)
+    assert 0.6 < b < 0.7
+
+    # Empty or single leaf -> 1.0
+    assert balance({}) == 1.0
+    assert balance({1: 1}) == 1.0
