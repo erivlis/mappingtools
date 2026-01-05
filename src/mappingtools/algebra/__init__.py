@@ -137,11 +137,11 @@ from mappingtools.algebra.semiring import (
     ViterbiSemiring,
 )
 from mappingtools.algebra.sparsity import (
-    balance,
     deepness,
     density,
     is_sparse,
     sparsity,
+    uniformness,
     wideness,
 )
 from mappingtools.algebra.transforms import (
@@ -179,7 +179,6 @@ __all__ = [
     'add',
     'adjoint',
     'average',
-    'balance',
     'bayes_update',
     'box_counting_dimension',
     'cofactor',
@@ -238,6 +237,7 @@ __all__ = [
     'symmetric_difference',
     'trace',
     'transpose',
+    'uniformness',
     'vec_mat',
     'wideness',
     'z_transform',

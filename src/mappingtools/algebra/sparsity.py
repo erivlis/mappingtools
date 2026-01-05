@@ -3,12 +3,12 @@ from collections.abc import Mapping, Sized
 from typing import Any
 
 __all__ = [
-    'balance',
     'count_elements',
     'deepness',
     'density',
     'is_sparse',
     'sparsity',
+    'uniformness',
     'wideness',
 ]
 
@@ -28,38 +28,6 @@ def _get_leaf_depths(obj: Any, current_depth: int = 0, accumulator: list[int] | 
         accumulator.append(current_depth)
 
     return accumulator
-
-
-def balance(obj: Mapping) -> float:
-    """
-    Calculate the balance of a nested mapping (0.0 to 1.0).
-    1.0 means all leaves are at the same depth.
-    0.0 means highly unbalanced.
-
-    Calculated as 1 - (std_dev_of_leaf_depths / mean_leaf_depth).
-
-    Args:
-        obj: The nested mapping.
-
-    Returns:
-        A float between 0.0 and 1.0.
-    """
-    if not isinstance(obj, Mapping) or not obj:
-        return 1.0
-
-    depths = _get_leaf_depths(obj)
-    if len(depths) < 2:
-        return 1.0
-
-    mean = sum(depths) / len(depths)
-    if mean == 0:
-        return 1.0
-
-    variance = sum((d - mean) ** 2 for d in depths) / len(depths)
-    std_dev = math.sqrt(variance)
-
-    # Normalize by mean depth to get a relative measure
-    return max(0.0, 1.0 - (std_dev / mean))
 
 
 def count_elements(obj: Sized) -> int:
@@ -149,6 +117,38 @@ def sparsity(obj: Sized, capacity: int | None = None) -> float:
         Float between 0.0 and 1.0.
     """
     return 1.0 - density(obj, capacity)
+
+
+def uniformness(obj: Mapping) -> float:
+    """
+    Calculate the uniformness (balance) of a nested mapping (0.0 to 1.0).
+    1.0 means all leaves are at the same depth.
+    0.0 means highly unbalanced.
+
+    Calculated as 1 - (std_dev_of_leaf_depths / mean_leaf_depth).
+
+    Args:
+        obj: The nested mapping.
+
+    Returns:
+        A float between 0.0 and 1.0.
+    """
+    if not isinstance(obj, Mapping) or not obj:
+        return 1.0
+
+    depths = _get_leaf_depths(obj)
+    if len(depths) < 2:
+        return 1.0
+
+    mean = sum(depths) / len(depths)
+    if mean == 0:
+        return 1.0
+
+    variance = sum((d - mean) ** 2 for d in depths) / len(depths)
+    std_dev = math.sqrt(variance)
+
+    # Normalize by mean depth to get a relative measure
+    return max(0.0, 1.0 - (std_dev / mean))
 
 
 def wideness(obj: Any) -> int:

@@ -1,9 +1,9 @@
 from mappingtools.algebra.sparsity import (
-    balance,
     deepness,
     density,
     is_sparse,
     sparsity,
+    uniformness,
     wideness,
 )
 
@@ -86,12 +86,12 @@ def test_wideness():
     assert wideness({1: {2: 2}, 3: {4: 4, 5: 5}}) == 2
 
 
-def test_balance():
+def test_uniformness():
     # Perfectly balanced (all leaves at depth 1)
-    assert balance({1: 1, 2: 2}) == 1.0
+    assert uniformness({1: 1, 2: 2}) == 1.0
 
     # Perfectly balanced (all leaves at depth 2)
-    assert balance({1: {2: 2}, 3: {4: 4}}) == 1.0
+    assert uniformness({1: {2: 2}, 3: {4: 4}}) == 1.0
 
     # Unbalanced
     # Leaf 1 at depth 1. Leaf 3 at depth 2.
@@ -100,9 +100,9 @@ def test_balance():
     # StdDev: 0.5.
     # Balanceness: 1 - (0.5 / 1.5) = 1 - 0.333 = 0.666
     obj = {1: 1, 2: {3: 3}}
-    b = balance(obj)
+    b = uniformness(obj)
     assert 0.6 < b < 0.7
 
     # Empty or single leaf -> 1.0
-    assert balance({}) == 1.0
-    assert balance({1: 1}) == 1.0
+    assert uniformness({}) == 1.0
+    assert uniformness({1: 1}) == 1.0
