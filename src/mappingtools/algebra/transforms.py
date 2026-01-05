@@ -41,8 +41,6 @@ def box_counting_dimension(
 
     # Extract coordinates
     coords = list(points.keys())
-    if not coords:
-        return 0.0
 
     # Determine dimensionality and extent
     dim = len(coords[0])

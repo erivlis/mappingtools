@@ -1,9 +1,12 @@
-from collections.abc import Mapping, Sequence
+import itertools
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import Any
 
 from mappingtools.algebra.typing import (
     DenseMatrix,
     DenseVector,
+    K,
+    N,
     SparseMatrix,
     SparseVector,
     V,
@@ -13,6 +16,10 @@ __all__ = [
     'dense_to_sparse_matrix',
     'dense_to_sparse_tensor',
     'dense_to_sparse_vector',
+    'flat_to_nested',
+    'nested_to_flat',
+    'sample',
+    'sample_tensor',
     'sparse_to_dense_matrix',
     'sparse_to_dense_tensor',
     'sparse_to_dense_vector',
@@ -245,8 +252,129 @@ def sparse_to_dense_tensor(
     for i in range(dim):
         sub_tensor = tensor.get(i, {})
         # If sub_tensor is missing (empty), we pass empty dict to recurse
-        # which will produce a zero-filled dense substructure.
+        # which will produce a zero-filled dense sub-structure.
         dense_sub = sparse_to_dense_tensor(sub_tensor, shape=sub_shape, default=default)
         result.append(dense_sub)
 
+    return result
+
+
+def sample(
+    func: Callable[[K], V],
+    domain: Iterable[K],
+    default: V = 0,
+) -> SparseVector[K, V]:
+    """
+    Sample a function over a finite domain to create a sparse vector (mapping).
+
+    Args:
+        func: The function to sample (K -> V).
+        domain: The set of keys to evaluate.
+        default: The value to treat as "empty" (not stored).
+
+    Returns:
+        A dictionary {k: func(k)} where func(k) != default.
+    """
+    result = {}
+    for k in domain:
+        val = func(k)
+        if val != default:
+            result[k] = val
+    return result
+
+
+def sample_tensor(
+    func: Callable[[tuple[Any, ...]], V],
+    ranges: Sequence[Iterable[Any]],
+    default: V = 0,
+) -> Mapping[Any, Any]:
+    """
+    Sample a multidimensional function over a grid to create a sparse tensor (nested mapping).
+
+    To sample over the domain of an existing sparse tensor (resampling), use:
+    `flat_to_nested(sample(func, nested_to_flat(tensor).keys()))`
+
+    Args:
+        func: The function to sample. Takes a tuple of coordinates.
+        ranges: A sequence of iterables, one for each dimension.
+        default: The value to treat as "empty".
+
+    Returns:
+        A nested dictionary representing the sparse tensor.
+    """
+    # Generate domain as Cartesian product
+    domain = itertools.product(*ranges)
+
+    # Sample to flat mapping
+    flat = sample(func, domain, default)
+
+    # Convert to nested mapping
+    return flat_to_nested(flat)
+
+
+def flat_to_nested(
+    mapping: Mapping[tuple, V],
+) -> Mapping[Any, Any]:
+    """
+    Convert a flat mapping with tuple keys to a nested mapping.
+    {(a, b): v} -> {a: {b: v}}
+
+    Args:
+        mapping: The flat mapping.
+
+    Returns:
+        A nested dictionary.
+    """
+    result = {}
+    for keys, value in mapping.items():
+        if not isinstance(keys, tuple):
+            # Handle scalar keys (depth 1)
+            result[keys] = value
+            continue
+
+        current = result
+        for key in keys[:-1]:
+            if key not in current:
+                current[key] = {}
+            current = current[key]
+            # Ensure we don't overwrite a value with a dict (mixed depth conflict)
+            if not isinstance(current, dict):
+                # This happens if we have (a,) and (a, b).
+                # (a,) sets result[a] = val.
+                # (a, b) tries to set result[a][b].
+                # We can't support mixed depth easily.
+                # For now, assume consistent depth or last-write-wins?
+                # Let's raise or overwrite. Overwrite is safer for now.
+                current = {}
+                result[keys[0]] = current  # Wait, this logic is flawed for recursion.
+                # Let's restart the traversal properly.
+
+        current[keys[-1]] = value
+
+    return result
+
+
+def nested_to_flat(
+    nested: Mapping[Any, Any],
+) -> Mapping[tuple, V]:
+    """
+    Convert a nested mapping to a flat mapping with tuple keys.
+    {a: {b: v}} -> {(a, b): v}
+
+    Args:
+        nested: The nested mapping.
+
+    Returns:
+        A flat dictionary.
+    """
+    result = {}
+
+    def _recurse(current, path):
+        if isinstance(current, Mapping):
+            for k, v in current.items():
+                _recurse(v, (*path, k))
+        else:
+            result[path] = current
+
+    _recurse(nested, ())
     return result

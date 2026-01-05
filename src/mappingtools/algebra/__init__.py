@@ -39,27 +39,28 @@ Comparison with Other Libraries
 Definitions & Criteria
 ----------------------
 
-* **Sparse**: Data where the number of non-zero elements ($k$) is significantly smaller than the total capacity ($N$).
-    * *Criterion*: Density ($k/N$) < 0.05 (5%).
-* **Dense**: Data where most elements are non-zero.
-    * *Criterion*: Density > 0.5 (50%).
-* **Lightweight**: Minimal memory overhead and startup time.
-    * *Criterion*: Import time < 10ms; Memory overhead < 1KB per object (beyond data).
-* **Symbolic**: Keys represent semantic entities (e.g., "User_123", "Product_X") rather than
-                contiguous memory offsets (0, 1, 2).
+*   **Sparse**: Data where the number of non-zero elements ($k$) is significantly smaller than the total capacity ($N$).
+    *   *Criterion*: Density ($k/N$) < 0.05 (5%).
+*   **Dense**: Data where most elements are non-zero.
+    *   *Criterion*: Density > 0.5 (50%).
+*   **Lightweight**: Minimal memory overhead and startup time.
+    *   *Criterion*: Import time < 10ms; Memory overhead < 1KB per object (beyond data).
+*   **Symbolic**: Keys represent semantic entities (e.g., "User_123", "Product_X") rather than
+                  contiguous memory offsets (0, 1, 2).
 
 Modules
 -------
 
-* **`matrix`**: Linear Algebra (Core & Academic).
-* **`lattice`**: Set/Fuzzy Logic (Union, Intersection).
-* **`analysis`**: Vector Calculus on Graphs (Gradient, Laplacian).
-* **`probability`**: Bayesian/Markov Inference.
-* **`transforms`**: Signal Processing (DFT, Convolution).
-* **`automata`**: Finite State Machines.
-* **`group`**: Permutations.
-* **`sparsity`**: Metrics and checks.
-* **`typing`**: Type aliases for sparse/dense structures.
+*   **`matrix`**: Linear Algebra (Core & Academic).
+*   **`lattice`**: Set/Fuzzy Logic (Union, Intersection).
+*   **`analysis`**: Vector Calculus on Graphs (Gradient, Laplacian).
+*   **`probability`**: Bayesian/Markov Inference.
+*   **`transforms`**: Signal Processing (DFT, Convolution).
+*   **`automata`**: Finite State Machines.
+*   **`group`**: Permutations.
+*   **`sparsity`**: Metrics and checks.
+*   **`semiring`**: Generalized algebra (Tropical, Boolean, String).
+*   **`typing`**: Type aliases for sparse/dense structures.
 """
 
 from mappingtools.algebra.analysis import (
@@ -124,6 +125,17 @@ from mappingtools.algebra.probability import (
     mutual_information,
     normalize,
 )
+from mappingtools.algebra.semiring import (
+    BooleanSemiring,
+    BottleneckSemiring,
+    LogSemiring,
+    ReliabilitySemiring,
+    Semiring,
+    StandardSemiring,
+    StringSemiring,
+    TropicalSemiring,
+    ViterbiSemiring,
+)
 from mappingtools.algebra.sparsity import density, is_sparse, sparsity
 from mappingtools.algebra.transforms import (
     box_counting_dimension,
@@ -143,11 +155,20 @@ from mappingtools.algebra.typing import (
 )
 
 __all__ = [
+    'BooleanSemiring',
+    'BottleneckSemiring',
     'DenseMatrix',
     'DenseVector',
+    'LogSemiring',
+    'ReliabilitySemiring',
+    'Semiring',
     'SparseMatrix',
     'SparseTensor',
     'SparseVector',
+    'StandardSemiring',
+    'StringSemiring',
+    'TropicalSemiring',
+    'ViterbiSemiring',
     'add',
     'adjoint',
     'average',

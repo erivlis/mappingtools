@@ -40,3 +40,15 @@ def test_is_sparse():
     # Dense vector
     dense_obj = dict.fromkeys(range(8), 1)
     assert is_sparse(dense_obj, capacity=10) is False
+
+
+def test_sparsity_string_value():
+    # Test that strings inside a mapping are treated as atomic values (count=1)
+    # rather than containers of characters.
+    # {0: "hello"} -> 1 element.
+    obj = {0: 'hello'}
+    assert density(obj, capacity=10) == 0.1
+
+    # Bytes
+    obj_bytes = {0: b'hello'}
+    assert density(obj_bytes, capacity=10) == 0.1

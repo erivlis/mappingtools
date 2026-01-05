@@ -2,6 +2,10 @@ from mappingtools.algebra.converters import (
     dense_to_sparse_matrix,
     dense_to_sparse_tensor,
     dense_to_sparse_vector,
+    flat_to_nested,
+    nested_to_flat,
+    sample,
+    sample_tensor,
     sparse_to_dense_matrix,
     sparse_to_dense_tensor,
     sparse_to_dense_vector,
@@ -116,3 +120,82 @@ def test_sparse_to_dense_tensor_explicit_shape():
     # Shape 1x1x2 -> [[1, 0]]
     dense = sparse_to_dense_tensor(sparse, shape=(1, 1, 2))
     assert dense == [[[1, 0]]]
+
+
+def test_sample():
+    # f(x) = x^2
+    # domain = [-1, 0, 1, 2]
+    # default = 0
+    # f(-1)=1, f(0)=0 (skip), f(1)=1, f(2)=4
+
+    def func(x):
+        return x**2
+
+    domain = [-1, 0, 1, 2]
+    sparse = sample(func, domain, default=0)
+
+    assert sparse == {-1: 1, 1: 1, 2: 4}
+    assert 0 not in sparse
+
+
+def test_flat_to_nested():
+    # {(0, 0): 1, (0, 1): 2, (1, 0): 3}
+    flat = {(0, 0): 1, (0, 1): 2, (1, 0): 3}
+    nested = flat_to_nested(flat)
+    expected = {0: {0: 1, 1: 2}, 1: {0: 3}}
+    assert nested == expected
+
+
+def test_nested_to_flat():
+    nested = {0: {0: 1, 1: 2}, 1: {0: 3}}
+    flat = nested_to_flat(nested)
+    expected = {(0, 0): 1, (0, 1): 2, (1, 0): 3}
+    assert flat == expected
+
+
+def test_sample_tensor():
+    # f(x, y) = x + y
+    # x in [0, 1], y in [0, 1]
+    # (0,0)->0 (skip), (0,1)->1, (1,0)->1, (1,1)->2
+
+    def func(p):
+        return p[0] + p[1]
+
+    ranges = [range(2), range(2)]
+
+    tensor = sample_tensor(func, ranges, default=0)
+
+    # Expected nested structure
+    expected = {0: {1: 1}, 1: {0: 1, 1: 2}}
+    assert tensor == expected
+
+
+def test_dense_to_sparse_tensor_base_case():
+    # Scalar input
+    assert dense_to_sparse_tensor(5) == 5
+    # String input (treated as scalar)
+    assert dense_to_sparse_tensor('hello') == 'hello'
+
+
+def test_flat_to_nested_conflict():
+    # Conflict: (0,) -> 1 vs (0, 1) -> 2
+    # 0 is both a leaf and a branch.
+    # Our implementation overwrites the leaf with the branch (or vice versa depending on order).
+    # Order is not guaranteed in dicts (though insertion order is preserved in modern Python).
+
+    # Case 1: Leaf first
+    flat = {(0,): 1, (0, 1): 2}
+    # (0,) sets result[0] = 1.
+    # (0, 1) sees result[0] is not dict. Overwrites with {}.
+    # result[0][1] = 2.
+    # Final: {0: {1: 2}}
+    nested = flat_to_nested(flat)
+    assert nested == {0: {1: 2}}
+
+    # Case 2: Branch first
+    flat2 = {(0, 1): 2, (0,): 1}
+    # (0, 1) sets result[0] = {1: 2}.
+    # (0,) sets result[0] = 1.
+    # Final: {0: 1}
+    nested2 = flat_to_nested(flat2)
+    assert nested2 == {0: 1}
