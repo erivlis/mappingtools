@@ -9,12 +9,17 @@ __all__ = [
     'bayes_update',
     'cross_entropy',
     'entropy',
+    'expected_value',
     'kl_divergence',
+    'kurtosis',
     'marginalize',
     'markov_steady_state',
     'markov_step',
+    'mode',
     'mutual_information',
     'normalize',
+    'skewness',
+    'variance',
 ]
 
 
@@ -98,6 +103,23 @@ def entropy(
     return result
 
 
+def expected_value(distribution: SparseVector[N, float]) -> float:
+    """
+    Compute the Expected Value (Mean) of a probability distribution.
+    E[X] = sum(x * P(x))
+
+    Args:
+        distribution: A mapping where keys are numeric outcomes and values are probabilities.
+
+    Returns:
+        The expected value.
+
+    Raises:
+        TypeError: If keys are not numeric.
+    """
+    return sum(k * v for k, v in distribution.items())
+
+
 def kl_divergence(
     p: SparseVector[K, float],
     q: SparseVector[K, float],
@@ -124,6 +146,35 @@ def kl_divergence(
             else:
                 return float('inf')
     return result
+
+
+def kurtosis(distribution: SparseVector[N, float], mu: float | None = None, sigma: float | None = None) -> float:
+    """
+    Compute the Kurtosis (4th standardized moment) of a probability distribution.
+    Kurt[X] = E[(X - mu)^4] / sigma^4
+
+    Args:
+        distribution: A mapping where keys are numeric outcomes and values are probabilities.
+        mu: Precomputed mean (optional).
+        sigma: Precomputed standard deviation (optional).
+
+    Returns:
+        The kurtosis value.
+    """
+    if mu is None:
+        mu = expected_value(distribution)
+
+    # Calculate 4th central moment
+    m4 = sum(((k - mu) ** 4) * v for k, v in distribution.items())
+
+    if sigma is None:
+        var = sum(((k - mu) ** 2) * v for k, v in distribution.items())
+        sigma = var**0.5
+
+    if sigma == 0:
+        return 0.0
+
+    return m4 / (sigma**4)
 
 
 def marginalize(matrix: SparseMatrix[K, N], axis: int = 0) -> SparseVector[K, N]:
@@ -218,6 +269,21 @@ def markov_step(
     return current
 
 
+def mode(distribution: SparseVector[K, float]) -> K:
+    """
+    Find the mode (key with the highest probability) of a distribution.
+
+    Args:
+        distribution: A mapping representing probabilities.
+
+    Returns:
+        The key with the maximum value.
+    """
+    if not distribution:
+        raise ValueError('Cannot find mode of empty distribution')
+    return max(distribution, key=distribution.get)
+
+
 def mutual_information(
     joint: SparseMatrix[K, float],
     base: float = 2.0,
@@ -268,3 +334,50 @@ def normalize(mapping: SparseVector[K, N]) -> SparseVector[K, float]:
     if total == 0:
         raise ValueError('Cannot normalize a mapping with zero sum.')
     return {k: v / total for k, v in mapping.items()}
+
+
+def skewness(distribution: SparseVector[N, float], mu: float | None = None, sigma: float | None = None) -> float:
+    """
+    Compute the Skewness (3rd standardized moment) of a probability distribution.
+    Skew[X] = E[(X - mu)^3] / sigma^3
+
+    Args:
+        distribution: A mapping where keys are numeric outcomes and values are probabilities.
+        mu: Precomputed mean (optional).
+        sigma: Precomputed standard deviation (optional).
+
+    Returns:
+        The skewness value.
+    """
+    if mu is None:
+        mu = expected_value(distribution)
+
+    # Calculate 3th central moment
+    m3 = sum(((k - mu) ** 3) * v for k, v in distribution.items())
+
+    if sigma is None:
+        var = sum(((k - mu) ** 2) * v for k, v in distribution.items())
+        sigma = var**0.5
+
+    if sigma == 0:
+        return 0.0
+
+    return m3 / (sigma**3)
+
+
+def variance(distribution: SparseVector[N, float], mu: float | None = None) -> float:
+    """
+    Compute the Variance (2nd central moment) of a probability distribution.
+    Var(X) = E[(X - mu)^2]
+
+    Args:
+        distribution: A mapping where keys are numeric outcomes and values are probabilities.
+        mu: Precomputed mean (optional).
+
+    Returns:
+        The variance value.
+    """
+    if mu is None:
+        mu = expected_value(distribution)
+
+    return sum(((k - mu) ** 2) * v for k, v in distribution.items())
