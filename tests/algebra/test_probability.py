@@ -203,6 +203,14 @@ def test_variance():
     assert variance(dist2) == pytest.approx(0.0)
 
 
+def test_variance_precomputed():
+    # Test with precomputed mean
+    dist = {1: 0.25, 2: 0.25, 3: 0.25, 4: 0.25}
+    # Mean is 2.5
+    var = variance(dist, mu=2.5)
+    assert var == pytest.approx(1.25)
+
+
 def test_skewness():
     # Symmetric: Skewness = 0
     dist = {-1: 0.25, 1: 0.25, -2: 0.25, 2: 0.25}
@@ -219,6 +227,21 @@ def test_skewness():
     assert skewness(dist2) > 0
 
 
+def test_skewness_precomputed():
+    # Test with precomputed mu and sigma
+    dist = {-1: 0.25, 1: 0.25, -2: 0.25, 2: 0.25}
+    # Mean = 0
+    # Var = 0.25*(1+1+4+4) = 2.5. Sigma = sqrt(2.5)
+    skew = skewness(dist, mu=0.0, sigma=math.sqrt(2.5))
+    assert skew == pytest.approx(0.0)
+
+
+def test_skewness_zero_variance():
+    # Constant distribution -> Sigma = 0
+    dist = {5: 1.0}
+    assert skewness(dist) == 0.0
+
+
 def test_kurtosis():
     # Normal-ish (Binomial n=4, p=0.5) -> 0, 1, 2, 3, 4
     # 1, 4, 6, 4, 1 / 16
@@ -229,6 +252,21 @@ def test_kurtosis():
     # p=0.5 -> 1-6(0.25) = -0.5. np(1-p) = 4*0.25 = 1.
     # Kurt = 3 - 0.5 = 2.5
     assert kurtosis(dist) == pytest.approx(2.5)
+
+
+def test_kurtosis_precomputed():
+    # Test with precomputed mu and sigma
+    dist = {0: 1 / 16, 1: 4 / 16, 2: 6 / 16, 3: 4 / 16, 4: 1 / 16}
+    # Mean = 2
+    # Var = 1. Sigma = 1
+    kurt = kurtosis(dist, mu=2.0, sigma=1.0)
+    assert kurt == pytest.approx(2.5)
+
+
+def test_kurtosis_zero_variance():
+    # Constant distribution -> Sigma = 0
+    dist = {5: 1.0}
+    assert kurtosis(dist) == 0.0
 
 
 def test_mode():

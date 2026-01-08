@@ -98,6 +98,40 @@ def test_lorentz_sparse_removal():
     assert 1 not in boosted
 
 
+def test_lorentz_cancellation():
+    # Test exact cancellation of components
+    # t' = gamma * (t - beta * x)
+    # x' = gamma * (x - beta * t)
+
+    # Case 1: t' becomes 0
+    # Let beta = 0.5. gamma = 1.1547
+    # We need t = beta * x. Let x = 2, t = 1.
+    # t' = gamma * (1 - 0.5 * 2) = 0
+    # x' = gamma * (2 - 0.5 * 1) = gamma * 1.5 != 0
+    vec = {0: 1.0, 1: 2.0}
+    boosted = lorentz_boost(vec, beta=0.5)
+    assert 0 not in boosted
+    assert 1 in boosted
+
+    # Case 2: x' becomes 0
+    # We need x = beta * t. Let t = 2, x = 1.
+    # x' = gamma * (1 - 0.5 * 2) = 0
+    # t' = gamma * (2 - 0.5 * 1) = gamma * 1.5 != 0
+    vec2 = {0: 2.0, 1: 1.0}
+    boosted2 = lorentz_boost(vec2, beta=0.5)
+    assert 1 not in boosted2
+    assert 0 in boosted2
+
+
+def test_lorentz_cancellation_missing_key():
+    # Test cancellation when the key was NOT in the original vector
+    # This hits the 'elif 0 in result' -> False branch
+    vec = {}
+    boosted = lorentz_boost(vec, beta=0.5)
+    assert 0 not in boosted
+    assert 1 not in boosted
+
+
 def test_fractal():
     # Line of 4 points: (0,), (1,), (2,), (3,)
     # Box size 1: 4 boxes

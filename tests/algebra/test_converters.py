@@ -122,6 +122,23 @@ def test_sparse_to_dense_tensor_explicit_shape():
     assert dense == [[[1, 0]]]
 
 
+def test_sparse_to_dense_tensor_1d():
+    # 1D Tensor (Vector)
+    sparse = {0: 1, 2: 3}
+    # Inferred shape: (3,)
+    dense = sparse_to_dense_tensor(sparse)
+    assert dense == [1, 0, 3]
+
+
+def test_sparse_to_dense_tensor_deep():
+    # Force recursion in get_shape
+    # 2D Tensor: {0: {0: 1}}
+    sparse = {0: {0: 1}}
+    # get_shape({0: {0: 1}}) -> calls get_shape({0: 1}) -> calls get_shape(1)
+    dense = sparse_to_dense_tensor(sparse)
+    assert dense == [[1]]
+
+
 def test_sample():
     # f(x) = x^2
     # domain = [-1, 0, 1, 2]
@@ -144,6 +161,13 @@ def test_flat_to_nested():
     nested = flat_to_nested(flat)
     expected = {0: {0: 1, 1: 2}, 1: {0: 3}}
     assert nested == expected
+
+
+def test_flat_to_nested_scalar_keys():
+    # Test with scalar keys (depth 1)
+    flat = {0: 1, 1: 2}
+    nested = flat_to_nested(flat)
+    assert nested == {0: 1, 1: 2}
 
 
 def test_nested_to_flat():

@@ -76,15 +76,13 @@ def box_counting_dimension(
             boxes.add(box_idx)
 
         count = len(boxes)
-        if count > 0:
-            log_inv_s.append(math.log(1.0 / s))
-            log_n.append(math.log(count))
+        # count is always > 0 because points is not empty
+        log_inv_s.append(math.log(1.0 / s))
+        log_n.append(math.log(count))
 
     # Linear Regression to find slope D
     # D = Cov(X, Y) / Var(X)
     n_points = len(log_inv_s)
-    if n_points < 2:
-        return 0.0
 
     mean_x = sum(log_inv_s) / n_points
     mean_y = sum(log_n) / n_points
@@ -92,9 +90,7 @@ def box_counting_dimension(
     cov_xy = sum((log_inv_s[i] - mean_x) * (log_n[i] - mean_y) for i in range(n_points))
     var_x = sum((log_inv_s[i] - mean_x) ** 2 for i in range(n_points))
 
-    if math.isclose(var_x, 0, abs_tol=1e-9):
-        return 0.0
-
+    # var_x cannot be 0 because sizes are distinct powers of 2
     return cov_xy / var_x
 
 

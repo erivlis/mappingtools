@@ -47,6 +47,14 @@ def test_slice_matrix():
     assert s == {1: {0: 2}}
 
 
+def test_slice_matrix_empty_intersection():
+    # Row 0 exists, but col 5 does not.
+    # Result should be empty (row 0 is skipped because new_row is empty)
+    m = {0: {0: 1}}
+    s = slice_matrix(m, rows=[0], cols=[5])
+    assert s == {}
+
+
 def test_hstack():
     # [1]  [2] -> [1 2]
     m1 = {0: {0: 1}}
@@ -73,6 +81,17 @@ def test_vstack():
     assert v == {0: {0: 1}, 1: {0: 2}}
 
 
+def test_vstack_empty_input():
+    # [1]
+    # []  -> [1]
+    # [2]    [2]
+    m1 = {0: {0: 1}}
+    m2 = {0: {0: 2}}
+    v = vstack([m1, {}, m2])
+    # m1 is row 0. Empty skipped. m2 starts at row 1.
+    assert v == {0: {0: 1}, 1: {0: 2}}
+
+
 def test_block_diag():
     # [1] (+) [2] -> [1 0]
     #                [0 2]
@@ -95,3 +114,12 @@ def test_block_diag():
     assert b2[0] == {0: 1, 1: 1}
     assert b2[1] == {0: 1, 1: 1}
     assert b2[2] == {2: 2}
+
+
+def test_block_diag_empty_input():
+    # [1] (+) [] (+) [2] -> [1 0]
+    #                       [0 2]
+    m1 = {0: {0: 1}}
+    m2 = {0: {0: 2}}
+    b = block_diag([m1, {}, m2])
+    assert b == {0: {0: 1}, 1: {1: 2}}

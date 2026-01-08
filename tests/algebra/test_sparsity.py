@@ -106,3 +106,19 @@ def test_uniformness():
     # Empty or single leaf -> 1.0
     assert uniformness({}) == 1.0
     assert uniformness({1: 1}) == 1.0
+
+
+def test_uniformness_empty_nested():
+    # Test case for empty nested dict (hits Line 23)
+    # {1: {}} -> Leaf at depth 1 (the empty dict itself is a leaf)
+    # {2: 2} -> Leaf at depth 1
+    # Depths: [1, 1]. Mean: 1. Uniformness: 1.0
+    obj = {1: {}, 2: 2}
+    assert uniformness(obj) == 1.0
+
+    # Unbalanced empty nested
+    # {1: {2: {}}} -> Leaf at depth 2
+    # {3: 3} -> Leaf at depth 1
+    # Depths: [2, 1]. Mean: 1.5.
+    obj2 = {1: {2: {}}, 3: 3}
+    assert uniformness(obj2) < 1.0

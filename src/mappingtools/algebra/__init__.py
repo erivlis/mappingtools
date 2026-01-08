@@ -60,6 +60,7 @@ Modules
 *   **`group`**: Permutations.
 *   **`sparsity`**: Metrics and checks.
 *   **`semiring`**: Generalized algebra (Tropical, Boolean, String).
+*   **`trie`**: Algebraic Tries (Sparse Tensors).
 *   **`typing`**: Type aliases for sparse/dense structures.
 """
 
@@ -158,6 +159,7 @@ from mappingtools.algebra.transforms import (
     lorentz_boost,
     z_transform,
 )
+from mappingtools.algebra.trie import AlgebraicTrie
 from mappingtools.algebra.typing import (
     DenseMatrix,
     DenseVector,
@@ -167,6 +169,7 @@ from mappingtools.algebra.typing import (
 )
 
 __all__ = [
+    'AlgebraicTrie',
     'BooleanSemiring',
     'BottleneckSemiring',
     'DenseMatrix',

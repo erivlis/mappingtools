@@ -141,8 +141,7 @@ def uniformness(obj: Mapping) -> float:
         return 1.0
 
     mean = sum(depths) / len(depths)
-    if mean == 0:
-        return 1.0
+    # mean is always >= 1 because depths start at 1 for non-empty Mapping
 
     variance = sum((d - mean) ** 2 for d in depths) / len(depths)
     std_dev = math.sqrt(variance)

@@ -87,3 +87,69 @@ def test_string_keys():
     trie.add(['home', 'bin'], 1)
 
     assert trie.contract(['home']) == 2
+
+
+def test_getitem_prefix_no_value():
+    trie = AlgebraicTrie(StandardSemiring)
+    trie[('a', 'b')] = 1
+
+    # 'a' exists as a node, but has no value
+    with pytest.raises(KeyError):
+        _ = trie[('a',)]
+
+
+def test_delitem_root():
+    trie = AlgebraicTrie(StandardSemiring)
+
+    # Set value at root (empty path)
+    trie[()] = 10
+    assert trie[()] == 10
+
+    # Delete root value
+    del trie[()]
+
+    with pytest.raises(KeyError):
+        _ = trie[()]
+
+    # Try deleting root again (should fail)
+    with pytest.raises(KeyError):
+        del trie[()]
+
+
+def test_delitem_missing_path():
+    trie = AlgebraicTrie(StandardSemiring)
+    trie[('a', 'b')] = 1
+
+    # Path doesn't exist at all
+    with pytest.raises(KeyError):
+        del trie[('x',)]
+
+    # Path exists partially ('a'), but 'c' missing
+    with pytest.raises(KeyError):
+        del trie[('a', 'c')]
+
+
+def test_delitem_prefix_no_value():
+    trie = AlgebraicTrie(StandardSemiring)
+    trie[('a', 'b')] = 1
+
+    # Path 'a' exists, but has no value to delete
+    with pytest.raises(KeyError):
+        del trie[('a',)]
+
+
+def test_delitem_cleanup_chain():
+    trie = AlgebraicTrie(StandardSemiring)
+
+    # Insert single item
+    trie[('a',)] = 1
+    assert len(trie) == 1
+
+    # Delete it. This should trigger cleanup of node 'a' from root.
+    del trie[('a',)]
+    assert len(trie) == 0
+
+    # Verify internal structure is clean (root has no keys except maybe sentinel if we set it?
+    # No, sentinel is for value)
+    # The root dict should be empty of keys 'a'
+    assert 'a' not in trie._data

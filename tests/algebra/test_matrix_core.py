@@ -73,6 +73,15 @@ def test_mat_vec():
     assert res == {0: 5, 1: 11}
 
 
+def test_mat_vec_cancellation():
+    # [1 1] [ 1] = [1*1 + 1*(-1)] = [0]
+    #       [-1]
+    m = {0: {0: 1, 1: 1}}
+    v = {0: 1, 1: -1}
+    res = mat_vec(m, v)
+    assert res == {}
+
+
 def test_vec_mat():
     # [1 2] [1 2] = [1*1+2*3, 1*2+2*4] = [7, 10]
     #       [3 4]

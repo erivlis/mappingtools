@@ -195,12 +195,6 @@ def sparse_to_dense_tensor(
 
     if shape is None:
         # Infer shape
-        # This is tricky for irregular tensors. We assume rectangularity based on max keys.
-        # We need to find the depth and max index at each level.
-        # For simplicity, let's infer the shape of the current dimension
-        # and recurse for the rest?
-        # No, we need the full shape upfront to build the dense structure.
-
         # Helper to find max shape
         def get_shape(t, current_depth=0):
             if not isinstance(t, Mapping):
@@ -218,10 +212,8 @@ def sparse_to_dense_tensor(
 
             # Merge sub-shapes (take max of each dimension)
             # This assumes all sub-tensors have the same rank.
-            if not sub_shapes:
-                return [dim]
+            # Note: sub_shapes is never empty here because t is not empty.
 
-            # Align ranks?
             max_rank = max(len(s) for s in sub_shapes)
             merged_sub = [0] * max_rank
             for s in sub_shapes:
@@ -231,9 +223,6 @@ def sparse_to_dense_tensor(
             return [dim, *merged_sub]
 
         shape = tuple(get_shape(tensor))
-
-    if not shape:
-        return default
 
     # Build dense structure
     dim = shape[0]
