@@ -143,7 +143,8 @@ def pivot(
         col_key = item[columns]
         val = item[values]
 
-        aggregate(result[row_key], col_key, val)
+        # Pass value as a tuple because aggregator expects iterable
+        aggregate(result[row_key], col_key, (val,))
 
     # Convert defaultdicts to regular dicts for clean output
     # This is a deep conversion
@@ -212,7 +213,8 @@ def rekey(
     aggregate = aggregation.aggregator
 
     for k, v in mapping.items():
-        aggregate(target, key_factory(k, v), v)
+        # Pass value as a tuple because aggregator expects iterable
+        aggregate(target, key_factory(k, v), (v,))
 
     return dict(target)
 
@@ -267,8 +269,9 @@ def reshape(
 
         # Apply aggregation at the leaf
         if ctype and leaf_val not in current:
-            current[item.get(leaf_key)] = ctype()
+            current[leaf_val] = ctype()
 
-        aggregate(current, leaf_val, value_val)
+        # Pass value as a tuple because aggregator expects iterable
+        aggregate(current, leaf_val, (value_val,))
 
     return result

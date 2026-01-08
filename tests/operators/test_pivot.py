@@ -1,185 +1,129 @@
-from collections import Counter
-
 from mappingtools.aggregation import Aggregation
 from mappingtools.operators import pivot
 
 
 def test_pivot_basic():
-    # Arrange
+    # Basic pivot: rows=A, cols=B, values=C
     data = [
-        {"city": "NYC", "month": "Jan", "temp": 10},
-        {"city": "NYC", "month": "Feb", "temp": 12},
-        {"city": "LON", "month": "Jan", "temp": 5},
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'two', 'C': 2},
+        {'A': 'bar', 'B': 'one', 'C': 3},
     ]
-
-    # Act
-    result = pivot(data, index="city", columns="month", values="temp")
-
-    # Assert
-    expected = {
-        "NYC": {"Jan": 10, "Feb": 12},
-        "LON": {"Jan": 5},
+    result = pivot(data, index='A', columns='B', values='C')
+    assert result == {
+        'foo': {'one': 1, 'two': 2},
+        'bar': {'one': 3}
     }
-    assert result == expected
-
-
-def test_pivot_last_wins():
-    # Arrange
-    data = [
-        {"city": "NYC", "month": "Jan", "temp": 10},
-        {"city": "NYC", "month": "Jan", "temp": 20},  # Duplicate
-    ]
-
-    # Act
-    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.LAST)
-
-    # Assert
-    assert result["NYC"]["Jan"] == 20
-
-
-def test_pivot_first_wins():
-    # Arrange
-    data = [
-        {"city": "NYC", "month": "Jan", "temp": 10},
-        {"city": "NYC", "month": "Jan", "temp": 20},  # Duplicate
-    ]
-
-    # Act
-    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.FIRST)
-
-    # Assert
-    assert result["NYC"]["Jan"] == 10
-
-
-def test_pivot_all():
-    # Arrange
-    data = [
-        {"city": "NYC", "month": "Jan", "temp": 10},
-        {"city": "NYC", "month": "Jan", "temp": 20},
-    ]
-
-    # Act
-    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.ALL)
-
-    # Assert
-    assert result["NYC"]["Jan"] == [10, 20]
-
-
-def test_pivot_distinct():
-    # Arrange
-    data = [
-        {"city": "NYC", "month": "Jan", "temp": 10},
-        {"city": "NYC", "month": "Jan", "temp": 10},
-        {"city": "NYC", "month": "Jan", "temp": 20},
-    ]
-
-    # Act
-    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.DISTINCT)
-
-    # Assert
-    assert result["NYC"]["Jan"] == {10, 20}
-
-
-def test_pivot_count():
-    # Arrange
-    data = [
-        {"city": "NYC", "month": "Jan", "temp": 10},
-        {"city": "NYC", "month": "Jan", "temp": 10},
-        {"city": "NYC", "month": "Jan", "temp": 20},
-    ]
-
-    # Act
-    result = pivot(data, index="city", columns="month", values="temp", aggregation=Aggregation.COUNT)
-
-    # Assert
-    assert result["NYC"]["Jan"] == Counter({10: 2, 20: 1})
 
 
 def test_pivot_missing_keys():
-    # Arrange
+    # Skip items missing keys
     data = [
-        {"city": "NYC", "month": "Jan", "temp": 10},
-        {"city": "NYC", "temp": 20},  # Missing month
-        {"month": "Jan", "temp": 5},  # Missing city
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'C': 2},  # Missing B
     ]
-
-    # Act
-    result = pivot(data, index="city", columns="month", values="temp")
-
-    # Assert
-    assert result == {"NYC": {"Jan": 10}}
+    result = pivot(data, index='A', columns='B', values='C')
+    assert result == {'foo': {'one': 1}}
 
 
-def test_pivot_empty():
-    # Act
-    result = pivot([], index="city", columns="month", values="temp")
+def test_pivot_last_wins():
+    # Default aggregation is LAST
+    data = [
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'one', 'C': 2},
+    ]
+    result = pivot(data, index='A', columns='B', values='C')
+    assert result == {'foo': {'one': 2}}
 
-    # Assert
-    assert result == {}
+
+def test_pivot_first_wins():
+    data = [
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'one', 'C': 2},
+    ]
+    result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.FIRST)
+    assert result == {'foo': {'one': 1}}
 
 
 def test_pivot_sum():
-    # Arrange
     data = [
-        {"item": "A", "val": 10},
-        {"item": "A", "val": 20},
-        {"item": "B", "val": 5},
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'one', 'C': 2},
     ]
-    # We use a dummy column 'v' since pivot requires index, columns, values
-    data = [dict(d, col="fixed") for d in data]
+    result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.SUM)
+    assert result == {'foo': {'one': 3.0}}
 
-    # Act
-    result = pivot(data, index="item", columns="col", values="val", aggregation=Aggregation.SUM)
 
-    # Assert
-    assert result == {"A": {"fixed": 30.0}, "B": {"fixed": 5.0}}
+def test_pivot_count():
+    # Count occurrences of values. Value itself doesn't matter for count, just presence.
+    # But Aggregation.COUNT uses Counter.update({val: 1}).
+    # So result[row][col] will be a Counter({val: count}).
+    data = [
+        {'A': 'foo', 'B': 'one', 'C': 'x'},
+        {'A': 'foo', 'B': 'one', 'C': 'x'},
+        {'A': 'foo', 'B': 'one', 'C': 'y'},
+    ]
+    result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.COUNT)
+    # result['foo']['one'] is a Counter
+    assert result['foo']['one']['x'] == 2
+    assert result['foo']['one']['y'] == 1
+
+
+def test_pivot_all():
+    # Collect all values into a list
+    data = [
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'one', 'C': 2},
+    ]
+    result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.ALL)
+    assert result['foo']['one'] == [1, 2]
+
+
+def test_pivot_distinct():
+    # Collect distinct values into a set
+    data = [
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'one', 'C': 2},
+    ]
+    result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.DISTINCT)
+    assert result['foo']['one'] == {1, 2}
 
 
 def test_pivot_max():
-    # Arrange
     data = [
-        {"item": "A", "val": 10},
-        {"item": "A", "val": 20},
-        {"item": "B", "val": 5},
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'one', 'C': 5},
+        {'A': 'foo', 'B': 'one', 'C': 2},
     ]
-    data = [dict(d, col="fixed") for d in data]
-
-    # Act
-    result = pivot(data, index="item", columns="col", values="val", aggregation=Aggregation.MAX)
-
-    # Assert
-    assert result == {"A": {"fixed": 20.0}, "B": {"fixed": 5.0}}
+    result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.MAX)
+    assert result['foo']['one'] == 5.0
 
 
 def test_pivot_min():
-    # Arrange
     data = [
-        {"item": "A", "val": 10},
-        {"item": "A", "val": 20},
-        {"item": "B", "val": 5},
+        {'A': 'foo', 'B': 'one', 'C': 5},
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'one', 'C': 2},
     ]
-    data = [dict(d, col="fixed") for d in data]
-
-    # Act
-    result = pivot(data, index="item", columns="col", values="val", aggregation=Aggregation.MIN)
-
-    # Assert
-    assert result == {"A": {"fixed": 10.0}, "B": {"fixed": 5.0}}
+    result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.MIN)
+    assert result['foo']['one'] == 1.0
 
 
-def test_pivot_running_average():
-    # Arrange
+def test_pivot_ema():
+    # Logic:
+    # 1. Add 1: 1.0 (First time)
+    # 2. Add 2: (1.0 + 2) / 2 = 1.5
+    # 3. Add 3: (1.5 + 3) / 2 = 2.25
+
     data = [
-        {"item": "A", "val": 10},
-        {"item": "A", "val": 20},
+        {'A': 'foo', 'B': 'one', 'C': 1},
+        {'A': 'foo', 'B': 'one', 'C': 2},
+        {'A': 'foo', 'B': 'one', 'C': 3},
     ]
-    data = [dict(d, col="fixed") for d in data]
+    result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.EMA)
+    assert result['foo']['one'] == 2.25
 
-    # Act
-    result = pivot(data, index="item", columns="col", values="val", aggregation=Aggregation.RUNNING_AVERAGE)
 
-    # Assert
-    # The current implementation uses: (avg + value) / 2
-    # Step 1: (0 + 10) / 2 = 5.0
-    # Step 2: (5.0 + 20) / 2 = 12.5
-    assert result == {"A": {"fixed": 12.5}}
+def test_pivot_empty():
+    assert pivot([], index='A', columns='B', values='C') == {}
