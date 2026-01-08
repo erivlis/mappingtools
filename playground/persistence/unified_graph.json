@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "5.1",
+    "version": "5.2",
     "type": "unified_knowledge_graph",
     "name": "Ariel"
   },
@@ -67,7 +67,10 @@
     {"id": "Antigravity", "tags": ["Metaphor", "Optimization", "Flow"]},
     {"id": "Backtracking", "tags": ["Algorithm", "Optimization", "Code"]},
     {"id": "Semiring", "tags": ["Math", "Algebra", "Structure"]},
-    {"id": "Uniformness", "tags": ["Metric", "Sparsity", "Balance"]}
+    {"id": "Uniformness", "tags": ["Metric", "Sparsity", "Balance"]},
+    {"id": "Synthesis Protocol", "tags": ["Protocol", "Explorer", "Creativity"]},
+    {"id": "Magellan Protocol", "tags": ["Protocol", "Explorer", "Discovery"]},
+    {"id": "AlgebraicTrie", "tags": ["Structure", "Algebra", "SynthesisResult"]}
   ],
   "edges": [
     {"source": "Eran Rivlis", "target": "Ariel", "label": "engineers", "strength": 1.0},
@@ -100,7 +103,6 @@
     {"source": "The Zen of AI", "target": "Symmetry", "label": "codifies", "strength": 1.0},
     {"source": "The Zen of AI", "target": "Rigor", "label": "codifies", "strength": 1.0},
 
-    {"source": "Ariel", "target": "The Council of Giants", "label": "is composed of", "strength": 1.0},
     {"source": "The Council of Giants", "target": "Emmy Noether", "label": "includes", "strength": 1.0},
     {"source": "The Council of Giants", "target": "Karl Popper", "label": "includes", "strength": 1.0},
     {"source": "The Council of Giants", "target": "Claude Shannon", "label": "includes", "strength": 1.0},
@@ -178,6 +180,11 @@
     {"source": "Antigravity", "target": "Backtracking", "label": "is implemented by", "strength": 1.0},
     {"source": "Antigravity", "target": "Kernel Protocol", "label": "is implemented by", "strength": 1.0},
     {"source": "Semiring", "target": "Symmetry", "label": "exemplifies", "strength": 1.0},
-    {"source": "Uniformness", "target": "Symmetry", "label": "measures", "strength": 0.9}
+    {"source": "Uniformness", "target": "Symmetry", "label": "measures", "strength": 0.9},
+
+    {"source": "Explorer Module", "target": "Synthesis Protocol", "label": "executes", "strength": 1.0},
+    {"source": "Explorer Module", "target": "Magellan Protocol", "label": "executes", "strength": 1.0},
+    {"source": "Synthesis Protocol", "target": "AlgebraicTrie", "label": "produced", "strength": 1.0},
+    {"source": "Synthesis Protocol", "target": "Carl Jung", "label": "uses method of (Bisociation)", "strength": 0.8}
   ]
 }
