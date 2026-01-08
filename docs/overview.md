@@ -16,10 +16,20 @@ Below is a brief description of the main namespaces within the library:
     | Class                  | Description                                                                                                              |
     |------------------------|--------------------------------------------------------------------------------------------------------------------------|
     | **AutoMapper**         | A Mapping-like class that automatically generates and assigns unique, minified strings values for any new keys accessed. |
-    | **CategoryCounter**    | Extends a dictionary to count occurrences of data items categorized by multiple categories.                              |
+    | **CategoryCollector**  | A generalized collector that aggregates data into categories (2D structure). Supports various aggregation modes.         |
+    | **CategoryCounter**    | A specialized `CategoryCollector` for counting occurrences (Aggregation.COUNT).                                          |
     | **MappingCollector**   | Collects key-value pairs into an internal mapping based on different modes (ALL, COUNT, DISTINCT, FIRST, LAST).          |
     | **MeteredDict**        | A dictionary that tracks changes made to it.                                                                             |
     | **nested_defaultdict** | Creates a nested `defaultdict` with specified depth and factory.                                                         |
+
+=== ":lucide-square-pi: Algebra"
+
+    This namespace provides mathematical primitives for sparse data structures.
+
+    | Class             | Description                                                                                                                                                                                                                                                      |
+    |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | **AlgebraicTrie** | A Trie (Prefix Tree) implemented as a Sparse Tensor over a Semiring. Supports algebraic operations like addition and contraction.                                                                                                                                |
+    | **Semiring**      | A protocol defining algebraic structures (Standard, Tropical, Boolean, etc.) used for generalized matrix operations.                                                                                                                                             |
 
 === ":lucide-square-asterisk: Operators"
 
@@ -76,4 +86,3 @@ Below is a brief description of the main namespaces within the library:
     | **simplify**  | Converts objects to strictly structured dictionaries.                                              |
     | **strictify** | Applies a strict structural conversion to an object using optional converters for keys and values. |
     | **stringify** | Converts an object into a string representation by recursively processing it based on its type.    |
-
