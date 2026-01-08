@@ -101,7 +101,7 @@ class AlgebraicTrie(MutableMapping[tuple[K, ...], V], Generic[K, V]):
 
             for k, v in node.items():
                 if k != self._value_key:
-                    stack.append((v, path + [k]))
+                    stack.append((v, [*path, k]))
 
     def __len__(self) -> int:
         """Returns the number of set values in the Trie."""
