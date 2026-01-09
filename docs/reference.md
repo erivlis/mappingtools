@@ -10,6 +10,10 @@ This page contains the complete API reference for the `mappingtools` library.
 
 ::: mappingtools.collectors
 
+## :lucide-square-pi: Algebra
+
+::: mappingtools.algebra
+
 ## :lucide-square-asterisk: Operators
 
 ::: mappingtools.operators

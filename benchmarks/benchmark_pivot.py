@@ -85,7 +85,7 @@ def pivot_optimized(iterable, index, columns, values, mode=Aggregation.LAST):
     result = defaultdict(lambda: defaultdict(ctype)) if ctype else defaultdict(dict)
 
     # Optimization: Bind the global collect to a local variable
-    local_collect = mode.aggregator
+    local_collect = mode.aggregate_one
 
     for item in iterable:
         if index not in item or columns not in item or values not in item:

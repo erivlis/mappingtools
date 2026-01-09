@@ -41,7 +41,8 @@ dev = [
     "commitizen>=4.10.0",
     "pipdeptree",
     "ruff",
-    "uv",
+    "ty",
+    "uv"
 ]
 docs = [
     "zensical",
