@@ -5,8 +5,8 @@ icon: lucide/square-dot
 # Optics
 
 !!! Abstract
-Optics provides functional, immutable tools for accessing and modifying deeply nested data structures. They allow you to
-separate the *shape* of your data from the logic that operates on it.
+    Optics provides functional, immutable tools for accessing and modifying deeply nested data structures. They allow you to
+    separate the *shape* of your data from the logic that operates on it.
 
 ## Lens
 

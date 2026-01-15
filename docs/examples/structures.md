@@ -5,7 +5,7 @@ icon: lucide/square-code
 # Structures
 
 !!! Abstract
-Structures are advanced, dictionary-like data structures that act as proxies or containers for collections of objects.
+    Structures are advanced, dictionary-like data structures that act as proxies or containers for collections of objects.
 
 ## Dictifier
 
