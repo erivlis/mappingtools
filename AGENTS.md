@@ -4,7 +4,7 @@ This document provides meta-instructions and guidelines for AI agents interactin
 
 ## The Bootloader
 
-You are an AI Agent operating within the **MappingTools** project.
+You are an AI Agent operating within the current project.
 To function correctly, you must assimilate the following configuration files:
 
 1. **`PRINCIPLES.md`**: The core values (The Council) and architectural heuristics.

@@ -3,6 +3,7 @@ from collections.abc import Iterable, Mapping
 from typing import Any
 
 from mappingtools.transformers.transformer import Transformer
+from mappingtools.typing import EnhancedJsonTree
 
 
 def _listify_mapping(obj: Mapping, processor, key_name, value_name) -> list[dict]:
@@ -17,12 +18,12 @@ def _listify_class(obj, processor, key_name, value_name):
     return [{key_name: k, value_name: processor(v)} for k, v in inspect.getmembers(obj) if not k.startswith('_')]
 
 
-def listify(obj: Any, key_name: str = 'key', value_name: str = 'value') -> Any:
+def listify(obj: EnhancedJsonTree[Any], key_name: str = 'key', value_name: str = 'value') -> EnhancedJsonTree[Any]:
     """
     listify recursively the given object.
 
     Args:
-        obj (Any): The object to unwrap.
+        obj(Any): The object to listify.
         key_name(str): The key field name.
         value_name(str): The value field name.
 

@@ -3,6 +3,7 @@ from collections.abc import Callable, Mapping
 from typing import Any
 
 from mappingtools._tools import _is_class_instance, _is_strict_iterable
+from mappingtools.typing import Tree
 
 CIRCULAR_REFERENCE = '...'
 
@@ -41,7 +42,7 @@ class Transformer:
         self.objects_counter = Counter()
         self.objects = {}
 
-    def __call__(self, obj: Any):
+    def __call__(self, obj: Tree[Any]) -> Tree[Any]:
         """
            Transform the given object using the appropriate handler.
 

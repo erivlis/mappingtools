@@ -22,15 +22,6 @@ Below is a brief description of the main namespaces within the library:
     | **MeteredDict**        | A dictionary that tracks changes made to it.                                                                             |
     | **nested_defaultdict** | Creates a nested `defaultdict` with specified depth and factory.                                                         |
 
-=== ":lucide-square-pi: Algebra"
-
-    This namespace provides mathematical primitives for sparse data structures.
-
-    | Class             | Description                                                                                                                                                                                                                                                      |
-    |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    | **AlgebraicTrie** | A Trie (Prefix Tree) implemented as a Sparse Tensor over a Semiring. Supports algebraic operations like addition and contraction.                                                                                                                                |
-    | **Semiring**      | A protocol defining algebraic structures (Standard, Tropical, Boolean, etc.) used for generalized matrix operations.                                                                                                                                             |
-
 === ":lucide-square-asterisk: Operators"
 
     This namespace provides functions that perform operations on mappings.
@@ -86,3 +77,55 @@ Below is a brief description of the main namespaces within the library:
     | **simplify**  | Converts objects to strictly structured dictionaries.                                              |
     | **strictify** | Applies a strict structural conversion to an object using optional converters for keys and values. |
     | **stringify** | Converts an object into a string representation by recursively processing it based on its type.    |
+
+## Comparison with Other Libraries
+
+`mappingtools` occupies a unique niche in the Python ecosystem. Here is how it compares to other well-known libraries.
+
+### 1. GraphBLAS (`python-graphblas`)
+
+* **Domain:** High-Performance Sparse Linear Algebra.
+* **Backend:** C (SuiteSparse).
+* **Keys:** Integer indices only ($0 \dots N-1$).
+* **Comparison:**
+    * **GraphBLAS** is the "F1 Car." It is optimized for massive scale (billions of edges) and raw speed on integer
+      matrices.
+    * **MappingTools** is the "All-Terrain Vehicle." It works with **Symbolic Keys** (strings, tuples, objects)
+      directly, without needing to map them to integers first. It is pure Python and zero-dependency.
+* **Verdict:** Use GraphBLAS for massive numerical graphs. Use MappingTools for NLP, Knowledge Graphs, and symbolic
+  prototyping.
+
+### 2. NumPy (`numpy`)
+
+* **Domain:** Dense Linear Algebra.
+* **Backend:** C/Fortran.
+* **Comparison:**
+    * **NumPy** stores matrices as dense arrays. It is unbeatable for dense data (density > 50%).
+    * **MappingTools** stores matrices as sparse dictionaries. It is orders of magnitude faster for very sparse data (
+      density < 1%).
+* **Verdict:** Use NumPy for images and dense tensors. Use MappingTools for sparse feature vectors and graphs.
+
+### 3. SciPy Sparse (`scipy.sparse`)
+
+* **Domain:** Numerical Sparse Linear Algebra.
+* **Backend:** C/C++.
+* **Keys:** Integer indices only.
+* **Comparison:**
+    * **SciPy** is the industry standard for numerical sparse matrices. However, it is limited to standard
+      arithmetic ($+, \times$).
+    * **MappingTools** supports **Generalized Semirings** (Tropical, Boolean, Expectation), allowing you to solve
+      Shortest Path, Reachability, and Viterbi Decoding using the same "matrix multiplication" code.
+* **Verdict:** Use SciPy for standard numerical solvers (eigenvalues, linear systems). Use MappingTools for generalized
+  algebraic problems.
+
+### 4. NetworkX (`networkx`)
+
+* **Domain:** Graph Algorithms.
+* **Backend:** Pure Python.
+* **Comparison:**
+    * **NetworkX** is object-oriented. You manipulate `Graph` objects, add nodes, and run algorithms like
+      `shortest_path`.
+    * **MappingTools** is algebraic. You represent the graph as a sparse matrix and run `dot` (matrix multiplication) to
+      find paths.
+* **Verdict:** Use NetworkX for complex graph algorithms (clustering, community detection) and visualization. Use
+  MappingTools when you want to express graph problems as linear algebra equations.

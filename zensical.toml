@@ -3,10 +3,9 @@ copyright = "Copyright &copy; 2025 Eran Rivlis"
 site_name = "MappingTools"
 site_author = "Eran Rivlis"
 site_description = ""
-repo_url = "https://erivlis.github.io/mappingtools/"
+repo_url = "https://github.com/erivlis/mappingtools"
 repo_name = "erivlis/mappingtools"
-
-#license = "https://github.com/erivlis/mappingtools/LICENSE"
+license = "https://github.com/erivlis/mappingtools/LICENSE"
 extra_css = [
     "stylesheets/extra.css"
 ]

@@ -1,1 +1,0 @@
-Backup of root persistence files before v4.5 promotion

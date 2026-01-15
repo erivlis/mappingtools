@@ -10,21 +10,6 @@ This document provides a visual representation of the `mappingtools` library str
 ```mermaid
 graph TD
     subgraph mappingtools
-        subgraph algebra [Algebra]
-            subgraph matrix [Matrix]
-                core
-                academic
-            end
-            lattice
-            analysis
-            probability
-            transforms
-            automata
-            group
-            sparsity
-            semiring
-            converters
-        end
 
         subgraph collectors [Collectors]
             AutoMapper
@@ -97,35 +82,9 @@ graph TD
     flatten --> _tools
     Transformer --> _tools
 
-%% Algebra Dependencies
-    core --> semiring
-    academic --> core
-    analysis --> core
-    probability --> core
-    probability --> lattice
-    transforms --> lattice
-    converters --> core
-    automata --> semiring
 ```
 
 ## Component Descriptions
-
-### Algebra
-
-Mathematical operations on sparse mappings.
-
-- **matrix**: Linear algebra (dot, power, inverse).
-    - **core**: Efficient sparse operations.
-    - **academic**: Educational algorithms (determinant, cofactor).
-- **lattice**: Set theory and fuzzy logic (union, intersection).
-- **analysis**: Discrete Exterior Calculus on graphs (gradient, laplacian).
-- **probability**: Bayesian inference and Markov chains.
-- **transforms**: Signal processing (DFT, Hilbert, Lorentz).
-- **automata**: Finite State Machine simulation.
-- **group**: Permutation groups.
-- **sparsity**: Metrics for sparse structures (density, uniformness, deepness).
-- **semiring**: Generalized algebraic structures (Tropical, Boolean).
-- **converters**: Translation between dense/sparse and function/data.
 
 ### Collectors
 
