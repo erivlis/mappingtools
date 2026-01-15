@@ -82,7 +82,7 @@ def test_adding_key_value_pairs_in_first_mode():
 def test_initialization_with_invalid_mode():
     # Arrange & Act & Assert
     with pytest.raises(TypeError):
-        MappingCollector("INVALID_MODE")
+        MappingCollector('INVALID_MODE')
 
 
 # Adding key-value pairs with non-hashable keys
@@ -126,3 +126,56 @@ def test_adding_duplicate_keys_in_last_mode():
     collector.add('key1', 'value2')
     # Assert
     assert collector.mapping['key1'] == 'value2'
+
+
+# Adding with no values (Coverage for empty *args)
+def test_add_no_values():
+    # Arrange
+    collector = MappingCollector(MappingCollectorMode.ALL)
+    # Act
+    collector.add('key1')
+    # Assert
+    # Should not add anything or crash
+    assert 'key1' not in collector.mapping
+
+
+# Test SUM mode
+def test_sum_mode():
+    collector = MappingCollector(MappingCollectorMode.SUM)
+    collector.add('key1', 10)
+    collector.add('key1', 20)
+    assert collector.mapping['key1'] == 30.0
+
+
+# Test MAX mode
+def test_max_mode():
+    collector = MappingCollector(MappingCollectorMode.MAX)
+    collector.add('key1', 10)
+    collector.add('key1', 20)
+    collector.add('key1', 5)
+    assert collector.mapping['key1'] == 20.0
+
+
+# Test MIN mode
+def test_min_mode():
+    collector = MappingCollector(MappingCollectorMode.MIN)
+    collector.add('key1', 10)
+    collector.add('key1', 20)
+    collector.add('key1', 5)
+    assert collector.mapping['key1'] == 5.0
+
+
+# Test MOVING_AVERAGE mode
+def test_moving_average_mode():
+    collector = MappingCollector(MappingCollectorMode.EMA)
+    # 1. Add 10: (0 + 10) / 1 = 10.0
+    collector.add('key1', 10)
+    assert collector.mapping['key1'] == 10.0
+
+    # 2. Add 20: (10 + 20) / 2 = 15.0
+    collector.add('key1', 20)
+    assert collector.mapping['key1'] == 15.0
+
+    # 3. Add 30: (15 + 30) / 2 = 22.5
+    collector.add('key1', 30)
+    assert collector.mapping['key1'] == 22.5

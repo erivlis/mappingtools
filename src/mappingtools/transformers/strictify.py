@@ -3,6 +3,7 @@ from collections.abc import Callable, Iterable, Mapping
 from typing import Any
 
 from mappingtools.transformers.transformer import Transformer
+from mappingtools.typing import Tree
 
 
 def _class_generator(obj):
@@ -26,9 +27,9 @@ def _strictify_class(obj, processor, key_converter, value_converter):
     }
 
 
-def strictify(obj: Any,
+def strictify(obj: Tree[Any],
               key_converter: Callable[[Any], str] | None = None,
-              value_converter: Callable[[Any], Any] | None = None) -> Any:
+              value_converter: Callable[[Any], Any] | None = None) -> Tree[Any]:
     """Applies strict structural conversion to the given object using optional specific converters for keys and values.
 
        Args:

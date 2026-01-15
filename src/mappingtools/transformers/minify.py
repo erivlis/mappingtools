@@ -3,9 +3,10 @@ from typing import Any
 
 from mappingtools.collectors import AutoMapper
 from mappingtools.transformers.strictify import strictify
+from mappingtools.typing import EnhancedJsonTree, Tree
 
 
-def minify(obj: Any, alphabet=string.ascii_uppercase) -> Any:
+def minify(obj: Tree[Any], alphabet=string.ascii_uppercase) -> Tree[Any]:
     """Minify the keys of an object using the provided alphabet.
 
     Args:

@@ -31,17 +31,20 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://erivlis.github.io/mappingtools"
-"Documentation" = "https://erivlis.github.io/mappingtools/README.md"
+"Homepage" = "https://github.com/erivlis/mappingtools/README.md"
+"Repository" = "https://github.com/erivlis/mappingtools.git"
+"Source" = "https://github.com/erivlis/mappingtools.git"
 "Bug Tracker" = "https://github.com/erivlis/mappingtools/issues"
-"Source" = "https://github.com/erivlis/mappingtools"
+"Documentation" = "https://erivlis.github.io/mappingtools"
+
 
 [dependency-groups]
 dev = [
     "commitizen>=4.10.0",
     "pipdeptree",
     "ruff",
-    "uv",
+    "ty",
+    "uv"
 ]
 docs = [
     "zensical",
@@ -117,6 +120,9 @@ line-length = 120
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.format]
+quote-style = "single"
 
 [tool.ruff.lint]
 select = [

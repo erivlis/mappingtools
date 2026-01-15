@@ -72,7 +72,7 @@ class StringArrangements:
     def stream(self, count: int) -> Generator[str, None, None]:
         """
         Generates the given count of possible string arrangements with all lengths.
-        Starting with length 1 then if possible 2 .
+        Starting with length 1, then if possible, 2, 3, and so on.
 
         Args:
             count (int): The number of strings to generate.

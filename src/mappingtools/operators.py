@@ -8,13 +8,13 @@ from mappingtools.aggregation import Aggregation
 from mappingtools.typing import K
 
 __all__ = [
-    "distinct",
-    "flatten",
-    "inverse",
-    "pivot",
-    "rekey",
-    "rename",
-    "reshape",
+    'distinct',
+    'flatten',
+    'inverse',
+    'pivot',
+    'rekey',
+    'rename',
+    'reshape',
 ]
 
 
@@ -49,21 +49,42 @@ def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tu
     Returns:
         dict
     """
+    result = {}
+    path = []
 
-    def _flatten(key: tuple, value: Any):
+    def _recurse(value: Any):
         if isinstance(value, Mapping):
             for k, v in value.items():
-                new_key = tuple([*key, *k] if _is_strict_iterable(k) else [*key, k])
-                yield from _flatten(new_key, v)
+                # Fast path for common atomic keys (str, int)
+                if isinstance(k, (str, int)):
+                    path.append(k)
+                    _recurse(v)
+                    path.pop()
+                elif _is_strict_iterable(k):
+                    # k is a tuple/list/iterable, extend path
+                    # We need to convert to list to know length for backtracking if it's a generator
+                    # But _is_strict_iterable allows generators.
+                    # If k is a generator, extending path consumes it.
+                    # We can't easily know how many items were added without counting.
+                    # So we convert to tuple/list first.
+                    k_seq = tuple(k)
+                    path.extend(k_seq)
+                    _recurse(v)
+                    # Backtrack
+                    del path[-len(k_seq) :]
+                else:
+                    path.append(k)
+                    _recurse(v)
+                    path.pop()
         else:
-            yield key, value
+            result[tuple(path)] = value
 
-    flattened = _flatten((), mapping)
+    _recurse(mapping)
 
     if delimiter is not None:
-        flattened = ((delimiter.join(map(str, k)), v) for k, v in flattened)
+        return {delimiter.join(map(str, k)): v for k, v in result.items()}
 
-    return dict(flattened)
+    return result
 
 
 def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
@@ -122,7 +143,8 @@ def pivot(
         col_key = item[columns]
         val = item[values]
 
-        aggregate(result[row_key], col_key, val)
+        # Pass value as a tuple because aggregator expects iterable
+        aggregate(result[row_key], col_key, (val,))
 
     # Convert defaultdicts to regular dicts for clean output
     # This is a deep conversion
@@ -191,9 +213,11 @@ def rekey(
     aggregate = aggregation.aggregator
 
     for k, v in mapping.items():
-        aggregate(target, key_factory(k, v), v)
+        # Pass value as a tuple because aggregator expects iterable
+        aggregate(target, key_factory(k, v), (v,))
 
     return dict(target)
+
 
 def reshape(
     iterable: Iterable[Mapping],
@@ -245,8 +269,9 @@ def reshape(
 
         # Apply aggregation at the leaf
         if ctype and leaf_val not in current:
-            current[item.get(leaf_key)] = ctype()
+            current[leaf_val] = ctype()
 
-        aggregate(current, leaf_val, value_val)
+        # Pass value as a tuple because aggregator expects iterable
+        aggregate(current, leaf_val, (value_val,))
 
     return result

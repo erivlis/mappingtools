@@ -3,6 +3,7 @@ from typing import Any
 
 from mappingtools.transformers.strictify import _class_generator
 from mappingtools.transformers.transformer import Transformer
+from mappingtools.typing import Tree
 
 
 def _stringify_kv_stream(iterable: Iterable[tuple[Any, Any]],
@@ -28,7 +29,7 @@ def _stringify_class(obj, processor, kv_delimiter, item_delimiter, *args, **kwar
     return _stringify_kv_stream(_class_generator(obj), processor, kv_delimiter, item_delimiter, *args, **kwargs)
 
 
-def stringify(obj: Any, kv_delimiter: str = '=', item_delimiter: str = ', ') -> str:
+def stringify(obj: Tree[Any], kv_delimiter: str = '=', item_delimiter: str = ', ') -> str:
     """Stringify recursively the given object.
 
     Args:

@@ -241,3 +241,33 @@ print(f"Lazy (on access): {lazy_users.greet()['u1']}")
 # output: Lazy (on access): Hi, I'm Alice
 ```
 
+## Classical Semirings
+
+- **Shortest Path**: ⊕=Min, ⊗=Sum. Use: Distance (Dijkstra).
+- **Reliability**: ⊕=Max, ⊗=Product. Use: Probability.
+- **Bottleneck**: ⊕=Max, ⊗=Min. Use: Bandwidth/Capacity.
+- **Connectivity**: ⊕=OR, ⊗=AND. Use: Reachability.
+
+## Advanced Semirings (Matrix/Quillen)
+
+- **Fiber Bundle (Matrix)**: ⊕=Min (Element-wise), ⊗=MatMul. Use: Gauge Theory, Robotics (Non-commutative).
+- **Arbitrage**: ⊕=Max, ⊗=Product. Use: Currency loops.
+- **Group / Homotopy**: ⊕=Composition, ⊗=Concatenation. Use: Path equivalence.
+- **Traffic / Flow**: ⊕=Sum, ⊗=Sum. Use: Momentum.
+
+## AI & Intelligence Structures
+
+- **LLM Semiring**: ⊕=Random Sample, ⊗=Probability Chain.
+- **Attention Semiring**: ⊕=Softmax Sum, ⊗=Dot Product.
+- **Meaning Semiring**: ⊕=Vector Sum, ⊗=Contextual Embedding.
+
+## Physics & Signal Processing (Plesset)
+
+- **Convolution**: ⊕=Sum, ⊗=Convolution. Use: GNNs, smoothing.
+- **Min-Plus Convolution**: ⊕=Min, ⊗=Inf-Convolution. Use: Network Calculus (Delay).
+- **Fourier / Spectral**: ⊕=Sum, ⊗=Pointwise Product. Use: Spectral Graph Theory.
+- **Pressure**: ⊕=Sum, ⊗=Difference. Use: Cavitation modeling.
+
+## Metrics
+
+- **Graph Reynolds Number**: Total Momentum / Topological Viscosity.
