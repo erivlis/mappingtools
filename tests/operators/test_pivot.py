@@ -1,3 +1,5 @@
+import pytest
+
 from mappingtools.aggregation import Aggregation
 from mappingtools.operators import pivot
 
@@ -51,7 +53,7 @@ def test_pivot_sum():
         {'A': 'foo', 'B': 'one', 'C': 2},
     ]
     result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.SUM)
-    assert result == {'foo': {'one': 3.0}}
+    assert result == {'foo': {'one': 3}}
 
 
 def test_pivot_count():
@@ -97,7 +99,7 @@ def test_pivot_max():
         {'A': 'foo', 'B': 'one', 'C': 2},
     ]
     result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.MAX)
-    assert result['foo']['one'] == 5.0
+    assert result['foo']['one'] == 5
 
 
 def test_pivot_min():
@@ -107,7 +109,7 @@ def test_pivot_min():
         {'A': 'foo', 'B': 'one', 'C': 2},
     ]
     result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.MIN)
-    assert result['foo']['one'] == 1.0
+    assert result['foo']['one'] == 1
 
 
 def test_pivot_ema():
@@ -122,7 +124,7 @@ def test_pivot_ema():
         {'A': 'foo', 'B': 'one', 'C': 3},
     ]
     result = pivot(data, index='A', columns='B', values='C', aggregation=Aggregation.EMA)
-    assert result['foo']['one'] == 2.25
+    assert result['foo']['one'] == pytest.approx(2.25)
 
 
 def test_pivot_empty():

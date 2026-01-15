@@ -1,6 +1,7 @@
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
+#     "anyio"
 #     "playwright",
 #     "beautifulsoup4",
 #     "html2text",
@@ -38,15 +39,18 @@ Features
 *   **Ephemeral Environment:** Uses PEP 723 inline metadata for zero-config execution with `uv`.
 """
 
-import sys
 import asyncio
 import os
-from playwright.async_api import async_playwright
+import sys
+
+import anyio
 import html2text
+from playwright.async_api import async_playwright
+
 
 async def fetch_and_convert(url, output_file):
     print(f"🚀 Launching browser to fetch: {url}")
-    
+
     async with async_playwright() as p:
         # Launch browser (headless)
         try:
@@ -57,19 +61,19 @@ async def fetch_and_convert(url, output_file):
             sys.exit(1)
 
         page = await browser.new_page()
-        
+
         # Go to URL and wait for network idle to ensure JS loads
         print("⏳ Loading page...")
         try:
-            await page.goto(url, wait_until="networkidle", timeout=60000) # 60s timeout
+            await page.goto(url, wait_until="networkidle", timeout=60000)  # 60s timeout
         except Exception as e:
-             print(f"⚠️ Warning: Page load timed out or failed: {e}")
-             print("   Attempting to proceed with partial content...")
+            print(f"⚠️ Warning: Page load timed out or failed: {e}")
+            print("   Attempting to proceed with partial content...")
 
         # Get the full HTML content
         html_content = await page.content()
         print("✅ Page loaded.")
-        
+
         await browser.close()
 
     # Convert to Markdown
@@ -77,23 +81,24 @@ async def fetch_and_convert(url, output_file):
     converter = html2text.HTML2Text()
     converter.ignore_links = False
     converter.ignore_images = True
-    converter.body_width = 0 # No wrapping
+    converter.body_width = 0  # No wrapping
     markdown_content = converter.handle(html_content)
 
     # Ensure directory exists
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     # Save to file
-    with open(output_file, "w", encoding="utf-8") as f:
+    async with await anyio.open_file(output_file, "w", encoding="utf-8") as f:
         f.write(markdown_content)
-    
+
     print(f"💾 Saved to: {output_file}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: uv run tools/smart_fetch.py <URL> <OUTPUT_FILE>")
         sys.exit(1)
-        
+
     url = sys.argv[1]
     output_file = sys.argv[2]
 
