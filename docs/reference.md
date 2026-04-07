@@ -6,6 +6,11 @@ icon: lucide/book-open
 
 This page contains the complete API reference for the `mappingtools` library.
 
+
+## :lucide-square-pi: Aggregation
+
+::: mappingtools.aggregation 
+
 ## :lucide-square-sigma: Collectors
 
 ::: mappingtools.collectors
@@ -25,3 +30,7 @@ This page contains the complete API reference for the `mappingtools` library.
 ## :lucide-square-function: Transformers
 
 ::: mappingtools.transformers
+
+## :lucide-square-star: Typing
+
+::: mappingtools.typing
