@@ -6,8 +6,9 @@ VT = TypeVar('VT')
 VT_co = TypeVar('VT_co')
 Category = TypeVar('Category', bound=str | tuple | int | float)
 
-
 T = TypeVar('T')
+U = TypeVar('U')
+V = TypeVar('V')
 
 Tree: TypeAlias = T | list['Tree[T]'] | dict[str, 'Tree[T]']
 """Tree is a recursive type representing a tree structure where each node can be of type T,

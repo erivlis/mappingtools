@@ -1,7 +1,8 @@
 import contextlib
 from collections.abc import Mapping
-from typing import TypeVar, overload
+from typing import overload
 
+from ..typing import T
 from .dictifier import Dictifier
 from .lazy_dictifier import LazyDictifier
 
@@ -15,44 +16,42 @@ __all__ = (
     "map_objects",
 )
 
-T = TypeVar("T")
-
 
 @overload
 def map_objects(
-    source: Mapping[str, T],
-    *,
-    lazy: bool = False,
-    type_hint: type[T],
+        source: Mapping[str, T],
+        *,
+        lazy: bool = False,
+        type_hint: type[T],
 ) -> Dictifier[T]:
     ...
 
 
 @overload
 def map_objects(
-    source: Mapping[str, T],
-    *,
-    lazy: bool = True,
-    type_hint: type[T] | None = None,
+        source: Mapping[str, T],
+        *,
+        lazy: bool = True,
+        type_hint: type[T] | None = None,
 ) -> LazyDictifier[T]:
     ...
 
 
 @overload
 def map_objects(
-    source: Mapping[str, T],
-    *,
-    lazy: bool = False,
-    type_hint: None = None,
+        source: Mapping[str, T],
+        *,
+        lazy: bool = False,
+        type_hint: None = None,
 ) -> Dictifier[T]:  # Returns an auto-inferring Dictifier
     ...
 
 
 def map_objects(
-    source: Mapping[str, T],
-    *,
-    lazy: bool = False,
-    type_hint: type[T] | None = None,
+        source: Mapping[str, T],
+        *,
+        lazy: bool = False,
+        type_hint: type[T] | None = None,
 ) -> Mapping[str, T]:
     """
     Creates a proxy mapping for a collection of objects.

@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterator, Mapping
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic
 
-T = TypeVar("T")
+from ..typing import T
 
 
 class LazyDictifier(Mapping[str, T], Generic[T]):

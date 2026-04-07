@@ -1,10 +1,8 @@
 import copy
 from collections.abc import Callable
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic
 
-T = TypeVar("T")  # The source object type
-U = TypeVar("U")  # The focus value type
-V = TypeVar("V")  # The new focus value type
+from ..typing import T, U, V
 
 
 class Lens(Generic[T, U]):

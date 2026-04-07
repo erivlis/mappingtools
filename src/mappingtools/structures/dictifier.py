@@ -2,10 +2,9 @@ import asyncio
 import inspect
 import types
 from collections.abc import Callable, Mapping
-from typing import Any, Generic, TypeVar, get_args, get_type_hints
+from typing import Any, Generic, get_args, get_type_hints
 
-T = TypeVar("T")
-
+from ..typing import T
 
 # region Helpers
 

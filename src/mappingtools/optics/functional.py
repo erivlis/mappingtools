@@ -1,9 +1,8 @@
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any
 
-from mappingtools.optics.lens import Lens
-
-T = TypeVar('T')
+from ..typing import T
+from .lens import Lens
 
 
 def _to_lens(path: str | Lens) -> Lens:
