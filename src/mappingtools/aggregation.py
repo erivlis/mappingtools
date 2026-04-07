@@ -1,5 +1,5 @@
 from collections import Counter
-from collections.abc import Callable, Iterable, MutableMapping
+from collections.abc import Callable, Iterable, MutableMapping, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
@@ -31,10 +31,13 @@ def last_aggregator(mapping: MutableMapping, key: Any, values: Iterable[Any]):
     """Sets mapping[key] to the last value in the iterable."""
     # Take the last value from the iterable
     # Efficient for sequences, less so for generic iterables without len
-    val = None
-    for val in values:
-        pass
-    mapping[key] = val
+    if isinstance(values, Sequence):
+        mapping[key] = values[-1]
+    else:
+        val = None
+        for val in values:
+            pass
+        mapping[key] = val
 
 
 def sum_aggregator(mapping: MutableMapping, key: Any, values: Iterable[Any]):
