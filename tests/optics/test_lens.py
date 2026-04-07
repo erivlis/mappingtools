@@ -191,3 +191,75 @@ def test_set_uncopyable_object():
     # So it mutates in place if uncopyable.
     lens.set(container, 2)
     assert container.val == 2
+
+def test_lens_item_uncopyable_container_raises():
+    # Arrange
+    import collections
+
+    # Create a custom mapping container that lacks a valid copy operation
+    class CustomMapping(collections.abc.MutableMapping):
+        def __init__(self, data):
+            self._data = data
+
+        def __getitem__(self, key):
+            return self._data[key]
+
+        def __setitem__(self, key, value):
+            self._data[key] = value
+
+        def __delitem__(self, key):
+            del self._data[key]
+
+        def __iter__(self):
+            return iter(self._data)
+
+        def __len__(self):
+            return len(self._data)
+
+        def __copy__(self):
+            raise TypeError("I am an uncopyable custom mapping")
+
+    container = CustomMapping({'a': 1})
+    lens = Lens.item('a')
+
+    # Act & Assert
+    with pytest.raises(TypeError, match="Cannot set item immutably on"):
+        lens.set(container, 2)
+
+def test_lens_item_generic_fallback_success():
+    # Arrange
+    import collections
+    import copy
+
+    class CustomCopyableMapping(collections.abc.MutableMapping):
+        def __init__(self, data):
+            self._data = data
+
+        def __getitem__(self, key):
+            return self._data[key]
+
+        def __setitem__(self, key, value):
+            self._data[key] = value
+
+        def __delitem__(self, key):
+            del self._data[key]
+
+        def __iter__(self):
+            return iter(self._data)
+
+        def __len__(self):
+            return len(self._data)
+
+        def __copy__(self):
+            # Return a shallow copy
+            return CustomCopyableMapping(self._data.copy())
+
+    container = CustomCopyableMapping({'a': 1})
+    lens = Lens.item('a')
+
+    # Act
+    new_container = lens.set(container, 2)
+
+    # Assert
+    assert new_container['a'] == 2
+    assert container['a'] == 1 # Prove it was immutable (a copy was made)
