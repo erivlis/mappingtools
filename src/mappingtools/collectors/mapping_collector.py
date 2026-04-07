@@ -10,6 +10,19 @@ MappingCollectorMode = Aggregation
 
 
 class MappingCollector(Generic[KT, VT_co]):
+    """
+    `MappingCollector` is a flexible utility for collecting key-value pairs based on a specified aggregation mode.
+    It supports various modes of aggregation, such as collecting all values for a key, counting occurrences,
+    or applying custom aggregation functions.
+    The class is initialized based on the collection type associated with the chosen aggregation mode,
+    allowing for efficient storage and retrieval of collected data.
+
+    Public Methods:
+        - `add(key: KT, *values: VT)`: Add one or more values to the internal mapping based on the specified mode.
+        - `collect(iterable: Iterable[tuple[KT, VT]])`: Collect key-value pairs from the given iterable based on the
+            specified mode.
+    """
+
     def __init__(self, aggregation: Aggregation = Aggregation.ALL, **kwargs):
         """
         Initialize the MappingCollector with the specified mode.
@@ -76,6 +89,13 @@ class MappingCollector(Generic[KT, VT_co]):
 
 
 class CategoryCollector(defaultdict[str, MappingCollector[Category, VT_co]]):
+    """
+    `CategoryCollector` is a specialized collector that organizes values into categories based on specified criteria.
+    It extends `defaultdict` to automatically create `MappingCollector` instances for each category as needed.
+    The collector supports both constant and dynamic categories, allowing for flexible data organization and
+    aggregation based on the specified mode.
+    """
+
     def __init__(self, aggregation: Aggregation = Aggregation.ALL, **kwargs: Any):
         """
         Initialize the CategoryCollector with the specified aggregation mode.
@@ -153,6 +173,11 @@ class CategoryCollector(defaultdict[str, MappingCollector[Category, VT_co]]):
 
 
 class CategoryCounter(CategoryCollector):
+    """
+    `CategoryCounter` is a specialized version of `CategoryCollector` that counts occurrences of values within
+     categories.
+    """
+
     def __init__(self, **kwargs: Any):
         """
         Initialize the CategoryCounter.
