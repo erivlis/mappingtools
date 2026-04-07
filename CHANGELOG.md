@@ -1,3 +1,9 @@
+## v0.11.1 (2026-04-08)
+
+### Refactor
+
+- update type imports to use local typing module
+
 ## v0.11.0 (2026-04-08)
 
 ### Feat
