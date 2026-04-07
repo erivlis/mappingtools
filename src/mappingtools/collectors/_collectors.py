@@ -15,6 +15,7 @@ class AutoMapper(Mapping):
           letters (A-Z).
 
     Example:
+        ```
         >>> from mappingtools.collectors import AutoMapper
         >>> auto_mapper = AutoMapper()
         >>> auto_mapper['example_key']
@@ -25,6 +26,7 @@ class AutoMapper(Mapping):
         'A'
         >>> auto_mapper
         {'example_key': 'A', 'another_key': 'B'}
+        ```
     """
 
     def __init__(self, alphabet: str = string.ascii_uppercase):

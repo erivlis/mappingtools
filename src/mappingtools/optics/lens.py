@@ -15,6 +15,7 @@ class Lens(Generic[T, U]):
     They are composable using the `/` operator, similar to pathlib.
 
     Example:
+        ```
         >>> data = {"user": {"profile": {"name": "Alice"}}}
         >>> # Path-like composition with auto-inference for keys/indices
         >>> name_lens = Lens.key("user") / "profile" / "name"
@@ -28,6 +29,7 @@ class Lens(Generic[T, U]):
         'Bob'
         >>> data["user"]["profile"]["name"]  # Original is unchanged
         'Alice'
+        ```
     """
 
     def __init__(self, getter: Callable[[T], U], setter: Callable[[T, U], T]):

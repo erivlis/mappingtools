@@ -5,7 +5,7 @@ icon: lucide/square-asterisk
 # Operators
 
 !!! Abstract
-    Operators are functions that perform operations on Mappings.
+Operators are functions that perform operations on Mappings.
 
 ## distinct
 
@@ -54,7 +54,7 @@ keys into tuples.
 Swaps keys and values in a dictionary.
 
 !!! Example
-    
+
     <!-- name: test_inverse -->
     
     ```python linenums="1"
@@ -70,6 +70,20 @@ Swaps keys and values in a dictionary.
 
 A pure function (Monoid operation) to deeply merge two recursive tree structures.
 The merging strategy resolves conflicts by overwriting existing values with new ones (right-side precedence).
+
+Mathematically, this operation forms a composite Monoid:
+
+- Last Monoid (Scalar Fallback): When resolving conflicts between simple values, the right-hand
+  side (`tree2`) wins.
+- Pointwise Monoid (Dictionary Merge): If the values are dictionaries, they are merged by key,
+  recursively calling `merge` on the values.
+- Zip Monoid (List Merge): If both are lists, they are zipped and merged positionally,
+  substituting `MISSING` for missing indices.
+- Free Monoid (Mixed List/Scalar): If one is a list and the other is a scalar/dict,
+  it concatenates (appends/prepends).
+
+Because it forms a Monoid, this function can be used with `functools.reduce` to collect an iterable of trees into a
+single structure.
 
 !!! Example "Merging two trees directly"
 
@@ -224,9 +238,9 @@ While `pivot` is limited to 2 dimensions (Index, Columns), `reshape` accepts a s
 
 ## rekey
 
-Transforms keys of a mapping based on a factory function of `(key, value)`. 
-This allows "re-indexing" a mapping where the new key depends on the content 
-of the value or a combination of the old key and value. Collisions are 
+Transforms keys of a mapping based on a factory function of `(key, value)`.
+This allows "re-indexing" a mapping where the new key depends on the content
+of the value or a combination of the old key and value. Collisions are
 handled according to the specified aggregation.
 
 !!! Example
@@ -259,7 +273,7 @@ handled according to the specified aggregation.
 ## rename
 
 Renames keys in a mapping based on a mapper (Mapping or Callable).
-If a key is not present in the mapper, it remains unchanged. Collisions 
+If a key is not present in the mapper, it remains unchanged. Collisions
 are handled according to the specified aggregation.
 
 !!! Example
