@@ -11,9 +11,10 @@ class Greeter:
     def greet(self) -> str:
         return f"Hello {self.i}"
 
-    async def greet_async(self) -> str:
+    async def greet_async(self) -> str:  # NOSONAR - intentionally has no internal async
         # No sleep to measure pure overhead
         return f"Hello {self.i}"
+
 
 @dictify
 class GreeterCollection:
@@ -23,7 +24,7 @@ class GreeterCollection:
     def greet(self) -> str:
         return f"Hello {self.i}"
 
-    async def greet_async(self) -> str:
+    async def greet_async(self) -> str:  # NOSONAR - intentionally has no internal async
         return f"Hello {self.i}"
 
 
@@ -38,8 +39,10 @@ def run_dictifier_sync(items: Dictifier[Greeter]):
 def run_autodictifier_sync(items: Dictifier):
     return items.greet()
 
+
 def run_dictify_sync(items: GreeterCollection):
     return items.greet()
+
 
 def run_lazy_dictifier_sync(items: LazyDictifier[Greeter]):
     # We must force execution to be fair
@@ -69,7 +72,6 @@ def benchmark(size: int, iterations: int = 1000):
     decorated_data = {str(i): GreeterCollection.Item(i) for i in range(size)}
     dictified = GreeterCollection(decorated_data)
 
-
     # 1. Native Loop
     t_native = timeit.timeit(lambda: run_native_loop(data), number=iterations)
     print(f"Native Loop:        {t_native:.4f}s")
@@ -93,7 +95,6 @@ def benchmark(size: int, iterations: int = 1000):
     t_lazy = timeit.timeit(lambda: run_lazy_dictifier_sync(lazy_dictifier), number=iterations)
     overhead_lazy = (t_lazy - t_native) / t_native * 100
     print(f"LazyDictifier:        {t_lazy:.4f}s (Overhead: {overhead_lazy:.1f}%)")
-
 
     # Async Benchmarks (run in a loop)
     loop = asyncio.new_event_loop()

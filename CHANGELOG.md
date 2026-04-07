@@ -1,3 +1,14 @@
+## v0.11.0 (2026-04-08)
+
+### Feat
+
+- implement merge function for deeply merging recursive tree structures
+- updates
+
+### Perf
+
+- handle sequences in mapping assignment for improved efficiency
+
 ## v0.10.0 (2026-01-01)
 
 ### Feat
@@ -7,6 +18,7 @@
 
 ### Refactor
 
+- remove deprecated, redundant operators and their tests.
 - simplify rekey by using 'aggregation' parameter for pivot function calls.
 - simplify rekey to use aggregation functional primitives more cleanly.
 
@@ -15,8 +27,6 @@
 ### Feat
 
 - add `Dictifier` and `LazyDictifier` and factories.
-
-## v0.8.1 (2025-12-13)
 
 ### Fix
 

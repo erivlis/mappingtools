@@ -6,7 +6,7 @@ from mappingtools.operators import pivot, rekey
 
 
 # Mock of the old inline logic for pivot (for comparison)
-def pivot_old_logic(iterable, index, columns, values, mode=Aggregation.LAST):
+def pivot_old_logic(iterable, index, columns, values, mode=Aggregation.LAST):  # NOSONAR - just benchmark
     if mode == Aggregation.ALL:
         result = defaultdict(lambda: defaultdict(list))
     elif mode == Aggregation.COUNT:
@@ -148,15 +148,15 @@ def benchmark():
 
     for mode in Aggregation:
         t_old = timeit.timeit(
-            lambda: pivot_old_logic(data, index="city", columns="month", values="temp", mode=mode),
+            lambda: pivot_old_logic(data, index="city", columns="month", values="temp", mode=mode),  # NOSOANR
             number=100
         )
         t_new = timeit.timeit(
-            lambda: pivot(data, index="city", columns="month", values="temp", aggregation=mode),
-                              number=100
+            lambda: pivot(data, index="city", columns="month", values="temp", aggregation=mode),  # NOSOANR
+            number=100
         )
         t_hyper = timeit.timeit(
-            lambda: pivot_hyper_opt(data, index="city", columns="month", values="temp", mode=mode),
+            lambda: pivot_hyper_opt(data, index="city", columns="month", values="temp", mode=mode),  # NOSOANR
             number=100
         )
 
