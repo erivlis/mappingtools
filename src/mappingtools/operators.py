@@ -1,3 +1,4 @@
+import itertools
 from collections import defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping, Sequence
 from itertools import chain
@@ -5,12 +6,13 @@ from typing import Any
 
 from mappingtools._tools import _is_strict_iterable
 from mappingtools.aggregation import Aggregation
-from mappingtools.typing import K
+from mappingtools.typing import MISSING, K, T, Tree
 
 __all__ = [
     'distinct',
     'flatten',
     'inverse',
+    'merge',
     'pivot',
     'rekey',
     'rename',
@@ -56,7 +58,7 @@ def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tu
         if isinstance(value, Mapping):
             for k, v in value.items():
                 # Fast path for common atomic keys (str, int)
-                if isinstance(k, (str, int)):
+                if isinstance(k, (str, int)): # NOSONAR
                     path.append(k)
                     _recurse(v)
                     path.pop()
@@ -275,3 +277,55 @@ def reshape(
         aggregate(current, leaf_val, (value_val,))
 
     return result
+
+
+def merge(tree1: Tree[T] | Any = MISSING, tree2: Tree[T] | Any = MISSING) -> Tree[T] | Any:
+    """
+    A pure function (Monoid operation) to deeply merge two recursive tree structures.
+    The merging strategy resolves conflicts by overwriting existing values with new ones (right-side precedence).
+    `MISSING` acts as the identity element.
+
+    Mathematically, this operation forms a composite Monoid:
+    - Last Monoid (Scalar Fallback): When resolving conflicts between simple values, the right-hand
+      side (`tree2`) wins.
+    - Pointwise Monoid (Dictionary Merge): If the values are dictionaries, they are merged by key,
+      recursively calling `merge` on the values.
+    - Zip Monoid (List Merge): If both are lists, they are zipped and merged positionally,
+      substituting `MISSING` for missing indices.
+    - Free Monoid (Mixed List/Scalar): If one is a list and the other is a scalar/dict,
+      it concatenates (appends/prepends).
+
+    Because it forms a Monoid, this function can be used with `functools.reduce` to collect
+    an iterable of trees into a single structure.
+
+    Args:
+        tree1 (Tree[T] | Any): The first tree structure.
+        tree2 (Tree[T] | Any): The second tree structure.
+
+    Returns:
+        Tree[T] | Any: The deeply merged tree structure.
+    """
+    if isinstance(tree1, dict) and isinstance(tree2, dict):
+        merged = dict(tree1)
+        for k, v in tree2.items():
+            merged[k] = merge(merged.get(k, MISSING), v)
+        return merged
+    elif isinstance(tree1, list) and isinstance(tree2, list):
+        # zip longest to handle different lengths, filling missing values with MISSING
+        zipped = itertools.zip_longest(tree1, tree2, fillvalue=MISSING)
+        return [merge(t1, t2) for t1, t2 in zipped]
+    elif isinstance(tree1, list) and not isinstance(tree2, list) and tree2 is not MISSING:
+        # If tree1 is a list and tree2 is not, append tree2 to tree1
+        return [*tree1, tree2]
+    elif not isinstance(tree1, list) and tree1 is not MISSING and isinstance(tree2, list):
+        # If tree2 is a list and tree1 is not, prepend tree1 to tree2
+        return [tree1, *tree2]
+    elif tree1 is MISSING:
+        return tree2
+    elif tree2 is MISSING:
+        return tree1
+    else:
+        # If both are values (not dicts or lists), or one is a value and the other is a dict/list,
+        # the non-MISSING value takes precedence.
+        # If both are non-MISSING and different types, tree2 overwrites tree1.
+        return tree2

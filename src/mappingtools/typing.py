@@ -34,3 +34,9 @@ JSON trees, or dictionaries mapping strings to enhanced JSON trees."""
 # type JsonTree = Tree[JsonScalar]
 #
 # type EnhancedJsonTree[T] = T | JsonTree | list[EnhancedJsonTree[T]] | dict[str, EnhancedJsonTree[T]]
+
+# Sentinel object used by the merge function to distinguish
+# an explicit missing value from an actual `None` value in a tree.
+MISSING = object()
+"""Sentinel object used to distinguish an explicit missing value from an actual `None` value.
+Used by the operators.merge function"""
