@@ -91,6 +91,75 @@ Yields subsets of mappings by retaining only the specified keys.
     Use a generator expression with a dictionary comprehension instead.
     See docstring for an example.
 
+## merge
+
+A pure function (Monoid operation) to deeply merge two recursive tree structures.
+The merging strategy resolves conflicts by overwriting existing values with new ones (right-side precedence).
+
+!!! Example "Merging two trees directly"
+
+    <!-- name: test_merge -->
+
+    ```python linenums="1"
+    from mappingtools.operators import merge
+    
+    tree1 = {"a": 1, "b": [1, 2]}
+    tree2 = {"b": [3], "c": 4}
+    
+    merged = merge(tree1, tree2)
+    print(merged)
+    # output: {'a': 1, 'b': [3, 2], 'c': 4}
+    ```
+
+!!! Example "Reducing an iterable of trees"
+
+    Using Python's standard `functools.reduce`, we can easily merge an entire sequence of nested structures.
+
+    <!-- name: test_merge_reduce -->
+
+    ```python linenums="1"
+    from functools import reduce
+    from mappingtools.operators import merge
+
+    trees = [
+        {"a": 1, "b": {"c": 2}},
+        {"b": {"d": 3}},
+        {"a": 10}, # Overwrites previous "a"
+    ]
+
+    merged = reduce(merge, trees)
+    print(merged)
+    # output: {'a': 10, 'b': {'c': 2, 'd': 3}}
+    ```
+
+!!! Example "Deep merging with Lenses"
+
+    If you need to merge data into a specific, deeply nested location of a larger tree, you can compose the `merge`
+    function with an Optic (`Lens`).
+    This avoids modifying the pure `merge` function with path traversal logic.
+
+    <!-- name: test_merge_lens -->
+
+    ```python linenums="1"
+    from mappingtools.operators import merge
+    from mappingtools.optics import Lens
+
+    system_state = {"system": {"config": {"retries": 3}}}
+    new_config = {"timeout": 30}
+
+    # Focus specifically on the 'config' node inside 'system'
+    config_lens = Lens.path("system", "config")
+
+    # Apply the merge function OVER the focused node
+    new_state = config_lens.modify(
+        system_state, 
+        lambda old: merge(old, new_config)
+    )
+
+    print(new_state)
+    # output: {'system': {'config': {'retries': 3, 'timeout': 30}}}
+    ```
+
 ## pivot
 
 Reshapes a list of mappings into a nested dictionary based on index and column keys.
@@ -270,7 +339,9 @@ Takes a mapping and an optional item factory function, and generates items from 
 If the item factory is provided, it applies the factory to each key-value pair before yielding.
 
 !!! Example
+
     <!-- name: test_stream -->
+
     ```python linenums="1"
     from collections import namedtuple
     
