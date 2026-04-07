@@ -1,6 +1,6 @@
 import copy
 from collections.abc import Callable
-from typing import Any, Generic, TypeVar, overload
+from typing import Any, Generic, TypeVar
 
 T = TypeVar("T")  # The source object type
 U = TypeVar("U")  # The focus value type
