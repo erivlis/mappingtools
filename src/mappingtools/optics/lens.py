@@ -2,7 +2,7 @@ import copy
 from collections.abc import Callable
 from typing import Any, Generic
 
-from ..typing import T, U, V
+from mappingtools.typing import T, U, V
 
 
 class Lens(Generic[T, U]):

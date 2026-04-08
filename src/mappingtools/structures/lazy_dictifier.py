@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterator, Mapping
 from typing import Any, Generic
 
-from ..typing import T
+from mappingtools.typing import T
 
 
 class LazyDictifier(Mapping[str, T], Generic[T]):
@@ -14,10 +14,10 @@ class LazyDictifier(Mapping[str, T], Generic[T]):
     """
 
     def __init__(
-        self,
-        source: Mapping[str, Any],
-        op_chain: list[Callable] | None = None,
-        target_type: type | None = None,
+            self,
+            source: Mapping[str, Any],
+            op_chain: list[Callable] | None = None,
+            target_type: type | None = None,
     ):
         self._source = source
         self._op_chain = op_chain or []

@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from typing import Any
 
-from ..typing import T
+from mappingtools.typing import T
 from .lens import Lens
 
 

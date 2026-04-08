@@ -2,7 +2,7 @@ import contextlib
 from collections.abc import Mapping
 from typing import overload
 
-from ..typing import T
+from mappingtools.typing import T
 from .dictifier import Dictifier
 from .lazy_dictifier import LazyDictifier
 

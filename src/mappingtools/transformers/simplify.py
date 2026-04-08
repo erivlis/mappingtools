@@ -1,7 +1,7 @@
 from typing import Any
 
 from mappingtools.transformers.strictify import strictify
-from mappingtools.typing import EnhancedJsonTree, Tree
+from mappingtools.typing import Tree
 
 
 def simplify(obj: Tree[Any]) -> Tree[Any]:

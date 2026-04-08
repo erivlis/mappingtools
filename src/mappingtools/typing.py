@@ -1,4 +1,4 @@
-from typing import TypeAlias, TypeVar
+from typing import TypeAlias, TypeVar, Protocol, Any
 
 K = TypeVar('K')
 KT = TypeVar('KT')
@@ -41,3 +41,9 @@ JSON trees, or dictionaries mapping strings to enhanced JSON trees."""
 MISSING = object()
 """Sentinel object used to distinguish an explicit missing value from an actual `None` value.
 Used by the operators.merge function"""
+
+
+class Handler(Protocol[T]):
+
+    def __call__(self, obj: T, *args, **kwargs) -> Any:
+        ...

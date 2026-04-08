@@ -3,7 +3,7 @@ from typing import Any
 
 from mappingtools.collectors import AutoMapper
 from mappingtools.transformers.strictify import strictify
-from mappingtools.typing import EnhancedJsonTree, Tree
+from mappingtools.typing import Tree
 
 
 def minify(obj: Tree[Any], alphabet=string.ascii_uppercase) -> Tree[Any]:
