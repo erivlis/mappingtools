@@ -4,7 +4,7 @@ import types
 from collections.abc import Callable, Mapping
 from typing import Any, Generic, get_args, get_type_hints
 
-from ..typing import T
+from mappingtools.typing import T
 
 # region Helpers
 
