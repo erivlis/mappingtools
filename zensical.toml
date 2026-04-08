@@ -22,6 +22,7 @@ nav = [
         "guide/structures.md",
         "guide/transformers.md"
     ] },
+    { Recipes = "recipes.md" },
     { Reference = "reference.md" },
     { Development = [
         "design_decisions.md",
