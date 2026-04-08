@@ -1,3 +1,9 @@
+## v0.11.2 (2026-04-08)
+
+### Refactor
+
+- update imports to use mappingtools.typing module
+
 ## v0.11.1 (2026-04-08)
 
 ### Refactor
