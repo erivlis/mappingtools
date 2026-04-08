@@ -15,12 +15,12 @@ nav = [
         "installation.md",
         "overview.md"
     ] },
-    { Examples = [
-        "examples/collectors.md",
-        "examples/operators.md",
-        "examples/optics.md",
-        "examples/structures.md",
-        "examples/transformers.md"
+    { Guide = [
+        "guide/collectors.md",
+        "guide/operators.md",
+        "guide/optics.md",
+        "guide/structures.md",
+        "guide/transformers.md"
     ] },
     { Reference = "reference.md" },
     { Development = [
