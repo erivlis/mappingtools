@@ -18,7 +18,9 @@ Below is a brief description of the main namespaces within the library:
     | **AutoMapper**         | A Mapping-like class that automatically generates and assigns unique, minified strings values for any new keys accessed. |
     | **CategoryCollector**  | A generalized collector that aggregates data into categories (2D structure). Supports various aggregation modes.         |
     | **CategoryCounter**    | A specialized `CategoryCollector` for counting occurrences (Aggregation.COUNT).                                          |
+    | **DictOperation**      | An enumeration of dictionary operations that can be tracked by `MeteredDict`.                                            |
     | **MappingCollector**   | Collects key-value pairs into an internal mapping based on different modes (ALL, COUNT, DISTINCT, FIRST, LAST).          |
+    | **MappingCollectorMode** | An enumeration of modes for the `MappingCollector`.                                                                    |
     | **MeteredDict**        | A dictionary that tracks changes made to it.                                                                             |
     | **nested_defaultdict** | Creates a nested `defaultdict` with specified depth and factory.                                                         |
 
@@ -31,26 +33,24 @@ Below is a brief description of the main namespaces within the library:
     | **distinct**                         | Yields distinct values for a specified key across multiple mappings.                                   |
     | **flatten**                          | Converts a nested mapping structure into a single-level dictionary by flattening the keys into tuples. |
     | **inverse**                          | Generates an inverse Mapping by swapping keys and values.                                              |
-    | **keep** `Deprecated`                | Yields subsets of mappings by retaining the specified keys.                                            |
+    | **merge**                            | Deeply merges two recursive tree structures.                                                           |
     | **pivot**                            | Reshapes a list of mappings into a nested dictionary based on index and column keys.                   |
-    | **rekey**                            | Transforms keys based on a function of (key, value). Supports aggregation.                              |
-    | **remove** `Deprecated`              | Yields subsets mappings with the specified keys removed.                                               |
+    | **rekey**                            | Transforms keys based on a function of (key, value). Supports aggregation.                             |
     | **rename**                           | Renames keys based on a mapping or callable. Supports aggregation.                                     |
-    | **stream** `Deprecated`              | Generates items from a mapping, optionally applying a factory function to each key-value pair.         |
-    | **stream_dict_records** `Deprecated` | Generates dictionary records from a mapping with customizable key and value names.                     |
+    | **reshape**                          | Reshapes a stream of mappings into a nested dictionary of arbitrary depth.                             |
 
 === ":lucide-square-dot: Optics"
 
     This namespace provides functional, immutable tools for accessing and modifying deeply nested data structures.
 
-    | Class             | Description                                                                                                                                                                                                                                                      |
-    |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    | **Lens**          | A functional optic for immutable access and modification of nested data structures. Supports composition via `/`.                                                                                                                                                |
-
-    | Function          | Description                                                                                                                                                                                                                                                      |
-    |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    | **patch**         | Applies a set of changes to a data structure immutably using dot-separated paths or Lenses.                                                                                                                                                                      |
-    | **project**       | Projects a data structure into a new dictionary shape based on a schema of dot-separated paths or Lenses.                                                                                                                                                        |
+    | Class    | Description                                                                                                       |
+    |----------|-------------------------------------------------------------------------------------------------------------------|
+    | **Lens** | A functional optic for immutable access and modification of nested data structures. Supports composition via `/`. |
+    
+    | Function    | Description                                                                                               |
+    |-------------|-----------------------------------------------------------------------------------------------------------|
+    | **patch**   | Applies a set of changes to a data structure immutably using dot-separated paths or Lenses.               |
+    | **project** | Projects a data structure into a new dictionary shape based on a schema of dot-separated paths or Lenses. |
 
 === ":lucide-square-code: Structures"
 
@@ -70,6 +70,10 @@ Below is a brief description of the main namespaces within the library:
 
     This namespace includes functions that reshape objects while maintaining the consistency of their structure.
 
+    | Class           | Description                                                       |
+    |-----------------|-------------------------------------------------------------------|
+    | **Transformer** | A base class for creating reusable, composable data transformers. |
+    
     | Function      | Description                                                                                        |
     |---------------|----------------------------------------------------------------------------------------------------|
     | **listify**   | Transforms complex objects into a list of dictionaries with key and value pairs.                   |
@@ -77,6 +81,19 @@ Below is a brief description of the main namespaces within the library:
     | **simplify**  | Converts objects to strictly structured dictionaries.                                              |
     | **strictify** | Applies a strict structural conversion to an object using optional converters for keys and values. |
     | **stringify** | Converts an object into a string representation by recursively processing it based on its type.    |
+
+=== ":lucide-square-star: Typing"
+
+    This namespace provides custom type hints and utility functions for working with types within the library.
+    
+    | Type                 | Description                                                                                                                                                            |
+    |----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | **Tree**             | A recursive type representing a tree structure where each node can be of a generic type `T`, a list of subtrees, or a dictionary mapping strings to subtrees.          |
+    | **JsonScalar**       | Represents the basic scalar types found in JSON data (`None`, `bool`, `int`, `float`, `str`).                                                                          |
+    | **JsonTree**         | A recursive type representing a JSON-like tree structure where each node can be a `JsonScalar`, a list of `JsonTree`s, or a dictionary mapping strings to `JsonTree`s. |
+    | **EnhancedJsonTree** | A recursive type that extends `JsonTree` by allowing each node to also be of a generic type `T`, in addition to `JsonScalar`s, lists, or dictionaries.                 |
+    | **MISSING**          | A sentinel object used to distinguish an explicit missing value from an actual `None` value, particularly in the `operators.merge` function.                           |
+    | **Handler**          | A protocol for a callable that takes an object of a generic type `T` and returns any value.                                                                            |
 
 ## Comparison with Other Libraries
 
