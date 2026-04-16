@@ -59,6 +59,14 @@ You can find the executable code for all of these recipes in the [
 * **[Schema-Guided Payload Correction](https://github.com/erivlis/mappingtools/blob/main/recipes/12_schema_guided_correction.py):**
   Combine `flatten`, `Lens`, and `merge` to build an auto-correction pipeline that casts types, migrates deprecated
   keys, and applies structural defaults to incoming JSON payloads.
+* **[JSON Schema Derivation](https://github.com/erivlis/mappingtools/blob/main/recipes/26_json_schema_derivation.py):**
+  Combine `flatten`, `Lens`, `patch`, and `merge` to derive a public API contract from a canonical internal JSON Schema
+  by pruning internal/read-only fields and overlaying partner-specific constraints.
+* **[JSON Schema Review Envelopes](https://github.com/erivlis/mappingtools/blob/main/recipes/27_json_schema_review_envelopes.py):**
+  Combine `flatten`, `Lens`, `patch`, and `merge` to preserve a JSON Schema's object shape while replacing each
+  primitive field, scalar array item, direct `$ref`, and direct union/composition schema (`oneOf`, `anyOf`, `allOf`)
+  with a `oneOf` wrapper representing either an override value or an approval decision. If the root schema has a `$id`,
+  the recipe also appends a suffix so the derived schema gets a distinct identity.
 * **[Bi-directional State Sync](https://github.com/erivlis/mappingtools/blob/main/recipes/18_bidirectional_state_sync.py):**
   Use `inverse` and `rekey` to instantly build a two-way synchronization bridge (snake_case <-> camelCase) between a
   Python backend and a React/Vue frontend payload.

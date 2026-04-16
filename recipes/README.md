@@ -66,3 +66,7 @@ In accordance with **The Council Framework** (Symmetry, Clarity, Functional Prim
   Use `MappingCollector` with `Aggregation.EMA` to maintain a memory-efficient baseline of a noisy time-series and instantly flag incoming data points that deviate beyond a set threshold.
 * [25. Markov Chain Text Generation](25_markov_chain_text_generator.py):
   Combine `MappingCollector` and `Aggregation.COUNT` to instantly build a Markov Transition Matrix (Word -> Counter(Next Words)) from a training corpus, and use it to hallucinate new sentences.
+* [26. JSON Schema Derivation](26_json_schema_derivation.py):
+  Combine `flatten`, `Lens`, `patch`, and `merge` to derive a public API contract from a canonical internal JSON Schema by pruning internal/read-only fields and overlaying partner-specific constraints.
+* [27. JSON Schema Review Envelopes](27_json_schema_review_envelopes.py):
+  Combine `flatten`, `Lens`, `patch`, and `merge` to preserve a JSON Schema's object shape while replacing each primitive field, scalar array item, direct `$ref`, and direct union/composition schema (`oneOf`, `anyOf`, `allOf`) with a `oneOf` wrapper representing either an override value or an approval decision. If the root schema has a `$id`, the recipe appends a suffix so the derived schema gets a distinct identity.
