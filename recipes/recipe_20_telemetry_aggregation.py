@@ -80,5 +80,9 @@ def main():
     # 'db_host' was read 2 times by A, and 1 time by B and C = 4 total.
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()

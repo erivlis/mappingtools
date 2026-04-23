@@ -160,7 +160,7 @@ Supports different aggregation modes via `Aggregation`.
     
     ```python linenums="1"
     from mappingtools.operators import pivot
-    from mappingtools.aggregation import Aggregation
+    from mappingtools.aggregations import Aggregation
     
     data = [
         {"city": "NYC", "month": "Jan", "temp": 10},
@@ -191,7 +191,7 @@ While `pivot` is limited to 2 dimensions (Index, Columns), `reshape` accepts a s
 
     ```python linenums="1"
     from mappingtools.operators import reshape
-    from mappingtools.aggregation import Aggregation
+    from mappingtools.aggregations import Aggregation
 
     data = [
         {"country": "US", "state": "NY", "city": "NYC", "pop": 8.4},
@@ -249,7 +249,7 @@ handled according to the specified aggregation.
     
     ```python linenums="1"
     from mappingtools.operators import rekey
-    from mappingtools.aggregation import Aggregation
+    from mappingtools.aggregations import Aggregation
     
     mapping = {
         "alice": {"dept": "IT", "id": 1},

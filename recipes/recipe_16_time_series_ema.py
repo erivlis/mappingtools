@@ -9,7 +9,7 @@ This recipe demonstrates how to use `MappingCollector` with the `Aggregation.EMA
 data points in real-time, grouped by their source.
 """
 
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.collectors import MappingCollector
 
 
@@ -43,6 +43,10 @@ def main():
     print("\n--- Final Smoothed State ---")
     for sensor_id, final_ema in metrics_tracker.mapping.items():
         print(f"{sensor_id}: {final_ema:.2f}")
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

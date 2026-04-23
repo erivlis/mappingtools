@@ -9,7 +9,7 @@ This page contains the complete API reference for the `mappingtools` library.
 
 ## :lucide-square-pi: Aggregation
 
-::: mappingtools.aggregation 
+::: mappingtools.aggregations 
 
 ## :lucide-square-sigma: Collectors
 

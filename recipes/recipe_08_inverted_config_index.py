@@ -11,7 +11,7 @@ By flattening the tree into (path -> value) and then collecting the swapped tupl
 into an inverted mapping of (value -> [paths]), we instantly reveal configuration duplication.
 """
 
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.collectors import MappingCollector
 from mappingtools.operators import flatten
 
@@ -24,10 +24,10 @@ def main():
             "replica": {"host": "10.0.0.6", "port": 5432, "timeout": 30}
         },
         "cache": {
-            "redis": {"host": "10.0.0.5", "port": 6379} # Duplicate IP!
+            "redis": {"host": "10.0.0.5", "port": 6379}  # Duplicate IP!
         },
         "services": {
-            "auth": {"url": "https://auth.internal", "timeout": 30}, # Duplicate timeout!
+            "auth": {"url": "https://auth.internal", "timeout": 30},  # Duplicate timeout!
             "billing": {"url": "https://billing.internal", "timeout": 60}
         }
     }
@@ -58,6 +58,10 @@ def main():
             print(f"\nValue: {value!r} is hardcoded in {len(paths)} locations:")
             for path in paths:
                 print(f"  - {path}")
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ to the established EMA baseline *before* updating it, we can instantly flag devi
 that exceed a specific threshold (e.g., a 30% spike).
 """
 
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.collectors import MappingCollector
 
 
@@ -23,8 +23,8 @@ def main():
         ("api_login", 102.0),
         ("api_login", 98.0),
         ("api_login", 105.0),
-        ("api_login", 450.0), # ANOMALY! Sudden latency spike
-        ("api_login", 110.0), # Recovery
+        ("api_login", 450.0),  # ANOMALY! Sudden latency spike
+        ("api_login", 110.0),  # Recovery
         ("api_login", 99.0),
     ]
 
@@ -50,7 +50,7 @@ def main():
                 print(f"[ALERT] 🚨 Anomaly detected on '{endpoint}'!")
                 print(
                     f"        Expected ~{established_baseline:.1f}ms, "
-                    f"but got {current_ping:.1f}ms (+{deviation*100:.0f}%)"
+                    f"but got {current_ping:.1f}ms (+{deviation * 100:.0f}%)"
                 )
             else:
                 print(f"[OK] {endpoint}: {current_ping:.1f}ms (Baseline: {established_baseline:.1f}ms)")
@@ -59,6 +59,10 @@ def main():
 
         # B. Update the baseline with the new data point
         baseline_tracker.add(endpoint, current_ping)
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

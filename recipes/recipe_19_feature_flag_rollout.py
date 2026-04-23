@@ -64,5 +64,9 @@ def main():
             print(f"  -> WARNING: '{flag}' is overridden at a lower tier!")
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()

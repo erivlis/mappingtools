@@ -1,6 +1,8 @@
 from collections import Counter
 
-from mappingtools.aggregation import (
+import pytest
+
+from mappingtools.aggregations import (
     all_aggregator,
     count_aggregator,
     distinct_aggregator,
@@ -63,13 +65,13 @@ def test_ema_aggregator_direct():
     # step 1: current_ema = 10 (since it was None)
     # step 2: current_ema = (20 + 10) * 0.5 = 15.0
     ema_aggregator(mapping, 'key', [10, 20])
-    assert mapping['key'] == 15.0
+    assert mapping['key'] == pytest.approx(15.0)
 
     # Key exists (currently 15.0)
     # value: [25]
     # current_ema = (25 + 15.0) * 0.5 = 20.0
     ema_aggregator(mapping, 'key', [25])
-    assert mapping['key'] == 20.0
+    assert mapping['key'] == pytest.approx(20.0)
 
 
 def test_max_aggregator_direct():

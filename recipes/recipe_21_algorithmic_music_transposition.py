@@ -12,7 +12,7 @@ transpose the pitch of a specific instrument (the Bass) up an octave, leaving
 the rest of the song completely untouched.
 """
 
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.operators import reshape
 from mappingtools.optics import Lens
 
@@ -67,6 +67,10 @@ def main():
 
     print("\n--- Original Score Untouched ---")
     print(json.dumps(score["Bass"], indent=2))
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

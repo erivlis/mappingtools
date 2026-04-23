@@ -66,5 +66,9 @@ def main():
         print(f"    {short_code} = {full_name}")
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()

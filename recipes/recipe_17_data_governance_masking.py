@@ -73,5 +73,9 @@ def main():
     print(json.dumps(safe_public_response, indent=2))
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()

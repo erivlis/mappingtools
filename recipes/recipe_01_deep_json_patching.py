@@ -31,8 +31,8 @@ def main():
 
     # 2. The "Patch" we want to apply to the database credentials
     db_patch = {
-        "password": "new_secure_password", # Overwrite existing
-        "timeout_ms": 5000                 # Add new field
+        "password": "new_secure_password",  # Overwrite existing
+        "timeout_ms": 5000  # Add new field
     }
 
     # 3. Create an Optic (Lens) that focuses exactly on the credentials
@@ -51,6 +51,10 @@ def main():
 
     print("\n--- New State (Patched) ---")
     print(new_app_state["database"]["credentials"])
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

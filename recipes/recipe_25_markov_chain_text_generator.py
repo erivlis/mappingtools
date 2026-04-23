@@ -13,7 +13,7 @@ allowing us to generate completely new, algorithmically hallucinated sentences!
 
 import random
 
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.collectors import MappingCollector
 
 
@@ -32,7 +32,7 @@ def main():
 
     # 3. Create a stream of Bigrams (Current Word -> Next Word)
     # E.g., [("the", "quick"), ("quick", "brown"), ...]
-    bigrams = [(words[i], words[i+1]) for i in range(len(words)-1)]
+    bigrams = [(words[i], words[i + 1]) for i in range(len(words) - 1)]
 
     # 4. Build the Markov Transition Matrix!
     # We use Aggregation.COUNT to count how many times "Word B" follows "Word A".
@@ -56,7 +56,7 @@ def main():
             next_word_counts = markov_model.mapping.get(current)
 
             if not next_word_counts or current == ".":
-                break # Reached the end of a chain or a period
+                break  # Reached the end of a chain or a period
 
             # Extract words and their frequencies (weights)
             population = list(next_word_counts.keys())
@@ -75,7 +75,11 @@ def main():
     # Because there is randomness weighted by the counters,
     # we get different, grammatically valid (within the corpus) sentences!
     for i in range(10):
-        print(f"Thought {i+1}: {generate_sentence(start_word='the')}")
+        print(f"Thought {i + 1}: {generate_sentence(start_word='the')}")
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

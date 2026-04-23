@@ -81,7 +81,7 @@ It supports modes like `ALL`, `COUNT`, `DISTINCT`, `FIRST`, `LAST`, and more via
     
     ```python linenums="1"
     from mappingtools.collectors import MappingCollector
-    from mappingtools.aggregation import Aggregation
+    from mappingtools.aggregations import Aggregation
     
     collector = MappingCollector(aggregation=Aggregation.ALL)
     collector.add('a', 1)

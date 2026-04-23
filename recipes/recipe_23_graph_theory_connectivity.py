@@ -77,5 +77,9 @@ def main():
     print("Notice that 'G' and 'H' are mathematically unreachable from 'A'!")
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()

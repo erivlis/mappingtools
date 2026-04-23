@@ -26,13 +26,13 @@ def main():
     }
 
     env_config = {
-        "logging": {"level": "DEBUG"}, # Overwrite level, keep file
+        "logging": {"level": "DEBUG"},  # Overwrite level, keep file
         "database": {"host": "db.production.local"},
-        "plugins": ["metrics"]         # Append to list (Free Monoid)
+        "plugins": ["metrics"]  # Append to list (Free Monoid)
     }
 
     user_overrides = {
-        "theme": "dark",               # Add a new top-level key
+        "theme": "dark",  # Add a new top-level key
         "database": {"pool_size": 10}  # Add a new nested key
     }
 
@@ -46,6 +46,10 @@ def main():
 
     print("--- Final Merged Configuration ---")
     print(json.dumps(final_config, indent=2))
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

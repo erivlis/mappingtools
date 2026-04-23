@@ -28,7 +28,7 @@ def main():
     for _ in range(5):
         # We always check the db_host
         _ = app_config["db_host"]
-        time.sleep(0.01) # Simulate some work
+        time.sleep(0.01)  # Simulate some work
 
     # Simulate a rare API call
     _ = app_config["api_key"]
@@ -51,6 +51,10 @@ def main():
             unused_keys.append(key)
 
     print(f"Loaded but never read: {unused_keys}")
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

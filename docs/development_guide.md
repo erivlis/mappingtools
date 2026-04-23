@@ -16,39 +16,39 @@ simplicity. We trust these instincts but verify them with rigorous testing and a
 
 If a feature feels "off," "asymmetrical," or "too magical," stop immediately. Do not code through the doubt.
 
-* **Action**: Pause development. Refactor the architecture until the feeling resolves.
-* **Example**: We initially had separate `Dictifier` and `AutoDictifier` classes. This felt asymmetrical. We refactored them into a single `Dictifier` class with a `Dictifier.auto()` factory method.
+- **Action**: Pause development. Refactor the architecture until the feeling resolves.
+- **Example**: We initially had separate `Dictifier` and `AutoDictifier` classes. This felt asymmetrical. We refactored them into a single `Dictifier` class with a `Dictifier.auto()` factory method.
 
 ### 2. Safety Over Magic
 
 We prefer explicit, predictable behavior over implicit, "magical" behavior that might crash at runtime.
 
-* **Action**: Isolate "magic" (like type inference) into separate classes or optional modes. Default to strictness.
-* **Example**: `Dictifier` is strict by default. Auto-inference is only enabled via the explicit `Dictifier.auto()` factory.
+- **Action**: Isolate "magic" (like type inference) into separate classes or optional modes. Default to strictness.
+- **Example**: `Dictifier` is strict by default. Auto-inference is only enabled via the explicit `Dictifier.auto()` factory.
 
 ### 3. The "Devil's Advocate" Testing
 
 We don't just test that it works; we test that it fails correctly. We actively hunt for edge cases.
 
-* **Action**: Write tests for empty collections, recursion loops, unresolvable type hints, and weird inheritance
+- **Action**: Write tests for empty collections, recursion loops, unresolvable type hints, and weird inheritance
   structures.
-* **Example**: We added tests for generator methods to document their behavior, which led to the discovery of a subtle bug in our `async` detection logic.
+- **Example**: We added tests for generator methods to document their behavior, which led to the discovery of a subtle bug in our `async` detection logic.
 
 ### 4. Ergonomics First
 
 Code is for humans. If the API is clunky, the implementation doesn't matter.
 
-* **Action**: Design the "User Experience" of the library (imports, function names) before finalizing the
+- **Action**: Design the "User Experience" of the library (imports, function names) before finalizing the
   implementation.
-* **Example**: We added the `map_objects` factory and kept the `@dictify` decorator as a convenient alias for the more cohesive `Dictifier.of()` class method.
+- **Example**: We added the `map_objects` factory and kept the `@dictify` decorator as a convenient alias for the more cohesive `Dictifier.of()` class method.
 
 ### 5. Prune Ruthlessly
 
 Avoid the "Sunk Cost Fallacy." Just because we built it doesn't mean we keep it.
 
-* **Action**: If a feature complicates the core value proposition without adding proportional value, sideline or delete
+- **Action**: If a feature complicates the core value proposition without adding proportional value, sideline or delete
   it.
-* **Example**: We built and then deleted the `AutoDictifier` class once we realized it was a "mode," not a "type."
+- **Example**: We built and then deleted the `AutoDictifier` class once we realized it was a "mode," not a "type."
 
 ## The Development Loop
 

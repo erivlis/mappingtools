@@ -18,12 +18,13 @@ from mappingtools.collectors import CategoryCounter
 
 def get_size_bucket(size_bytes: int) -> str:
     """Categorize file size into buckets."""
-    if size_bytes < 1024 * 10:       # < 10 KB
+    if size_bytes < 1024 * 10:  # < 10 KB
         return "Small (<10KB)"
-    elif size_bytes < 1024 * 1024:   # < 1 MB
+    elif size_bytes < 1024 * 1024:  # < 1 MB
         return "Medium (<1MB)"
     else:
         return "Large (>1MB)"
+
 
 def main():
     # 1. Initialize the CategoryCounter
@@ -53,7 +54,7 @@ def main():
                 size = file_path.stat().st_size
                 size_bucket = get_size_bucket(size)
             except FileNotFoundError:
-                continue # Skip broken symlinks
+                continue  # Skip broken symlinks
 
             total_files += 1
 
@@ -74,6 +75,7 @@ def main():
     # we access the underlying `mapping` dict, and then the specific bucket's Counter.
 
     print("\n--- By Extension (Top 5) ---")
+
     # For a CategoryCounter, accessing the category key gives you a MappingCollector.
     # It holds a mapping of `category_value -> Counter(items)`.
     # Since we always added the string "file", we want the sum of counts for each category value.
@@ -99,6 +101,10 @@ def main():
     print("\n--- Hidden Files ---")
     for hidden, count in get_bucket_counts('hidden'):
         print(f"{hidden:<15} : {count}")
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

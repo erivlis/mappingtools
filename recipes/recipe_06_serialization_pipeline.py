@@ -47,10 +47,14 @@ def main():
     simplified_data = strictify(user, key_converter=str, value_converter=serialize_values)
 
     print("--- Simplified Data (JSON ready) ---")
-    print(type(simplified_data)) # It's just a dict!
+    print(type(simplified_data))  # It's just a dict!
 
     # 5. Serialize to JSON directly
     print(json.dumps(simplified_data, indent=2))
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

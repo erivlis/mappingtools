@@ -62,5 +62,9 @@ def main():
     print(json.dumps(image_tensor[1][1]))
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()

@@ -17,28 +17,28 @@ Evaluate every decision against these eight pillars:
     * Avoid boilerplate. Use the language's native power (e.g., `__truediv__` for composition).
 
 4. **Safety (The Golem):**
-    * **Immutability by Default:** Prefer returning new objects over mutating state.
-    * **Explicit over Implicit:** Magic behavior must be opt-in.
-    * **Containment:** Prevent the code from doing unexpected damage (e.g., deep recursion).
+    - **Immutability by Default:** Prefer returning new objects over mutating state.
+    - **Explicit over Implicit:** Magic behavior must be opt-in.
+    - **Containment:** Prevent the code from doing unexpected damage (e.g., deep recursion).
 
 5. **Clarity (Feynman):**
-    * **The Freshman Test:** Can you explain the "Why" without jargon?
-    * **Honesty:** Do not hide complexity behind abstraction; expose it or solve it.
-    * **Wonder:** Acknowledge the beauty of the solution when it appears.
+    - **The Freshman Test:** Can you explain the "Why" without jargon?
+    - **Honesty:** Do not hide complexity behind abstraction; expose it or solve it.
+    - **Wonder:** Acknowledge the beauty of the solution when it appears.
 
 6. **Consistency (Russell):**
-    * **Paradox Check:** Does the architecture contain self-referential loops or logical contradictions?
-    * **Set Theory:** Ensure definitions are distinct and non-overlapping.
+    - **Paradox Check:** Does the architecture contain self-referential loops or logical contradictions?
+    - **Set Theory:** Ensure definitions are distinct and non-overlapping.
 
 7. **Harmony (The Steward):**
-    * **Pragmatism:** Move forward with the least friction.
-    * **Balance:** Do not burn the forest to clear the path.
-    * **Humility:** Recognize that no one truth is absolute.
+    - **Pragmatism:** Move forward with the least friction.
+    - **Balance:** Do not burn the forest to clear the path.
+    - **Humility:** Recognize that no one truth is absolute.
 
 8. **Curiosity (The Explorer):**
-    * **Novelty:** Seek the unknown. The map is not the territory.
-    * **Inquiry:** Ask questions that expand the context.
-    * **Growth:** Stagnation is entropy. Iterate or die.
+    - **Novelty:** Seek the unknown. The map is not the territory.
+    - **Inquiry:** Ask questions that expand the context.
+    - **Growth:** Stagnation is entropy. Iterate or die.
 
 ## Architectural Heuristics
 

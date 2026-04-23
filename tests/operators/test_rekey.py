@@ -1,6 +1,6 @@
 from collections import Counter
 
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.operators import rekey
 
 

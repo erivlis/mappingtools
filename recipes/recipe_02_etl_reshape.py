@@ -8,7 +8,7 @@ Instead of writing recursive `defaultdict` loops, we use `reshape` to group by k
 and `Aggregation` modes to resolve conflicts at the leaf nodes.
 """
 
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.operators import reshape
 
 
@@ -33,8 +33,8 @@ def main():
     )
 
     print("--- Aggregated Revenue by Region -> Country ---")
-    print("North America (US):", regional_revenue_tree["North"]["US"]) # Output: 250 (100 + 150)
-    print("South America (BR):", regional_revenue_tree["South"]["BR"]) # Output: 75 (50 + 25)
+    print("North America (US):", regional_revenue_tree["North"]["US"])  # Output: 250 (100 + 150)
+    print("South America (BR):", regional_revenue_tree["South"]["BR"])  # Output: 75 (50 + 25)
 
     # 3. Reshape into a 3-level hierarchy: Region -> Country -> Product
     #    We collect all individual sales into a list at the leaf using Aggregation.ALL
@@ -46,7 +46,11 @@ def main():
     )
 
     print("\n--- Detailed Sales Lists by Region -> Country -> Product ---")
-    print("Widget C in BR:", regional_product_sales["South"]["BR"]["Widget C"]) # Output: [50, 25]
+    print("Widget C in BR:", regional_product_sales["South"]["BR"]["Widget C"])  # Output: [50, 25]
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

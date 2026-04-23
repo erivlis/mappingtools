@@ -2,7 +2,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable, MutableMapping
 from typing import Any, Generic, cast
 
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.typing import KT, VT, Category, VT_co
 
 # Alias for backward compatibility
@@ -29,7 +29,6 @@ class MappingCollector(Generic[KT, VT_co]):
 
         Args:
             aggregation (Aggregation): The mode for collecting mappings.
-            *args: Variable positional arguments used to initialize the internal mapping.
             **kwargs: Variable keyword arguments used to initialize the internal mapping.
         """
         self._mapping: MutableMapping[KT, VT_co]

@@ -5,7 +5,7 @@ from itertools import chain
 from typing import Any
 
 from mappingtools._tools import _is_strict_iterable
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.typing import MISSING, K, T, Tree
 
 __all__ = [

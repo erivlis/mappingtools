@@ -41,11 +41,11 @@ def discover_wrappable_schema_paths(schema):
         path[:-1]
         for path in flatten(schema)
         if (
-            not any(segment in DEFINITION_KEYS for segment in path)
-            and (
-                (len(path) >= 3 and path[-3] == 'properties')
-                or (len(path) >= 2 and path[-2] == 'items')
-            )
+                not any(segment in DEFINITION_KEYS for segment in path)
+                and (
+                        (len(path) >= 3 and path[-3] == 'properties')
+                        or (len(path) >= 2 and path[-2] == 'items')
+                )
         )
     }
     return sorted(schema_paths, key=len)
@@ -133,7 +133,7 @@ def derive_review_schema(canonical_schema):
         {
             'title': 'UserReviewEnvelopeSchema',
             'description': 'Every primitive field, scalar array item, direct $ref, and direct union/composition '
-            'schema (oneOf/anyOf/allOf) is wrapped in an override-or-approval envelope.',
+                           'schema (oneOf/anyOf/allOf) is wrapped in an override-or-approval envelope.',
         },
     )
     if isinstance(canonical_schema.get('$id'), str):
@@ -210,13 +210,17 @@ def test_deeply_nested_schema_wraps_scalar_properties_and_scalar_items_only():
 
     assert review_schema['properties']['addresses']['type'] == 'array'
     assert review_schema['properties']['addresses']['items']['type'] == 'object'
-    assert review_schema['properties']['addresses']['items']['properties']['street']['oneOf'][0]['properties']['value'] == {'type': 'string'}
+    assert review_schema['properties']['addresses']['items']['properties']['street']['oneOf'][0]['properties'][
+               'value'] == {'type': 'string'}
     assert review_schema['properties']['addresses']['items']['properties']['country_codes']['type'] == 'array'
-    assert review_schema['properties']['addresses']['items']['properties']['country_codes']['items']['oneOf'][0]['properties']['value'] == {'type': 'string'}
+    assert \
+    review_schema['properties']['addresses']['items']['properties']['country_codes']['items']['oneOf'][0]['properties'][
+        'value'] == {'type': 'string'}
 
     assert review_schema['properties']['matrix']['type'] == 'array'
     assert review_schema['properties']['matrix']['items']['type'] == 'array'
-    assert review_schema['properties']['matrix']['items']['items']['oneOf'][0]['properties']['value'] == {'type': 'number'}
+    assert review_schema['properties']['matrix']['items']['items']['oneOf'][0]['properties']['value'] == {
+        'type': 'number'}
 
 
 def test_direct_ref_and_union_composition_nodes_are_wrapped_atomically():
@@ -282,19 +286,25 @@ def test_direct_ref_and_union_composition_nodes_are_wrapped_atomically():
     assert ('properties', 'maybe') in wrapped_paths
     assert ('properties', 'composed') in wrapped_paths
 
-    assert review_schema['properties']['choice']['oneOf'][0]['properties']['value'] == canonical_schema['properties']['choice']
-    assert review_schema['properties']['linked']['oneOf'][0]['properties']['value'] == canonical_schema['properties']['linked']
+    assert review_schema['properties']['choice']['oneOf'][0]['properties']['value'] == canonical_schema['properties'][
+        'choice']
+    assert review_schema['properties']['linked']['oneOf'][0]['properties']['value'] == canonical_schema['properties'][
+        'linked']
     assert review_schema['properties']['choices']['items']['oneOf'][0]['properties']['value'] == {
         'oneOf': [
             {'type': 'string'},
             {'type': 'integer'},
         ]
     }
-    assert review_schema['properties']['linked_items']['items']['oneOf'][0]['properties']['value'] == {'$ref': '#/$defs/LinkedType'}
-    assert review_schema['properties']['maybe']['oneOf'][0]['properties']['value'] == canonical_schema['properties']['maybe']
-    assert review_schema['properties']['composed']['oneOf'][0]['properties']['value'] == canonical_schema['properties']['composed']
+    assert review_schema['properties']['linked_items']['items']['oneOf'][0]['properties']['value'] == {
+        '$ref': '#/$defs/LinkedType'}
+    assert review_schema['properties']['maybe']['oneOf'][0]['properties']['value'] == canonical_schema['properties'][
+        'maybe']
+    assert review_schema['properties']['composed']['oneOf'][0]['properties']['value'] == canonical_schema['properties'][
+        'composed']
     assert review_schema['$defs'] == canonical_schema['$defs']
-    assert review_schema['properties']['record']['properties']['kind']['oneOf'][0]['properties']['value'] == {'type': ['string', 'null']}
+    assert review_schema['properties']['record']['properties']['kind']['oneOf'][0]['properties']['value'] == {
+        'type': ['string', 'null']}
 
 
 def test_root_id_suffix_preserves_fragment():
@@ -345,7 +355,8 @@ def test_alternating_array_object_array_object_array_nesting():
 
     assert ('properties', 'groups', 'items', 'properties', 'group_id') in wrapped_paths
     assert ('properties', 'groups', 'items', 'properties', 'members', 'items', 'properties', 'name') in wrapped_paths
-    assert ('properties', 'groups', 'items', 'properties', 'members', 'items', 'properties', 'labels', 'items') in wrapped_paths
+    assert ('properties', 'groups', 'items', 'properties', 'members', 'items', 'properties', 'labels',
+            'items') in wrapped_paths
 
     groups_schema = review_schema['properties']['groups']
     assert groups_schema['type'] == 'array'
@@ -451,6 +462,8 @@ def main():
     print('\n--- 4. Derived Review Schema ---')
     print(json.dumps(review_schema, indent=2))
 
+def test_main():
+    main()
 
 if __name__ == '__main__':
     main()

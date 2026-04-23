@@ -80,5 +80,9 @@ def main():
     print(f"SSN remains untouched in memory: {raw_payload['user']['profile']['ssn']}")
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()

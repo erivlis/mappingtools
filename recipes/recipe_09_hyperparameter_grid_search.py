@@ -74,5 +74,9 @@ def main():
     print(json.dumps(base_config["training"], indent=2))
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()

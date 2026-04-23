@@ -9,7 +9,7 @@ a flat stream of transactional records into an N-dimensional analytical tensor w
 losing any individual underlying transactions.
 """
 
-from mappingtools.aggregation import Aggregation
+from mappingtools.aggregations import Aggregation
 from mappingtools.operators import reshape
 
 
@@ -53,6 +53,10 @@ def main():
         print(f"  - Transaction {refund['id']}: ${refund['amount']}")
 
     print(f"Total Q1 Refunds: ${sum(r['amount'] for r in q1_refunds)}")
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

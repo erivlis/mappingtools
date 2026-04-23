@@ -28,10 +28,10 @@ def main():
     updated_profile = {
         "user": {
             "id": 101,
-            "name": "Alice Smith",          # Changed
+            "name": "Alice Smith",  # Changed
             "preferences": {
                 "theme": "light",
-                "notifications": {"email": True, "push": True} # Removed SMS, Added Push
+                "notifications": {"email": True, "push": True}  # Removed SMS, Added Push
             }
         }
     }
@@ -58,6 +58,10 @@ def main():
     print(f"Added: {[(k, flat_updated[k]) for k in added_keys]}")
     print(f"Removed: {[(k, flat_original[k]) for k in removed_keys]}")
     print(f"Changed: {[(k, f'{flat_original[k]} -> {flat_updated[k]}') for k in changed_keys]}")
+
+
+def test_main():
+    main()
 
 
 if __name__ == "__main__":

@@ -163,53 +163,8 @@ def main():
     print('\n--- 3. Derived Public Schema ---')
     print(json.dumps(public_schema, indent=2))
 
+def test_main():
+    main()
 
 if __name__ == '__main__':
     main()
-
-    new_properties = {
-        'id': {
-            "oneOf": [
-                {
-                    'type': 'object',
-                    'required': ['type', 'value'],
-                    'properties': {
-                        'type': {'type': 'string', 'const': 'override'},
-                        'value': {'type': 'string', 'format': 'uuid'},
-                        'details': {'type': 'string'}
-                    }
-                },
-                {
-                    'type': 'object',
-                    'required': ['type', 'value'],
-                    'properties': {
-                        'type': {'type': 'string', 'const': 'approved'},
-                        'value': {'type': ['bool', 'null']},
-                        'details': {'type': 'string'}
-                    }
-                }
-            ]
-        },
-        'email': {
-            "oneOf": [
-                {
-                    'type': 'object',
-                    'required': ['type', 'value'],
-                    'properties': {
-                        'type': {'type': 'string', 'const': 'override'},
-                        'value': {'type': 'string', 'format': 'email'},
-                        'details': {'type': 'string'}
-                    }
-                },
-                {
-                    'type': 'object',
-                    'required': ['type', 'value'],
-                    'properties': {
-                        'type': {'type': 'string', 'const': 'approved'},
-                        'value': {'type': ['bool', 'null']},
-                        'details': {'type': 'string'}
-                    }
-                }
-            ]
-        },
-    }

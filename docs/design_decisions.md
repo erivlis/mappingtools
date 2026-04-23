@@ -16,7 +16,7 @@ Based on the original structure of the library, we can infer several core design
 **Decision:** The library is organized into distinct namespaces: `collectors`, `operators`, `structures`, and
 `transformers`.
 
-* **Reasoning:** This is a strong architectural choice that separates concerns based on the *intent* of the operation.
+- **Reasoning:** This is a strong architectural choice that separates concerns based on the *intent* of the operation.
     * `collectors`: For stateful aggregation of data.
     * `operators`: For stateless transformations of mappings (e.g., `inverse`, `flatten`).
     * `structures`: For advanced, dictionary-like data containers.
@@ -26,7 +26,7 @@ Based on the original structure of the library, we can infer several core design
 
 **Decision:** The `operators` and `transformers` namespaces are composed almost entirely of pure functions.
 
-* **Reasoning:** This reflects a functional programming influence. By avoiding classes for stateless operations, the
+- **Reasoning:** This reflects a functional programming influence. By avoiding classes for stateless operations, the
   code becomes more predictable, easier to test, and less prone to side effects. Classes (like `MappingCollector` or
   `MeteredDict`) are reserved for when managing state is the primary purpose of the object.
 
@@ -35,14 +35,14 @@ Based on the original structure of the library, we can infer several core design
 **Decision:** Core operators like `inverse`, `flatten`, `keep`, and `remove` return new dictionaries rather than
 modifying their inputs.
 
-* **Reasoning:** This prevents unexpected side effects. Users can trust that passing a dictionary to a `mappingtools`
+- **Reasoning:** This prevents unexpected side effects. Users can trust that passing a dictionary to a `mappingtools`
   function will not alter the original data structure, which is crucial for building reliable data pipelines.
 
 ### 4. High Standard of Code Quality
 
 **Decision:** The original codebase was fully typed, documented, and tested.
 
-* **Reasoning:** This indicates a commitment to creating a maintainable, production-ready library. The high test
+- **Reasoning:** This indicates a commitment to creating a maintainable, production-ready library. The high test
   coverage and clear docstrings serve as a foundation for future development.
 
 ---
@@ -51,45 +51,45 @@ modifying their inputs.
 
 ### `collectors`
 
-* **Decision:** Use classes (`MappingCollector`, `MeteredDict`) to manage stateful data aggregation.
-* **Reasoning:** The primary purpose of this namespace is to collect data over time or track changes. This is an
+- **Decision:** Use classes (`MappingCollector`, `MeteredDict`) to manage stateful data aggregation.
+- **Reasoning:** The primary purpose of this namespace is to collect data over time or track changes. This is an
   inherently stateful problem, making classes the natural choice over functions.
-* **Specific Example (`MappingCollector`):** The decision to support multiple collection modes (`ALL`, `COUNT`,
+- **Specific Example (`MappingCollector`):** The decision to support multiple collection modes (`ALL`, `COUNT`,
   `DISTINCT`, etc.) within a single class allows for a unified interface for different aggregation strategies. This
   avoids a proliferation of small, specific collector classes.
-* **Specific Example (`MeteredDict`):** This class wraps a dictionary to track access patterns. The decision to
+- **Specific Example (`MeteredDict`):** This class wraps a dictionary to track access patterns. The decision to
   implement `MutableMapping` ensures it can be used as a drop-in replacement for a standard `dict` in most contexts,
   while adding the "metering" capability transparently.
 
 ### `operators`
 
-* **Decision:** Provide pure, stateless functions that operate on mappings.
-* **Reasoning:** Functions like `inverse` or `flatten` are mathematical transformations. They take an input and produce
+- **Decision:** Provide pure, stateless functions that operate on mappings.
+- **Reasoning:** Functions like `inverse` or `flatten` are mathematical transformations. They take an input and produce
   an output without side effects. Using pure functions makes them easy to reason about, test, and compose into larger
   data pipelines.
-* **Specific Example (`inverse`):** The decision to handle duplicate values by creating sets (e.g., `{v: {k1, k2}}`)
+- **Specific Example (`inverse`):** The decision to handle duplicate values by creating sets (e.g., `{v: {k1, k2}}`)
   rather than overwriting ensures that the inversion process is lossless. This prioritizes data integrity over
   simplicity.
-* **Specific Example (`stream`):** The inclusion of generator-based functions indicates a focus on memory efficiency for
+- **Specific Example (`stream`):** The inclusion of generator-based functions indicates a focus on memory efficiency for
   large datasets, allowing for lazy processing pipelines.
 
 ### `transformers`
 
-* **Decision:** Provide pure functions that recursively process complex, nested objects.
-* **Reasoning:** Similar to `operators`, these are stateless transformations. The key distinction is that they operate
+- **Decision:** Provide pure functions that recursively process complex, nested objects.
+- **Reasoning:** Similar to `operators`, these are stateless transformations. The key distinction is that they operate
   on the *content* and *shape* of objects (e.g., `simplify`, `stringify`), often involving recursion to handle nested
   data structures like lists and other dictionaries.
-* **Specific Example (`simplify`):** The decision to recursively convert objects (like dataclasses or custom classes)
+- **Specific Example (`simplify`):** The decision to recursively convert objects (like dataclasses or custom classes)
   into standard dictionaries allows for easy serialization (e.g., to JSON). This bridges the gap between Python's rich
   object model and external data formats.
-* **Specific Example (`listify`):** This function transforms nested structures into a uniform list of key-value pairs.
+- **Specific Example (`listify`):** This function transforms nested structures into a uniform list of key-value pairs.
   This decision supports use cases where a flat, list-based representation is required (e.g., for certain UI components
   or data exports).
 
 ### `structures`
 
-* **Decision:** Create a new category for advanced, specialized data structures.
-* **Reasoning:** This namespace is for classes that extend the capabilities of standard Python data structures (like
+- **Decision:** Create a new category for advanced, specialized data structures.
+- **Reasoning:** This namespace is for classes that extend the capabilities of standard Python data structures (like
   `dict` or `list`) with significant new behaviors. While the initial focus is on proxying (`Dictifier`), the namespace
   is designed to hold any complex data container that doesn't fit the "stateless operator" or "simple collector"
   paradigms.

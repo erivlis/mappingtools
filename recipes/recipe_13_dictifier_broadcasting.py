@@ -60,5 +60,9 @@ def main():
     print(new_readings)
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()

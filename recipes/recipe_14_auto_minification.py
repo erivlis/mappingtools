@@ -81,5 +81,9 @@ def main():
     print(json.dumps(clean_legend, indent=2))
 
 
+def test_main():
+    main()
+
+
 if __name__ == "__main__":
     main()
