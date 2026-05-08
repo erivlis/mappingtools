@@ -1,3 +1,9 @@
+## v0.12.1 (2026-05-08)
+
+### Fix
+
+- makes `Resolver.member` instances callable.
+
 ## v0.12.0 (2026-05-08)
 
 ### Feat
