@@ -78,7 +78,7 @@ You can pass a custom callable `(old, new) -> resolved` or use one of the pre-bu
 enum (`Resolver.SUM`, `Resolver.FAIL`, `Resolver.FIRST`, `Resolver.LAST`, etc.).
 
 If you just need the standard "last-wins" behavior, you can use the simpler `merge` operator, which is essentially
-`lift(tree1, tree2, op=Resolver.LAST)`.
+`lift(tree1, tree2, op=Resolver.LAST)`, barring the difference in handling list vs. scalars conflicts.
 
 !!! Example "Lifting a scalar operation over trees"
 
