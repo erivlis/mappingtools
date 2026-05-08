@@ -190,6 +190,13 @@ class MeteredDict(dict[KT, VT_co]):
         """Returns the list of active operations being tracked."""
         return self._atomic_operations(self._operations)
 
+    def _all_keys(self, operations: DictOperation | None = None) -> set[KT]:
+        """Returns all keys that exist in the dictionary or have been tracked."""
+        keys = set(self.keys())
+        for o in (self.operations if operations is None else self._atomic_operations(operations)):
+            keys.update(self._metering[o].keys())
+        return keys
+
     def _add(self, key: KT, operations: DictOperation):
         """
         Increment the tracking information for the specified key and operations.
@@ -267,7 +274,7 @@ class MeteredDict(dict[KT, VT_co]):
         Returns:
             dict[KT, dict[str, int]]: A dictionary containing access counts for each key.
         """
-        return {k: self.count(k, operations) for k in self}
+        return {k: self.count(k, operations) for k in self._all_keys(operations)}
 
     def frequency(self, key: KT, operations: DictOperation | None = None) -> dict[str, float]:
         """
@@ -289,7 +296,7 @@ class MeteredDict(dict[KT, VT_co]):
         Returns:
             dict[KT, dict[str, float]]: A dictionary containing access frequencies for each key.
         """
-        return {k: self.frequency(k, operations) for k in self}
+        return {k: self.frequency(k, operations) for k in self._all_keys(operations)}
 
     def summary(self, key: KT, operations: DictOperation | None = None) -> dict[str, Any]:
         """
@@ -307,13 +314,13 @@ class MeteredDict(dict[KT, VT_co]):
         Returns:
             dict[KT, dict[str, Any]]: A dictionary containing access information for each key.
         """
-        return {k: self.summary(k, operations) for k in self}
+        return {k: self.summary(k, operations) for k in self._all_keys(operations)}
 
     def filter_keys(self,
                     predicate: Callable[[KT, DictOperation], bool],
                     operations: DictOperation | None = None) -> list[KT]:
         return [
-            k for k in self
+            k for k in self._all_keys(operations)
             for o in (self.operations if operations is None else self._atomic_operations(operations))
             if predicate(k, o)
         ]
