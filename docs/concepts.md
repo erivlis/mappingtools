@@ -1,5 +1,5 @@
 ---
-icon: lucide/graduation-cap
+icon: lucide/circle-star
 ---
 
 # Core Concepts
