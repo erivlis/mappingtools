@@ -32,15 +32,15 @@ def main():
     file_stats = CategoryCounter()
     total_files = 0
 
-    # 2. Traverse a directory (let's use the parent directory of this script as an example)
-    # Note: We use `Path(__file__).parents[2]` to point to the root of `mappingtools`
-    target_dir = Path(__file__).parents[2]
+    # 2. Traverse a directory (let's use the root of mappingtools as an example)
+    # Note: We use `Path(__file__).parents[1]` to point to the root of `mappingtools`
+    target_dir = Path(__file__).parents[1]
 
     print(f"Scanning directory: {target_dir}")
 
     for root, dirs, files in os.walk(target_dir):
         # Skip standard hidden/cache directories for cleaner output
-        if '.git' in root or '__pycache__' in root or '.pytest_cache' in root:
+        if '.git' in root or '__pycache__' in root or '.pytest_cache' in root or '.venv' in root:
             continue
 
         for file_name in files:
