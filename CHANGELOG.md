@@ -1,3 +1,20 @@
+## v0.12.0 (2026-05-08)
+
+### Feat
+
+- generalize tree merging with `lift` and `Resolver` enum.
+
+### Fix
+
+- improves filesystem recipe by correcting scan path and skipping .venv.
+- expand reporting and filtering to cover all tracked keys.
+
+### Refactor
+
+- update telemetry aggregation to use `lift` and `Resolver.SUM`.
+- `aggregation` module to `aggregations`; rename recipes and links.
+- update imports to use mappingtools.typing module
+
 ## v0.11.1 (2026-04-08)
 
 ### Refactor

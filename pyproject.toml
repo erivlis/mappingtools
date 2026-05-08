@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mappingtools"
-version = "0.11.1"
+version = "0.12.0"
 authors = [
     { name = "Eran Rivlis", email = "eran@rivlis.info" },
 ]
@@ -45,7 +45,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "commitizen>=4.10.0",
+    "commitizen",
     "pipdeptree",
     "ruff",
     "ty",
