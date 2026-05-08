@@ -66,10 +66,47 @@ Swaps keys and values in a dictionary.
     # output: defaultdict(<class 'set'>, {1: {'a'}, 2: {'a'}, 3: {'b'}})
     ```
 
+## lift
+
+Lifts a binary operator `op` that works on scalars to work on entire recursive trees.
+
+This is a powerful generalization of `merge`. It recursively walks two tree structures and applies the `op` only when it
+encounters a conflict at the leaf nodes (e.g., two scalars at the same path, or a structural mismatch like a dict vs a
+list).
+
+You can pass a custom callable `(old, new) -> resolved` or use one of the pre-built strategies from the `Resolver`
+enum (`Resolver.SUM`, `Resolver.FAIL`, `Resolver.FIRST`, `Resolver.LAST`, etc.).
+
+If you just need the standard "last-wins" behavior, you can use the simpler `merge` operator, which is essentially
+`lift(tree1, tree2, op=Resolver.LAST)`.
+
+!!! Example "Lifting a scalar operation over trees"
+
+    <!-- name: test_lift -->
+
+    ```python linenums="1"
+    from mappingtools.operators import lift
+    from mappingtools.resolvers import Resolver
+    
+    tree1 = {"a": 1, "b": {"c": 10}}
+    tree2 = {"a": 2, "b": {"c": 20}, "d": 5}
+    
+    # 1. Sum conflicts
+    summed = lift(tree1, tree2, op=Resolver.SUM)
+    print(summed)
+    # output: {'a': 3, 'b': {'c': 30}, 'd': 5}
+    
+    # 2. Keep original values on conflict
+    first_wins = lift(tree1, tree2, op=Resolver.FIRST)
+    print(first_wins)
+    # output: {'a': 1, 'b': {'c': 10}, 'd': 5}
+    ```
+
 ## merge
 
 A pure function (Monoid operation) to deeply merge two recursive tree structures.
-The merging strategy resolves conflicts by overwriting existing values with new ones (right-side precedence).
+The merging strategy resolves conflicts by overwriting existing values with new ones (right-side precedence),
+unless the conflict is a list vs. scalar, in which case it concatenates (appends/prepends) the list.
 
 Mathematically, this operation forms a composite Monoid:
 
