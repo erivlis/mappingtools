@@ -6,12 +6,14 @@ from typing import Any
 
 from mappingtools._tools import _is_strict_iterable
 from mappingtools.aggregations import Aggregation
-from mappingtools.typing import MISSING, K, T, Tree
+from mappingtools.resolvers import Resolver
+from mappingtools.typing import MISSING, Combine, K, Missing, T, Tree
 
 __all__ = [
     'distinct',
     'flatten',
     'inverse',
+    'lift',
     'merge',
     'pivot',
     'rekey',
@@ -58,7 +60,7 @@ def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tu
         if isinstance(value, Mapping):
             for k, v in value.items():
                 # Fast path for common atomic keys (str, int)
-                if isinstance(k, (str, int)): # NOSONAR
+                if isinstance(k, (str, int)):  # NOSONAR
                     path.append(k)
                     _recurse(v)
                     path.pop()
@@ -73,7 +75,7 @@ def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tu
                     path.extend(k_seq)
                     _recurse(v)
                     # Backtrack
-                    del path[-len(k_seq) :]
+                    del path[-len(k_seq):]
                 else:
                     path.append(k)
                     _recurse(v)
@@ -107,13 +109,114 @@ def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
     return dict(dd)
 
 
+def lift(
+        tree1: Tree[T] | Missing = MISSING,
+        tree2: Tree[T] | Missing = MISSING,
+        op: Combine | Resolver = Resolver.LAST,
+) -> Tree[T] | Any:
+    """
+    Lifts a binary operator `op` that works on scalars to work on entire trees.
+
+    This is a powerful generalization of `merge`. It recursively walks two tree
+    structures and applies the `op` only when it encounters a conflict at the
+    leaf nodes (e.g., two scalars at the same path, or a structural mismatch).
+
+    Args:
+        tree1 (Tree[T] | Missing): The first tree structure.
+        tree2 (Tree[T] | Missing): The second tree structure.
+        op: A callable or a `Resolver` enum strategy to resolve
+            collisions. Defaults to `Resolver.LAST`.
+
+    Returns:
+        Tree[T] | Any: The combined tree structure.
+    """
+    if isinstance(op, Resolver):
+        op = op.value
+
+    def _lift(t1: Any, t2: Any) -> Any:
+        # 1) If one side is MISSING, the other side wins unconditionally.
+        if t1 is MISSING:
+            return t2
+        if t2 is MISSING:
+            return t1
+
+        # 2) If both are dicts, recursively lift the op over their values.
+        if isinstance(t1, dict) and isinstance(t2, dict):
+            combined = dict(t1)
+            for k, v in t2.items():
+                combined[k] = _lift(combined.get(k, MISSING), v)
+            return combined
+
+        # 3) If both are lists, recursively lift the op over their items by position.
+        if isinstance(t1, list) and isinstance(t2, list):
+            zipped = itertools.zip_longest(t1, t2, fillvalue=MISSING)
+            return [_lift(i1, i2) for i1, i2 in zipped]
+
+        # 4) Otherwise, the structures are in conflict. Apply the operator.
+        return op(t1, t2)
+
+    return _lift(tree1, tree2)
+
+
+def merge(tree1: Tree[T] | Missing = MISSING, tree2: Tree[T] | Missing = MISSING) -> Tree[T]:
+    """
+    A pure function (Monoid operation) to deeply merge two recursive tree structures.
+    The merging strategy resolves conflicts by overwriting existing values with new ones (right-side precedence).
+    `MISSING` acts as the identity element.
+
+    Mathematically, this operation forms a composite Monoid:
+    - Last Monoid (Scalar Fallback): When resolving conflicts between simple values, the right-hand
+      side (`tree2`) wins.
+    - Pointwise Monoid (Dictionary Merge): If the values are dictionaries, they are merged by key,
+      recursively calling `merge` on the values.
+    - Zip Monoid (List Merge): If both are lists, they are zipped and merged positionally,
+      substituting `MISSING` for missing indices.
+    - Free Monoid (Mixed List/Scalar): If one is a list and the other is a scalar/dict,
+      it concatenates (appends/prepends).
+
+    Because it forms a Monoid, this function can be used with `functools.reduce` to collect
+    an iterable of trees into a single structure.
+
+    Args:
+        tree1 (Tree[T] | Missing): The first tree structure.
+        tree2 (Tree[T] | Missing): The second tree structure.
+
+    Returns:
+        Tree[T] | Missing: The deeply merged tree structure.
+    """
+    if isinstance(tree1, dict) and isinstance(tree2, dict):
+        merged = dict(tree1)
+        for k, v in tree2.items():
+            merged[k] = merge(merged.get(k, MISSING), v)
+        return merged
+    elif isinstance(tree1, list) and isinstance(tree2, list):
+        # zip longest to handle different lengths, filling missing values with MISSING
+        zipped = itertools.zip_longest(tree1, tree2, fillvalue=MISSING)
+        return [merge(t1, t2) for t1, t2 in zipped]
+    elif isinstance(tree1, list) and not isinstance(tree2, list) and tree2 is not MISSING:
+        # If tree1 is a list and tree2 is not, append tree2 to a new list
+        return [*tree1, tree2]
+    elif not isinstance(tree1, list) and tree1 is not MISSING and isinstance(tree2, list):
+        # If tree2 is a list and tree1 is not, prepend tree1 to a new list
+        return [tree1, *tree2]
+    elif tree1 is MISSING:
+        return tree2
+    elif tree2 is MISSING:
+        return tree1
+    else:
+        # If both are values (not dicts or lists), or one is a value and the other is a dict/list,
+        # the non-MISSING value takes precedence.
+        # If both are non-MISSING and different types, tree2 overwrites tree1.
+        return tree2
+
+
 def pivot(
-    iterable: Iterable[Mapping],
-    *,
-    index: str,
-    columns: str,
-    values: str,
-    aggregation: Aggregation = Aggregation.LAST,
+        iterable: Iterable[Mapping],
+        *,
+        index: str,
+        columns: str,
+        values: str,
+        aggregation: Aggregation = Aggregation.LAST,
 ) -> dict[Any, dict[Any, Any]]:
     """
     Reshape data (produce a "pivot" table) based on column values.
@@ -158,10 +261,10 @@ def pivot(
 
 
 def rename(
-    mapping: Mapping[K, Any],
-    mapper: Mapping[K, K] | Callable[[K], K],
-    *,
-    aggregation: Aggregation = Aggregation.LAST,
+        mapping: Mapping[K, Any],
+        mapper: Mapping[K, K] | Callable[[K], K],
+        *,
+        aggregation: Aggregation = Aggregation.LAST,
 ) -> dict[K, Any]:
     """
     Rename keys in a mapping based on a mapper (Mapping or Callable).
@@ -189,10 +292,10 @@ def rename(
 
 
 def rekey(
-    mapping: Mapping[Any, Any],
-    key_factory: Callable[[Any, Any], K],
-    *,
-    aggregation: Aggregation = Aggregation.LAST,
+        mapping: Mapping[Any, Any],
+        key_factory: Callable[[Any, Any], K],
+        *,
+        aggregation: Aggregation = Aggregation.LAST,
 ) -> dict[K, Any]:
     """
     Transform keys of a mapping based on a factory function of (key, value).
@@ -222,10 +325,10 @@ def rekey(
 
 
 def reshape(
-    iterable: Iterable[Mapping],
-    keys: Sequence[str | Callable[[Mapping], Any]],
-    value: str | Callable[[Mapping], Any],
-    aggregation: Aggregation = Aggregation.LAST,
+        iterable: Iterable[Mapping],
+        keys: Sequence[str | Callable[[Mapping], Any]],
+        value: str | Callable[[Mapping], Any],
+        aggregation: Aggregation = Aggregation.LAST,
 ) -> dict[Any, Any]:
     """
     Reshape a stream of mappings into a nested dictionary (tensor) of arbitrary depth.
@@ -277,55 +380,3 @@ def reshape(
         aggregate(current, leaf_val, (value_val,))
 
     return result
-
-
-def merge(tree1: Tree[T] | Any = MISSING, tree2: Tree[T] | Any = MISSING) -> Tree[T] | Any:
-    """
-    A pure function (Monoid operation) to deeply merge two recursive tree structures.
-    The merging strategy resolves conflicts by overwriting existing values with new ones (right-side precedence).
-    `MISSING` acts as the identity element.
-
-    Mathematically, this operation forms a composite Monoid:
-    - Last Monoid (Scalar Fallback): When resolving conflicts between simple values, the right-hand
-      side (`tree2`) wins.
-    - Pointwise Monoid (Dictionary Merge): If the values are dictionaries, they are merged by key,
-      recursively calling `merge` on the values.
-    - Zip Monoid (List Merge): If both are lists, they are zipped and merged positionally,
-      substituting `MISSING` for missing indices.
-    - Free Monoid (Mixed List/Scalar): If one is a list and the other is a scalar/dict,
-      it concatenates (appends/prepends).
-
-    Because it forms a Monoid, this function can be used with `functools.reduce` to collect
-    an iterable of trees into a single structure.
-
-    Args:
-        tree1 (Tree[T] | Any): The first tree structure.
-        tree2 (Tree[T] | Any): The second tree structure.
-
-    Returns:
-        Tree[T] | Any: The deeply merged tree structure.
-    """
-    if isinstance(tree1, dict) and isinstance(tree2, dict):
-        merged = dict(tree1)
-        for k, v in tree2.items():
-            merged[k] = merge(merged.get(k, MISSING), v)
-        return merged
-    elif isinstance(tree1, list) and isinstance(tree2, list):
-        # zip longest to handle different lengths, filling missing values with MISSING
-        zipped = itertools.zip_longest(tree1, tree2, fillvalue=MISSING)
-        return [merge(t1, t2) for t1, t2 in zipped]
-    elif isinstance(tree1, list) and not isinstance(tree2, list) and tree2 is not MISSING:
-        # If tree1 is a list and tree2 is not, append tree2 to tree1
-        return [*tree1, tree2]
-    elif not isinstance(tree1, list) and tree1 is not MISSING and isinstance(tree2, list):
-        # If tree2 is a list and tree1 is not, prepend tree1 to tree2
-        return [tree1, *tree2]
-    elif tree1 is MISSING:
-        return tree2
-    elif tree2 is MISSING:
-        return tree1
-    else:
-        # If both are values (not dicts or lists), or one is a value and the other is a dict/list,
-        # the non-MISSING value takes precedence.
-        # If both are non-MISSING and different types, tree2 overwrites tree1.
-        return tree2

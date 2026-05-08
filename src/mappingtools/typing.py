@@ -42,8 +42,19 @@ MISSING = object()
 """Sentinel object used to distinguish an explicit missing value from an actual `None` value.
 Used by the operators.merge function"""
 
+Missing = TypeVar('Missing', bound=type(MISSING))
+"""Type variable representing the type of the MISSING sentinel object.
+This allows for type checking to recognize the MISSING object as a distinct type."""
+
 
 class Handler(Protocol[T]):
 
     def __call__(self, obj: T, *args, **kwargs) -> Any:
+        ...
+
+
+class Combine(Protocol[T]):
+
+    def __call__(self, first: T, last: T) -> T:
+        """Combine two values of type T and return the result."""
         ...
