@@ -1,5 +1,5 @@
 """
-Recipe 20: Telemetry Aggregation (MeteredDict + Dictifier + reduce)
+Recipe 20: Telemetry Aggregation (MeteredDict + Dictifier + lift)
 
 In a distributed or multi-threaded system, you might have multiple workers
 or sub-systems, each managing their own `MeteredDict` to profile performance
@@ -7,15 +7,17 @@ and access patterns.
 
 Eventually, you need to aggregate all these isolated telemetry summaries into a
 single global summary. This recipe demonstrates how to combine `Dictifier`
-(to broadcast the `summaries()` call across all workers) and `reduce(merge, ...)`
-to flawlessly combine the deeply nested metric trees into one.
+(to broadcast the `counts()` call across all workers) and `reduce` with
+`lift(op=Resolver.SUM)` to flawlessly combine the deeply nested metric trees
+into one.
 """
 
 import time
 from functools import reduce
 
 from mappingtools.collectors import MeteredDict
-from mappingtools.operators import merge
+from mappingtools.operators import lift
+from mappingtools.resolvers import Resolver
 from mappingtools.structures import Dictifier
 
 
@@ -36,6 +38,7 @@ class Worker:
 
         time.sleep(0.01)
 
+
 def main():
     # 1. A fleet of workers, each with their own isolated MeteredDict
     workers = {
@@ -50,29 +53,32 @@ def main():
 
     print("--- 1. Gathering Telemetry from Fleet ---")
 
-    # 3. Broadcast the `.summaries()` call to the entire fleet
-    # We wrap the dict of workers in a Dictifier so we can access `.config.summaries()`
+    # 3. Broadcast the `.counts()` call to the entire fleet
+    # We wrap the dict of workers in a Dictifier so we can access `.config.counts()`
     # simultaneously on all of them.
     fleet = Dictifier.auto(workers)
 
-    # This generates a dict of {"worker_A": {summaries_dict}, "worker_B": ...}
-    fleet_summaries = fleet.config.summaries()
+    # This generates a dict of {"worker_A": {counts_dict}, "worker_B": ...}
+    fleet_counts = fleet.config.counts()
 
-    print(f"Collected independent summaries from {len(fleet_summaries)} workers.")
+    print(f"Collected independent summaries from {len(fleet_counts)} workers.")
 
     print("\n--- 2. Aggregating Global Telemetry ---")
 
     # 4. Merge all the independent metric trees into a single global tree
-    # Because `MeteredDict.summaries()` outputs a deep, consistent schema of counters,
-    # and `merge` operates as a Monoid (summing counters via point-wise Dictionary Merge),
-    # `reduce(merge, ...)` flawlessly folds them all together.
+    # Because `MeteredDict.counts()` outputs a deep, consistent schema of integer counters,
+    # and `lift` with `Resolver.SUM` operates as a Monoid (summing counters via point-wise Dictionary Merge),
+    # `reduce(lambda a, b: lift(a, b, op=Resolver.SUM), ...)` flawlessly folds them all together.
 
     # We extract just the values (the actual summary dicts) to merge them.
-    global_telemetry = reduce(merge, fleet_summaries.values())
+    def sum_operator(a, b):
+        return lift(a, b, op=Resolver.SUM)
+
+    global_telemetry = reduce(sum_operator, fleet_counts.values())
 
     # 5. Display the aggregated results for specific keys
     for key in ["db_host", "feature_flag_x"]:
-        total_reads = global_telemetry[key]["get"]["count"] + global_telemetry[key]["get_default"]["count"]
+        total_reads = global_telemetry[key]["get"] + global_telemetry[key]["get_default"]
         print(f"Key '{key}' was accessed {total_reads} times globally.")
 
     # In this simulation:
