@@ -1,11 +1,11 @@
 ---
-icon: lucide/square-asterisk
+icon: lucide/square-function
 ---
 
 # Operators
 
 !!! Abstract
-Operators are functions that perform operations on Mappings.
+    Operators are functions that perform operations on Mappings.
 
 ## distinct
 

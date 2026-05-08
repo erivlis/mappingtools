@@ -7,6 +7,8 @@ icon: lucide/circle-ellipsis
 The **_MappingTools_** library is organized into several namespaces, each containing specific functionalities for
 manipulating and transforming data structures.
 
+## Library's Content
+
 Below is a brief description of the main namespaces within the library:
 
 === ":lucide-square-sigma: Collectors"
