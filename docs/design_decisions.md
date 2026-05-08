@@ -1,5 +1,5 @@
 ---
-icon: lucide/file-code
+icon: lucide/badge-info
 ---
 
 # Design Decisions
@@ -9,7 +9,7 @@ behind the code.
 
 ## Core Project Philosophy
 
-Based on the original structure of the library, we can infer several core design principles that guide the project.
+Core design principles that guide the project.
 
 ### 1. Namespace as Intent
 

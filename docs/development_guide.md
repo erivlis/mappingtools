@@ -1,5 +1,5 @@
 ---
-icon: lucide/brain-circuit
+icon: lucide/badge-alert
 ---
 
 # Development Guide & Philosophy
@@ -17,7 +17,8 @@ simplicity. We trust these instincts but verify them with rigorous testing and a
 If a feature feels "off," "asymmetrical," or "too magical," stop immediately. Do not code through the doubt.
 
 - **Action**: Pause development. Refactor the architecture until the feeling resolves.
-- **Example**: We initially had separate `Dictifier` and `AutoDictifier` classes. This felt asymmetrical. We refactored them into a single `Dictifier` class with a `Dictifier.auto()` factory method.
+- **Example**: We initially had separate `Dictifier` and `AutoDictifier` classes. This felt asymmetrical.
+  We refactored them into a single `Dictifier` class with a `Dictifier.auto()` factory method.
 
 ### 2. Safety Over Magic
 
@@ -32,7 +33,8 @@ We don't just test that it works; we test that it fails correctly. We actively h
 
 - **Action**: Write tests for empty collections, recursion loops, unresolvable type hints, and weird inheritance
   structures.
-- **Example**: We added tests for generator methods to document their behavior, which led to the discovery of a subtle bug in our `async` detection logic.
+- **Example**: We added tests for generator methods to document their behavior, which led to the discovery of
+  a subtle bug in our `async` detection logic.
 
 ### 4. Ergonomics First
 
@@ -40,14 +42,15 @@ Code is for humans. If the API is clunky, the implementation doesn't matter.
 
 - **Action**: Design the "User Experience" of the library (imports, function names) before finalizing the
   implementation.
-- **Example**: We added the `map_objects` factory and kept the `@dictify` decorator as a convenient alias for the more cohesive `Dictifier.of()` class method.
+- **Example**: We added the `map_objects` factory and kept the `@dictify` decorator as a convenient alias
+  for the more cohesive `Dictifier.of()` class method.
 
 ### 5. Prune Ruthlessly
 
 Avoid the "Sunk Cost Fallacy." Just because we built it doesn't mean we keep it.
 
-- **Action**: If a feature complicates the core value proposition without adding proportional value, sideline or delete
-  it.
+- **Action**: If a feature complicates the core value proposition without adding proportional value,
+  sideline or delete it.
 - **Example**: We built and then deleted the `AutoDictifier` class once we realized it was a "mode," not a "type."
 
 ## The Development Loop
@@ -62,16 +65,21 @@ When contributing to this project, follow this mental loop:
 
 ## Architectural Patterns
 
-*   **Mode vs. Type**: If you have two classes that differ only by a small behavior (like inference), consider merging them into one class with a mode flag or factory method.
-*   **Factory Method Pattern**: If a decorator creates a specialized subclass, consider moving that logic into a `classmethod` on the base class (e.g., `Dictifier.of()`). It improves cohesion.
+- **Mode vs. Type**: If you have two classes that differ only by a small behavior (like inference),
+    consider merging them into one class with a mode flag or factory method.
+  **Factory Method Pattern**: If a decorator creates a specialized subclass, consider moving that
+    logic into a `classmethod` on the base class (e.g., `Dictifier.of()`). It improves cohesion.
 
 ## Coding Standards
 
 ### Code Organization
-*   **Regions**: Use `# region Region Name` and `# endregion` comments to group related functions or classes within a file. This improves navigability in large files.
+- **Regions**: Use `# region Region Name` and `# endregion` comments to group related functions
+    or classes within a file. This improves navigability in large files.
 
 ### Testing
-*   **AAA Pattern**: Structure tests using the **Arrange-Act-Assert** pattern. Use comments to explicitly delimit these sections.
+- **AAA Pattern**: Structure tests using the **Arrange-Act-Assert** pattern.
+    Use comments to explicitly delimit these sections.
+
     ```python
     def test_example():
         # Arrange
@@ -86,8 +94,10 @@ When contributing to this project, follow this mental loop:
 
 ## Collaborating with AI
 
-*   **The Meta-Cognitive Loop**: For AI agents, explicitly asking for "Thought Traces," "Design Reviews," or "SWOT Analyses" yields better results than just asking for code.
-*   **Trust the Instinct**: When you feel "asymmetry" or a "code smell," communicate that feeling to the AI. It's a valuable signal that can trigger a productive refactoring path.
+- **The Meta-Cognitive Loop**: For AI agents, explicitly asking for "Thought Traces," "Design Reviews"
+    or "SWOT Analyses" yields better results than just asking for code.
+- **Trust the Instinct**: When you feel "asymmetry" or a "code smell," communicate that feeling to the AI.
+    It's a valuable signal that can trigger a productive refactoring path.
 
 ---
 *This philosophy was distilled from the development session of the `structures` namespace.*
