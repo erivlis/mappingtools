@@ -7,11 +7,19 @@ repo_url = "https://github.com/erivlis/mappingtools"
 repo_name = "erivlis/mappingtools"
 license = "https://github.com/erivlis/mappingtools/LICENSE"
 extra_css = [
-    "stylesheets/extra.css"
+    # Custom CSS
+    "stylesheets/extra.css",
+    # KaTeX
+    "https://unpkg.com/katex@0/dist/katex.min.css"
 ]
 extra_javascript = [
+    # MathJax
     "javascripts/mathjax.js",
-    "https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"
+    "https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js",
+    # KaTex
+    "javascripts/katex.js",
+    "https://unpkg.com/katex@0/dist/katex.min.js",
+    "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"
 ]
 nav = [
     { Start = [
