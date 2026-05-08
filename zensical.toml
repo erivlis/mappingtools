@@ -9,6 +9,10 @@ license = "https://github.com/erivlis/mappingtools/LICENSE"
 extra_css = [
     "stylesheets/extra.css"
 ]
+extra_javascript = [
+    "javascripts/mathjax.js",
+    "https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"
+]
 nav = [
     { Start = [
         "index.md",
@@ -117,8 +121,10 @@ show_source = false
 [project.markdown_extensions.admonition]
 [project.markdown_extensions.attr_list]
 [project.markdown_extensions.md_in_html]
-[project.markdown_extensions.pymdownx.details]
+[project.markdown_extensions.pymdownx.arithmatex]
+generic = true
 
+[project.markdown_extensions.pymdownx.details]
 [project.markdown_extensions.pymdownx.emoji]
 emoji_index = "zensical.extensions.emoji.twemoji" # (1)!
 emoji_generator = "zensical.extensions.emoji.to_svg"
@@ -131,7 +137,6 @@ pygments_lang_class = true
 [project.markdown_extensions.pymdownx.inlinehilite]
 [project.markdown_extensions.pymdownx.snippets]
 [project.markdown_extensions.pymdownx.superfences]
-
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true
 
