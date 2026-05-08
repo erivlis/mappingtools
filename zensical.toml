@@ -13,7 +13,8 @@ nav = [
     { Start = [
         "index.md",
         "installation.md",
-        "overview.md"
+        "overview.md",
+        "concepts.md"
     ] },
     { Guide = [
         "guide/collectors.md",
