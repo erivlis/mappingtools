@@ -1,3 +1,17 @@
+## v0.13.0 (2026-05-10)
+
+### Feat
+
+- Introduces LogicalResolver and expands lift's resolvers.
+- Adds Smart Fetch tool and standardizes 'uv run' commands.
+
+### Refactor
+
+- Adopts NumericResolver enum in recipe examples.
+- Separates numeric conflict resolvers into NumericResolver enum.
+- Removes unused imports and clarifies graph connectivity recipe.
+- update pivot benchmark
+
 ## v0.12.1 (2026-05-08)
 
 ### Fix
