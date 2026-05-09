@@ -146,24 +146,24 @@ def pivot_hyper_opt(iterable, index, columns, values, mode=Aggregation.LAST):
 def benchmark():
     print("Benchmarking pivot (10,000 records)...")
 
-    for mode in Aggregation:
+    for agg in Aggregation:
         t_old = timeit.timeit(
-            lambda: pivot_old_logic(data, index="city", columns="month", values="temp", mode=mode),  # NOSOANR
+            lambda mode=agg: pivot_old_logic(data, index="city", columns="month", values="temp", mode=mode),  # NOSOANR
             number=100
         )
         t_new = timeit.timeit(
-            lambda: pivot(data, index="city", columns="month", values="temp", aggregation=mode),  # NOSOANR
+            lambda mode=agg: pivot(data, index="city", columns="month", values="temp", aggregation=mode),  # NOSOANR
             number=100
         )
         t_hyper = timeit.timeit(
-            lambda: pivot_hyper_opt(data, index="city", columns="month", values="temp", mode=mode),  # NOSOANR
+            lambda mode=agg: pivot_hyper_opt(data, index="city", columns="month", values="temp", mode=mode),  # NOSOANR
             number=100
         )
 
         diff_new = (t_new - t_old) / t_old * 100
         diff_hyper = (t_hyper - t_old) / t_old * 100
         print(
-            f"Mode {mode.name:8}: Old: {t_old:.4f}s,"
+            f"Mode {agg.name:8}: Old: {t_old:.4f}s,"
             f" New: {t_new:.4f}s"
             f" ({diff_new:+.2f}%), Hyper (Closure): {t_hyper:.4f}s ({diff_hyper:+.2f}%)"
         )
