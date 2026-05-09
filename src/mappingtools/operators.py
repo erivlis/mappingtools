@@ -6,7 +6,7 @@ from typing import Any
 
 from mappingtools._tools import _is_strict_iterable
 from mappingtools.aggregations import Aggregation
-from mappingtools.resolvers import NumericResolver, Resolver, ResolverType
+from mappingtools.resolvers import LogicalResolver, NumericResolver, Resolver, ResolverType
 from mappingtools.typing import MISSING, Combine, K, Missing, T, Tree
 
 __all__ = [
@@ -130,7 +130,7 @@ def lift(
     Returns:
         Tree[T] | Any: The combined tree structure.
     """
-    if isinstance(op, (Resolver, NumericResolver)):
+    if isinstance(op, (Resolver, LogicalResolver, NumericResolver)):
         op = op.value
 
     def _lift(t1: Any, t2: Any) -> Any:
@@ -144,8 +144,15 @@ def lift(
         if isinstance(t1, dict) and isinstance(t2, dict):
             combined = dict(t1)
             for k, v in t2.items():
-                combined[k] = _lift(combined.get(k, MISSING), v)
-            return combined
+                val = _lift(combined.get(k, MISSING), v)
+                if val is MISSING:
+                    combined.pop(k, None)
+                else:
+                    combined[k] = val
+
+            # Also need to clean up keys that became MISSING during dict comprehension
+            # if they were already in t1 but not in t2
+            return {k: v for k, v in combined.items() if v is not MISSING}
 
         # 3) If both are lists, recursively lift the op over their items by position.
         if isinstance(t1, list) and isinstance(t2, list):
