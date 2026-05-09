@@ -116,7 +116,7 @@ You can find the executable code for all of these recipes in the
 
 - **[Conflict Resolution Strategies - Recipe #28](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_28_conflict_resolution.py):**
 
-  Use the `lift` operator alongside the `Resolver`, `LogicalResolver`, and `NumericResolver` enums (or a custom callable)
+  Use the `combine` operator alongside the `Resolver`, `LogicalResolver`, and `NumericResolver` enums (or a custom callable)
   to deeply merge two trees while precisely controlling how collisions at the leaf level are resolved (e.g., `FAIL`, `ALL`, `AND`, `SUM`).
 
 ### Telemetry & Analytics

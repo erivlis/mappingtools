@@ -32,10 +32,10 @@ Below is a brief description of the main namespaces within the library:
 
     | Function                             | Description                                                                                            |
     |--------------------------------------|--------------------------------------------------------------------------------------------------------|
+    | **combine**                          | Generalizes `merge` by using a binary operator to resolve conflicts over deeply nested structures.     |
     | **distinct**                         | Yields distinct values for a specified key across multiple mappings.                                   |
     | **flatten**                          | Converts a nested mapping structure into a single-level dictionary by flattening the keys into tuples. |
     | **inverse**                          | Generates an inverse Mapping by swapping keys and values.                                              |
-    | **lift**                             | Generalizes `merge` by lifting a conflict resolution scalar operator over deeply nested structures.    |
     | **merge**                            | Deeply merges two recursive tree structures.                                                           |
     | **pivot**                            | Reshapes a list of mappings into a nested dictionary based on index and column keys.                   |
     | **rekey**                            | Transforms keys based on a function of (key, value). Supports aggregation.                             |
@@ -96,7 +96,7 @@ Below is a brief description of the main namespaces within the library:
     | **JsonTree**         | A recursive type representing a JSON-like tree structure where each node can be a `JsonScalar`, a list of `JsonTree`s, or a dictionary mapping strings to `JsonTree`s. |
     | **EnhancedJsonTree** | A recursive type that extends `JsonTree` by allowing each node to also be of a generic type `T`, in addition to `JsonScalar`s, lists, or dictionaries.                 |
     | **MISSING**          | A sentinel object used to distinguish an explicit missing value from an actual `None` value, particularly in the `operators.merge` function.                           |
-    | **Combine**          | A protocol for a callable that takes two objects of type `T` and combines them, returning `T`. Used by the `lift` operator.                                            |
+    | **Combine**          | A protocol for a callable that takes two objects of type `T` and combines them, returning `T`. Used by the `combine` operator.                                         |
     | **Handler**          | A protocol for a callable that takes an object of a generic type `T` and returns any value.                                                                            |
 
 ## Comparison with Other Libraries

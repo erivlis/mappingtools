@@ -10,16 +10,72 @@ from mappingtools.resolvers import LogicalResolver, NumericResolver, Resolver, R
 from mappingtools.typing import MISSING, Combine, K, Missing, T, Tree
 
 __all__ = [
+    'combine',
     'distinct',
     'flatten',
     'inverse',
-    'lift',
     'merge',
     'pivot',
     'rekey',
     'rename',
     'reshape',
 ]
+
+
+def combine(
+        tree1: Tree[T] | Missing = MISSING,
+        tree2: Tree[T] | Missing = MISSING,
+        op: Combine | ResolverType = Resolver.LAST,
+) -> Tree[T] | Any:
+    """
+    Combines two trees using a binary operator `op` that resolves conflicts at the leaf nodes.
+
+    This is a powerful generalization of `merge`. It recursively walks two tree
+    structures and applies the `op` only when it encounters a conflict at the
+    leaf nodes (e.g., two scalars at the same path, or a structural mismatch).
+
+    Args:
+        tree1 (Tree[T] | Missing): The first tree structure.
+        tree2 (Tree[T] | Missing): The second tree structure.
+        op: A callable or a Resolver enum strategy (Resolver, LogicalResolver, NumericResolver)
+            to resolve collisions. Defaults to `Resolver.LAST`.
+
+    Returns:
+        Tree[T] | Any: The combined tree structure.
+    """
+    if isinstance(op, (Resolver, LogicalResolver, NumericResolver)):
+        op = op.value
+
+    def _combine(t1: Any, t2: Any) -> Any:
+        # 1) If one side is MISSING, the other side wins unconditionally.
+        if t1 is MISSING:
+            return t2
+        if t2 is MISSING:
+            return t1
+
+        # 2) If both are dicts, recursively combine the op over their values.
+        if isinstance(t1, dict) and isinstance(t2, dict):
+            combined = dict(t1)
+            for k, v in t2.items():
+                val = _combine(combined.get(k, MISSING), v)
+                if val is MISSING:
+                    combined.pop(k, None)
+                else:
+                    combined[k] = val
+
+            # Also need to clean up keys that became MISSING during dict comprehension
+            # if they were already in t1 but not in t2
+            return {k: v for k, v in combined.items() if v is not MISSING}
+
+        # 3) If both are lists, recursively combine the op over their items by position.
+        if isinstance(t1, list) and isinstance(t2, list):
+            zipped = itertools.zip_longest(t1, t2, fillvalue=MISSING)
+            return [_combine(i1, i2) for i1, i2 in zipped]
+
+        # 4) Otherwise, the structures are in conflict. Apply the operator.
+        return op(t1, t2)
+
+    return _combine(tree1, tree2)
 
 
 def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:
@@ -107,62 +163,6 @@ def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
         dd[k].add(v)
 
     return dict(dd)
-
-
-def lift(
-        tree1: Tree[T] | Missing = MISSING,
-        tree2: Tree[T] | Missing = MISSING,
-        op: Combine | ResolverType = Resolver.LAST,
-) -> Tree[T] | Any:
-    """
-    Lifts a binary operator `op` that works on scalars to work on entire trees.
-
-    This is a powerful generalization of `merge`. It recursively walks two tree
-    structures and applies the `op` only when it encounters a conflict at the
-    leaf nodes (e.g., two scalars at the same path, or a structural mismatch).
-
-    Args:
-        tree1 (Tree[T] | Missing): The first tree structure.
-        tree2 (Tree[T] | Missing): The second tree structure.
-        op: A callable or a `Resolver` enum strategy to resolve
-            collisions. Defaults to `Resolver.LAST`.
-
-    Returns:
-        Tree[T] | Any: The combined tree structure.
-    """
-    if isinstance(op, (Resolver, LogicalResolver, NumericResolver)):
-        op = op.value
-
-    def _lift(t1: Any, t2: Any) -> Any:
-        # 1) If one side is MISSING, the other side wins unconditionally.
-        if t1 is MISSING:
-            return t2
-        if t2 is MISSING:
-            return t1
-
-        # 2) If both are dicts, recursively lift the op over their values.
-        if isinstance(t1, dict) and isinstance(t2, dict):
-            combined = dict(t1)
-            for k, v in t2.items():
-                val = _lift(combined.get(k, MISSING), v)
-                if val is MISSING:
-                    combined.pop(k, None)
-                else:
-                    combined[k] = val
-
-            # Also need to clean up keys that became MISSING during dict comprehension
-            # if they were already in t1 but not in t2
-            return {k: v for k, v in combined.items() if v is not MISSING}
-
-        # 3) If both are lists, recursively lift the op over their items by position.
-        if isinstance(t1, list) and isinstance(t2, list):
-            zipped = itertools.zip_longest(t1, t2, fillvalue=MISSING)
-            return [_lift(i1, i2) for i1, i2 in zipped]
-
-        # 4) Otherwise, the structures are in conflict. Apply the operator.
-        return op(t1, t2)
-
-    return _lift(tree1, tree2)
 
 
 def merge(tree1: Tree[T] | Missing = MISSING, tree2: Tree[T] | Missing = MISSING) -> Tree[T]:

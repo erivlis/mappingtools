@@ -1,5 +1,5 @@
 """
-Recipe 20: Telemetry Aggregation (MeteredDict + Dictifier + lift)
+Recipe 20: Telemetry Aggregation (MeteredDict + Dictifier + combine)
 
 In a distributed or multi-threaded system, you might have multiple workers
 or sub-systems, each managing their own `MeteredDict` to profile performance
@@ -8,7 +8,7 @@ and access patterns.
 Eventually, you need to aggregate all these isolated telemetry summaries into a
 single global summary. This recipe demonstrates how to combine `Dictifier`
 (to broadcast the `counts()` call across all workers) and `reduce` with
-`lift(op=Resolver.SUM)` to flawlessly combine the deeply nested metric trees
+`combine(op=NumericResolver.SUM)` to flawlessly combine the deeply nested metric trees
 into one.
 """
 
@@ -16,8 +16,8 @@ import time
 from functools import reduce
 
 from mappingtools.collectors import MeteredDict
-from mappingtools.operators import lift
-from mappingtools.resolvers import NumericResolver, Resolver
+from mappingtools.operators import combine
+from mappingtools.resolvers import NumericResolver
 from mappingtools.structures import Dictifier
 
 
@@ -67,12 +67,12 @@ def main():
 
     # 4. Merge all the independent metric trees into a single global tree
     # Because `MeteredDict.counts()` outputs a deep, consistent schema of integer counters,
-    # and `lift` with `Resolver.SUM` operates as a Monoid (summing counters via point-wise Dictionary Merge),
-    # `reduce(lambda a, b: lift(a, b, op=Resolver.SUM), ...)` flawlessly folds them all together.
+    # and `combine` with `NumericResolver.SUM` operates as a Monoid (summing counters via point-wise Dictionary Merge),
+    # `reduce(lambda a, b: combine(a, b, op=NumericResolver.SUM), ...)` flawlessly folds them all together.
 
     # We extract just the values (the actual summary dicts) to merge them.
     def sum_operator(a, b):
-        return lift(a, b, op=NumericResolver.SUM)
+        return combine(a, b, op=NumericResolver.SUM)
 
     global_telemetry = reduce(sum_operator, fleet_counts.values())
 

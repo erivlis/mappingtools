@@ -29,7 +29,7 @@ It states that any node in our data is exactly one of three things:
 3. **A Mapping (`dict`)**: A labeled, unordered set of subtrees.
 
 Because the library restricts itself to operating *only* on this specific mathematical structure, we can guarantee that
-operations like `lift` or `flatten` will recurse safely and predictably over any JSON-like payload.
+operations like `combine` or `flatten` will recurse safely and predictably over any JSON-like payload.
 
 ---
 
@@ -64,15 +64,15 @@ them, you are performing a **Binary Operation**.
 is no issue. Where they differ, you have a **conflict** that must be resolved.
 
 - **Tools to use:**
-    - **`lift`:**
+    - **`combine`:**
     
         This is the engine of binary combination. You provide it with two trees and an `op` (a `Resolver` rule
-        for handling conflicts at the leaf level, like `SUM`, `FIRST`, or `FAIL`). The `lift` operator walks the two trees
+        for handling conflicts at the leaf level, like `SUM`, `FIRST`, or `FAIL`). The `combine` operator walks the two trees
         simultaneously and invokes your rule whenever a structural conflict occurs.
   
     - **`merge`:**
       
-        This is simply a specialized alias for `lift(tree1, tree2, op=Resolver.LAST)`. It is the classic "
+        This is simply a specialized alias for `combine(tree1, tree2, op=Resolver.LAST)`. It is the classic "
         right-side wins" overlay.
 
 ### N-ary Operations: Processing a Sequence of Trees
@@ -84,9 +84,9 @@ an **N-ary Operation**.
 passes through all of them.
 
 - **Tools to use:**
-    - **`functools.reduce` + `lift`:**
+    - **`functools.reduce` + `combine`:**
       
-        Because our binary operations (like `merge` or `lift` with `Resolver.SUM`) are mathematically
+        Because our binary operations (like `merge` or `combine` with `NumericResolver.SUM`) are mathematically
         designed as *Monoids*, they can be chained indefinitely. You can take a list of 1,000 partial JSON
         payloads and `reduce` them into a single, structurally sound object.
   
@@ -135,7 +135,7 @@ If you have: `{"user1": {"admin"}, "user2": {"viewer"}}`, taking the `inverse` i
 
 ## 4. The Broadcasting Functor: `Dictifier`
 
-If `lift` is about fusing parallel structures, `Dictifier` is about **Broadcasting** (or "Vectorization").
+If `combine` is about fusing parallel structures, `Dictifier` is about **Broadcasting** (or "Vectorization").
 
 In category theory, a `Dictifier` acts as a **Functor**. It is a container that knows how to map a function uniformly
 over its contents.

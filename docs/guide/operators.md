@@ -7,6 +7,42 @@ icon: lucide/square-function
 !!! Abstract
     Operators are functions that perform operations on Mappings.
 
+## combine
+
+Combines two recursive tree structures using a binary operator `op` to resolve conflicts at the leaf nodes.
+
+This is a powerful generalization of `merge`. It recursively walks two tree structures and applies the `op` only when it
+encounters a conflict at the leaf nodes (e.g., two scalars at the same path, or a structural mismatch like a dict vs a
+list).
+
+You can pass a custom callable `(old, new) -> resolved` or use one of the pre-built strategies from the resolver enums:
+`Resolver` (structural), `LogicalResolver` (bitwise/sets), or `NumericResolver` (math).
+
+If you just need the standard "last-wins" behavior, you can use the simpler `merge` operator, which is essentially
+`combine(tree1, tree2, op=Resolver.LAST)`, barring the difference in handling list vs. scalars conflicts.
+
+!!! Example "Combining with different conflict resolutions"
+
+    <!-- name: test_combine -->
+
+    ```python linenums="1"
+    from mappingtools.operators import combine
+    from mappingtools.resolvers import NumericResolver, Resolver
+    
+    tree1 = {"a": 1, "b": {"c": 10}}
+    tree2 = {"a": 2, "b": {"c": 20}, "d": 5}
+    
+    # 1. Sum conflicts
+    summed = combine(tree1, tree2, op=NumericResolver.SUM)
+    print(summed)
+    # output: {'a': 3, 'b': {'c': 30}, 'd': 5}
+    
+    # 2. Keep original values on conflict
+    first_wins = combine(tree1, tree2, op=Resolver.FIRST)
+    print(first_wins)
+    # output: {'a': 1, 'b': {'c': 10}, 'd': 5}
+    ```
+
 ## distinct
 
 Yields distinct values for a specified key across multiple mappings.
@@ -64,42 +100,6 @@ Swaps keys and values in a dictionary.
     inverted_mapping = inverse(original_mapping)
     print(inverted_mapping)
     # output: defaultdict(<class 'set'>, {1: {'a'}, 2: {'a'}, 3: {'b'}})
-    ```
-
-## lift
-
-Lifts a binary operator `op` that works on scalars to work on entire recursive trees.
-
-This is a powerful generalization of `merge`. It recursively walks two tree structures and applies the `op` only when it
-encounters a conflict at the leaf nodes (e.g., two scalars at the same path, or a structural mismatch like a dict vs a
-list).
-
-You can pass a custom callable `(old, new) -> resolved` or use one of the pre-built strategies from the `Resolver`
-enum (`Resolver.SUM`, `Resolver.FAIL`, `Resolver.FIRST`, `Resolver.LAST`, etc.).
-
-If you just need the standard "last-wins" behavior, you can use the simpler `merge` operator, which is essentially
-`lift(tree1, tree2, op=Resolver.LAST)`, barring the difference in handling list vs. scalars conflicts.
-
-!!! Example "Lifting a scalar operation over trees"
-
-    <!-- name: test_lift -->
-
-    ```python linenums="1"
-    from mappingtools.operators import lift
-    from mappingtools.resolvers import Resolver
-    
-    tree1 = {"a": 1, "b": {"c": 10}}
-    tree2 = {"a": 2, "b": {"c": 20}, "d": 5}
-    
-    # 1. Sum conflicts
-    summed = lift(tree1, tree2, op=Resolver.SUM)
-    print(summed)
-    # output: {'a': 3, 'b': {'c': 30}, 'd': 5}
-    
-    # 2. Keep original values on conflict
-    first_wins = lift(tree1, tree2, op=Resolver.FIRST)
-    print(first_wins)
-    # output: {'a': 1, 'b': {'c': 10}, 'd': 5}
     ```
 
 ## merge
