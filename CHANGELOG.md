@@ -1,3 +1,9 @@
+## v0.13.1 (2026-05-10)
+
+### Refactor
+
+- Rename `lift` to `combine` across codebase and update related documentation
+
 ## v0.13.0 (2026-05-10)
 
 ### Feat

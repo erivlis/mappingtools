@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mappingtools"
-version = "0.13.0"
+version = "0.13.1"
 authors = [
     { name = "Eran Rivlis", email = "eran@rivlis.info" },
 ]
