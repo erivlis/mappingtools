@@ -1,18 +1,16 @@
 """
-Recipe 23: Graph Theory Connectivity (flatten + distinct)
+Recipe 23: Graph Theory Connectivity (flatten)
 
 In Graph Theory, determining connectivity components (which nodes can reach which other nodes)
 is a classic algorithm. If a graph is represented as a dictionary of Adjacency Lists
 (Node -> [Connected Nodes]), we can use `mappingtools` primitives to find all uniquely reachable
 nodes within a connected sub-graph.
 
-This recipe uses `flatten` to expand a nested graph traversal and `distinct`
-to collect the unique nodes forming the connectivity set.
+This recipe uses `flatten` to expand a nested graph traversal and extract the unique nodes
+forming the connectivity set.
 """
 
-from collections import defaultdict
-
-from mappingtools.operators import distinct, flatten
+from mappingtools.operators import flatten
 
 
 def main():
@@ -24,8 +22,8 @@ def main():
         "C": ["D", "E"],
         "D": ["F"],
         "E": [],
-        "F": ["A"], # Circular cycle!
-        "G": ["H"], # Disconnected sub-graph
+        "F": ["A"],  # Circular cycle!
+        "G": ["H"],  # Disconnected sub-graph
         "H": []
     }
 
@@ -38,10 +36,10 @@ def main():
     # This creates a deeply nested dictionary representing all possible paths.
     def unroll_paths(node, max_depth, current_depth=0):
         if current_depth >= max_depth:
-            return node # Leaf node
+            return node  # Leaf node
         neighbors = graph.get(node, [])
         if not neighbors:
-            return node # Dead end
+            return node  # Dead end
 
         # Recursively build the tree
         subtree = {}
@@ -58,7 +56,7 @@ def main():
     # 3. Flatten the tree to find all paths
     flat_paths = flatten(reachability_tree)
 
-    # 4. Extract all uniquely visited nodes using `distinct`
+    # 4. Extract all uniquely visited nodes
     # Since `flatten` creates paths like `('A', 'C', 'D', 'F')`,
     # the nodes themselves are the elements of the path tuples.
     # We collect them into a set to find the unique connectivity component.

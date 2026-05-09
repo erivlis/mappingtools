@@ -192,6 +192,7 @@ def test_set_uncopyable_object():
     lens.set(container, 2)
     assert container.val == 2
 
+
 def test_lens_item_uncopyable_container_raises():
     # Arrange
     import collections
@@ -226,10 +227,10 @@ def test_lens_item_uncopyable_container_raises():
     with pytest.raises(TypeError, match="Cannot set item immutably on"):
         lens.set(container, 2)
 
+
 def test_lens_item_generic_fallback_success():
     # Arrange
     import collections
-    import copy
 
     class CustomCopyableMapping(collections.abc.MutableMapping):
         def __init__(self, data):
@@ -262,4 +263,4 @@ def test_lens_item_generic_fallback_success():
 
     # Assert
     assert new_container['a'] == 2
-    assert container['a'] == 1 # Prove it was immutable (a copy was made)
+    assert container['a'] == 1  # Prove it was immutable (a copy was made)

@@ -2,12 +2,13 @@ import contextlib
 
 import pytest
 
-from mappingtools.structures import Dictifier, dictify
+from mappingtools.structures import Dictifier
 
 
 class Address:
     def __init__(self, city: str):
         self.city = city
+
 
 class Greeter:
     def __init__(self, greeting: str, city: str = "Nowhere"):
@@ -249,6 +250,7 @@ def test_dictifier_unresolvable_type_hint_fallback():
 
 def test_dictifier_deep_field_access_with_hints():
     """Test deep field access when type hints are present."""
+
     # Arrange
     class TypedGreeter(Greeter):
         address: Address  # Hinted field
@@ -273,6 +275,7 @@ def test_dictifier_deep_field_access_with_hints():
 
 def test_dictifier_field_access_broken_hint():
     """Test field access with a broken type hint falls back to auto mode."""
+
     # Arrange
     class BrokenGreeter(Greeter):
         # Hint points to non-existent class
