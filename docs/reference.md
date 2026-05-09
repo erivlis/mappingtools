@@ -6,7 +6,6 @@ icon: lucide/book-open
 
 This page contains the complete API reference for the `mappingtools` library.
 
-
 ## :lucide-square-pi: Aggregation
 
 ::: mappingtools.aggregations 

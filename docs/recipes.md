@@ -76,7 +76,6 @@ You can find the executable code for all of these recipes in the
   Combine native dictionary comprehensions, `rename`, and `Lens` optics to strip internal metadata, reshape schemas, and
   cryptographically mask sensitive fields before sending a database record to an external API client.
 
-
 ### Architecture & Microservices
 
 - **[Deep JSON Patching - Recipe #1](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_01_deep_json_patching.py):**
