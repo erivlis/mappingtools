@@ -88,7 +88,7 @@ Built for developers who need more than just standard dictionaries.
 
 ## Documentation
 
-https://erivlis.github.io/mappingtools/
+<https://erivlis.github.io/mappingtools/>
 
 ## Development
 
