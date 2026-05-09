@@ -1,7 +1,7 @@
 import pytest
 
 from mappingtools.operators import lift
-from mappingtools.resolvers import Resolver
+from mappingtools.resolvers import NumericResolver, Resolver
 from mappingtools.typing import MISSING
 
 
@@ -32,8 +32,16 @@ def test_lift_with_sum():
     t1 = {"revenue": 100, "costs": {"q1": 50}}
     t2 = {"revenue": 200, "costs": {"q1": 60, "q2": 10}}
 
-    result = lift(t1, t2, op=Resolver.SUM)
+    result = lift(t1, t2, op=NumericResolver.SUM)
     assert result == {"revenue": 300, "costs": {"q1": 110, "q2": 10}}
+
+
+def test_lift_with_min():
+    t1 = {"revenue": 100, "costs": {"q1": 50}}
+    t2 = {"revenue": 200, "costs": {"q1": 60, "q2": 10}}
+
+    result = lift(t1, t2, op=NumericResolver.MIN)
+    assert result == {"revenue": 100, "costs": {"q1": 50, "q2": 10}}
 
 
 def test_lift_with_fail():
@@ -87,7 +95,7 @@ def test_lift_deep_nested_conflict():
     }
 
     # Max aggregation
-    result = lift(t1, t2, op=Resolver.MAX)
+    result = lift(t1, t2, op=NumericResolver.MAX)
     assert result == {
         "user": {
             "profile": {

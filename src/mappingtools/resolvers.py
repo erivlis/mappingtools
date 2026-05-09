@@ -23,6 +23,14 @@ def _fail_resolver(first: Any, last: Any) -> Any:
     raise ValueError(f"Conflict detected at leaf. Old: {first}, New: {last}")
 
 
+def _first_resolver(first: Any, last: Any) -> Any:
+    return first
+
+
+def _last_resolver(first: Any, last: Any) -> Any:
+    return last
+
+
 class Resolver(Enum):
     """
     Defines a strategy for resolving a conflict between two scalar values during a merge.
@@ -31,17 +39,22 @@ class Resolver(Enum):
     FAIL = member(_fail_resolver)
     """Raise a ValueError on any conflict."""
 
-    FIRST = member(lambda first, last: first)
+    FIRST = member(_first_resolver)
     """Keep the original value in a conflict."""
 
-    LAST = member(lambda first, last: last)
+    LAST = member(_last_resolver)
     """Overwrite the original value with the new one."""
 
-    MAX = member(lambda first, last: max(first, last))
+
+class NumericResolver(Enum):
+    MAX = member(max)
     """Take the maximum of the old and new values."""
 
-    MIN = member(lambda first, last: min(first, last))
+    MIN = member(min)
     """Take the minimum of the old and new values."""
 
     SUM = member(operator.add)
     """Sum the old and new values in a conflict."""
+
+
+ResolverType = Resolver | NumericResolver

@@ -6,7 +6,7 @@ from typing import Any
 
 from mappingtools._tools import _is_strict_iterable
 from mappingtools.aggregations import Aggregation
-from mappingtools.resolvers import Resolver
+from mappingtools.resolvers import NumericResolver, Resolver, ResolverType
 from mappingtools.typing import MISSING, Combine, K, Missing, T, Tree
 
 __all__ = [
@@ -112,7 +112,7 @@ def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
 def lift(
         tree1: Tree[T] | Missing = MISSING,
         tree2: Tree[T] | Missing = MISSING,
-        op: Combine | Resolver = Resolver.LAST,
+        op: Combine | ResolverType = Resolver.LAST,
 ) -> Tree[T] | Any:
     """
     Lifts a binary operator `op` that works on scalars to work on entire trees.
@@ -130,7 +130,7 @@ def lift(
     Returns:
         Tree[T] | Any: The combined tree structure.
     """
-    if isinstance(op, Resolver):
+    if isinstance(op, (Resolver, NumericResolver)):
         op = op.value
 
     def _lift(t1: Any, t2: Any) -> Any:
