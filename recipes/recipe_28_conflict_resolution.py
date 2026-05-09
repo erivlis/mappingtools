@@ -10,9 +10,10 @@ accepts an `op` strategy. This strategy can be a pre-built `Resolver`
 enum or any custom callable that takes `(old_value, new_value)` and returns a
 resolved value.
 """
+import operator
 
 from mappingtools.operators import lift
-from mappingtools.resolvers import Resolver
+from mappingtools.resolvers import NumericResolver, Resolver
 
 
 def main():
@@ -43,7 +44,7 @@ def main():
 
     print("\n--- 3. SUM ---")
     # Use a built-in numeric aggregation
-    summed = lift(tree1, tree2, op=Resolver.SUM)
+    summed = lift(tree1, tree2, op=NumericResolver.SUM)
     print(summed)
     assert summed['a'] == 100
     assert summed['b']['c'] == 100
@@ -64,7 +65,7 @@ def main():
     print("\n--- 5. Custom Callable (String Concatenation) ---")
     str_tree1 = {'msg': "hello"}
     str_tree2 = {'msg': " world"}
-    concatenated = lift(str_tree1, str_tree2, op=lambda old, new: old + new)
+    concatenated = lift(str_tree1, str_tree2, op=operator.add)
     print(concatenated)
     assert concatenated['msg'] == "hello world"
 

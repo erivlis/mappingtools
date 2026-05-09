@@ -17,7 +17,7 @@ from functools import reduce
 
 from mappingtools.collectors import MeteredDict
 from mappingtools.operators import lift
-from mappingtools.resolvers import Resolver
+from mappingtools.resolvers import NumericResolver, Resolver
 from mappingtools.structures import Dictifier
 
 
@@ -72,7 +72,7 @@ def main():
 
     # We extract just the values (the actual summary dicts) to merge them.
     def sum_operator(a, b):
-        return lift(a, b, op=Resolver.SUM)
+        return lift(a, b, op=NumericResolver.SUM)
 
     global_telemetry = reduce(sum_operator, fleet_counts.values())
 
