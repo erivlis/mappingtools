@@ -28,18 +28,23 @@ This project is built and maintained with the help of several open-source tools 
 
     An extremely fast Python linter, written in Rust.
 
--   #### :lucide-package: Hatch
+-   #### ![Hatch](https://hatch.pypa.io/latest/assets/images/logo.svg){width="24" height="24"} Hatch
 
     ---
 
     A modern, extensible Python project manager.
 
--   #### :lucide-git-commit: Commitizen
+-   #### ![Commitizen](https://commitizen-tools.github.io/commitizen/images/cz_logo.png){width="24" height="24"} Commitizen
 
     ---
 
     A tool to create committing rules for projects, auto bump versions, and generate changelogs.
 
+-   #### ![Zensical](https://zensical.org/assets/zensical.svg){width="24" height="24"} Zensical
+
+    ---
+
+    A modern static site generator designed to simplify building and maintaining project documentation.
 </div>
 
 ## Scans
@@ -70,7 +75,7 @@ This project is built and maintained with the help of several open-source tools 
 
     Automated code review for Git.
 
--   #### :lucide-shield-check: DeepSource
+-   #### ![DeepSource](https://deepsource.com/favicon.svg){width="24" height="24"} DeepSource
 
     ---
 
