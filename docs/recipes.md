@@ -159,8 +159,7 @@ You can find the executable code for all of these recipes in the
 
 - **[Graph Theory Connectivity - Recipe #23](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_23_graph_theory_connectivity.py):**
 
-  Combine `flatten` and `distinct` to extract all unique nodes reachable within a specific sub-graph generated from an
-  Adjacency List.
+  Use `flatten` to expand a nested graph traversal and extract all unique nodes reachable within a specific sub-graph generated from an Adjacency List.
 
 - **[Markov Chain Text Generation - Recipe #25](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_25_markov_chain_text_generator.py):**
 
