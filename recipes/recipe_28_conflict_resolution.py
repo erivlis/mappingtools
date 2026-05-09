@@ -6,14 +6,14 @@ layering configurations. However, sometimes you need more control when two
 trees have conflicting values at the same leaf path.
 
 This recipe introduces the `lift` operator, a generalization of `merge` that
-accepts an `op` strategy. This strategy can be a pre-built `Resolver`
-enum or any custom callable that takes `(old_value, new_value)` and returns a
-resolved value.
+accepts an `op` strategy. This strategy can be a pre-built resolver enum
+(`Resolver`, `NumericResolver`, `LogicalResolver`) or any custom callable
+that takes `(old_value, new_value)` and returns a resolved value.
 """
 import operator
 
 from mappingtools.operators import lift
-from mappingtools.resolvers import NumericResolver, Resolver
+from mappingtools.resolvers import LogicalResolver, NumericResolver, Resolver
 
 
 def main():
@@ -42,7 +42,7 @@ def main():
     assert first_wins['a'] == 1
     assert first_wins['b']['c'] == 2
 
-    print("\n--- 3. SUM ---")
+    print("\n--- 3. SUM (NumericResolver) ---")
     # Use a built-in numeric aggregation
     summed = lift(tree1, tree2, op=NumericResolver.SUM)
     print(summed)
@@ -62,7 +62,32 @@ def main():
     print("Successfully combined disjoint trees.")
     assert success['e'] == 5
 
-    print("\n--- 5. Custom Callable (String Concatenation) ---")
+    print("\n--- 5. ALL (Lossless Tuple Accumulation) ---")
+    # Preserves history linearly into a tuple
+    all_history = lift(tree1, tree2, op=Resolver.ALL)
+    print(all_history)
+    assert all_history['a'] == (1, 99)
+    assert all_history['b']['c'] == (2, 98)
+
+    print("\n--- 6. VOID (Annihilation) ---")
+    # The conflicting leaves are completely pruned from the tree
+    void_tree = lift(tree1, tree2, op=Resolver.VOID)
+    print(void_tree)
+    assert 'a' not in void_tree
+    assert 'c' not in void_tree['b']
+    assert void_tree['b']['d'] == 97
+
+    print("\n--- 7. Logical AND (Bitmasks and Sets) ---")
+    # The logical resolvers handle truthiness, sets, and bitwise integers automatically.
+    perms1 = {'write_cache': 0b101, 'tags': {'A', 'B'}}
+    perms2 = {'write_cache': 0b011, 'tags': {'B', 'C'}}
+
+    intersected = lift(perms1, perms2, op=LogicalResolver.AND)
+    print(intersected)
+    assert intersected['write_cache'] == 0b001
+    assert intersected['tags'] == {'B'}
+
+    print("\n--- 8. Custom Callable (String Concatenation) ---")
     str_tree1 = {'msg': "hello"}
     str_tree2 = {'msg': " world"}
     concatenated = lift(str_tree1, str_tree2, op=operator.add)
