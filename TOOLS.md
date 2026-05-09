@@ -19,7 +19,7 @@ When an Agent needs to perform a calculation or state the time, it should:
 **Command:**
 
 ```shell
-python -c "import datetime; print(datetime.datetime.now().isoformat())"
+uv run python -c "import datetime; print(datetime.datetime.now().isoformat())"
 ```
 
 ### 2. Abacus (Simple Arithmetic)
@@ -28,10 +28,10 @@ python -c "import datetime; print(datetime.datetime.now().isoformat())"
 **Command:**
 
 ```shell
-python -c "print({expression})"
+uv run python -c "print({expression})"
 ```
 
-*Example:* `python -c "print(123 * 456)"`
+*Example:* `uv run python -c "print(123 * 456)"`
 
 ### 3. Calculator (Advanced Math)
 
@@ -39,10 +39,10 @@ python -c "print({expression})"
 **Command:**
 
 ```shell
-python -c "import math; print({expression})"
+uv run python -c "import math; print({expression})"
 ```
 
-*Example:* `python -c "import math; print(math.sqrt(2) * math.pi)"`
+*Example:* `uv run python -c "import math; print(math.sqrt(2) * math.pi)"``
 
 ### 4. Randomness (Entropy)
 
@@ -50,16 +50,25 @@ python -c "import math; print({expression})"
 **Command:**
 
 ```shell
-python -c "import uuid; print(uuid.uuid4())"
+uv run python -c "import uuid; print(uuid.uuid4())"
 ```
 
 ### 5. Resource to Markdown
 
-uses https://github.com/microsoft/markitdown
+uses <https://github.com/microsoft/markitdown>
 
 **Goal:** Convert a resource to Markdown format.
 **Command:**
 
 ```shell
 uvx --from 'markitdown[pdf]' markitdown {input_pdf} -o {output_md}
+```
+
+### 6. Smart Fetch
+
+**Goal:** Get a web resource as Markdown
+**Command:**
+
+```shell
+uv run tools/smart_fetch.py "{input_url_to_resource}" "{output_md}"
 ```

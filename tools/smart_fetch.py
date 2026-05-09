@@ -1,10 +1,11 @@
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
-#     "anyio"
+#     "anyio",
 #     "playwright",
 #     "beautifulsoup4",
 #     "html2text",
+#     "rich",
 # ]
 # ///
 
@@ -17,14 +18,12 @@ It uses Playwright to render the page and html2text to format the output.
 
 Prerequisites
 -------------
-Before running this script for the first time, you must install the Playwright browser binaries.
-Use `uvx` to do this cleanly:
-
-    $ uvx playwright install chromium
+No installation of Playwright binaries is strictly required. This script is configured
+to use your local system's installation of Google Chrome or Microsoft Edge.
 
 Usage
 -----
-Run the script using `uv run` to automatically handle the Python dependencies (playwright, bs4, html2text):
+Run the script using `uv run` to automatically handle the Python dependencies:
 
     $ uv run tools/smart_fetch.py <URL> <OUTPUT_FILE>
 
@@ -46,60 +45,78 @@ import sys
 import anyio
 import html2text
 from playwright.async_api import async_playwright
+from rich.console import Console
+from rich.panel import Panel
+from rich.theme import Theme
+
+# Set up Rich console with a custom theme for semantic logging
+custom_theme = Theme({
+    "info": "cyan",
+    "warning": "yellow",
+    "error": "bold red",
+    "success": "bold green",
+})
+console = Console(theme=custom_theme)
 
 
-async def fetch_and_convert(url, output_file):
-    print(f"🚀 Launching browser to fetch: {url}")
+async def fetch_and_convert(url: str, output_file: str):
+    console.print(Panel(f"Target: [bold]{url}[/bold]\nOutput: [bold]{output_file}[/bold]", title="🚀 Smart Fetch Initialized", expand=False))
 
     async with async_playwright() as p:
-        # Launch browser (headless)
+        # Launch browser (headless) using the local system Chrome/Edge installation.
+        # 'channel="chrome"' tells playwright to look for the system Chrome.
+        # Alternatively, 'channel="msedge"' works on Windows.
         try:
-            browser = await p.chromium.launch()
+            with console.status("[info]Launching local Chrome browser...", spinner="dots"):
+                browser = await p.chromium.launch(channel="chrome")
         except Exception as e:
-            print(f"❌ Error launching browser: {e}")
-            print("💡 Hint: Did you run 'uvx playwright install chromium'?")
+            console.print(f"[error]❌ Error launching local Chrome:[/error] {e}")
+            console.print("[warning]💡 Hint: Ensure Google Chrome is installed on your system.[/warning]")
+            console.print("[info]If Chrome is missing, you can install the Playwright binaries via: uvx playwright install chromium[/info]")
             sys.exit(1)
 
         page = await browser.new_page()
 
         # Go to URL and wait for network idle to ensure JS loads
-        print("⏳ Loading page...")
-        try:
-            await page.goto(url, wait_until="networkidle", timeout=60000)  # 60s timeout
-        except Exception as e:
-            print(f"⚠️ Warning: Page load timed out or failed: {e}")
-            print("   Attempting to proceed with partial content...")
+        with console.status(f"[info]Loading page and waiting for network idle...[/info]", spinner="bouncingBar"):
+            try:
+                await page.goto(url, wait_until="networkidle", timeout=60000)  # 60s timeout
+                console.print("[success]✅ Page loaded successfully.[/success]")
+            except Exception as e:
+                console.print(f"[warning]⚠️ Warning: Page load timed out or failed: {e}[/warning]")
+                console.print("[info]Attempting to proceed with partial content...[/info]")
 
         # Get the full HTML content
-        html_content = await page.content()
-        print("✅ Page loaded.")
+        with console.status("[info]Extracting HTML content...[/info]"):
+            html_content = await page.content()
 
         await browser.close()
 
     # Convert to Markdown
-    print("📝 Converting to Markdown...")
-    converter = html2text.HTML2Text()
-    converter.ignore_links = False
-    converter.ignore_images = True
-    converter.body_width = 0  # No wrapping
-    markdown_content = converter.handle(html_content)
+    with console.status("[info]📝 Converting HTML to Markdown...[/info]"):
+        converter = html2text.HTML2Text()
+        converter.ignore_links = False
+        converter.ignore_images = True
+        converter.body_width = 0  # No wrapping
+        markdown_content = converter.handle(html_content)
 
     # Ensure directory exists
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     # Save to file
-    async with await anyio.open_file(output_file, "w", encoding="utf-8") as f:
-        f.write(markdown_content)
+    with console.status("[info]💾 Writing to disk...[/info]"):
+        async with await anyio.open_file(output_file, "w", encoding="utf-8") as f:
+            await f.write(markdown_content)
 
-    print(f"💾 Saved to: {output_file}")
+    console.print(f"[success]🎉 Done! Saved to: {output_file}[/success]")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: uv run tools/smart_fetch.py <URL> <OUTPUT_FILE>")
+        console.print("[error]Usage:[/error] uv run tools/smart_fetch.py <URL> <OUTPUT_FILE>")
         sys.exit(1)
 
-    url = sys.argv[1]
-    output_file = sys.argv[2]
+    target_url = sys.argv[1]
+    target_output = sys.argv[2]
 
-    asyncio.run(fetch_and_convert(url, output_file))
+    asyncio.run(fetch_and_convert(target_url, target_output))
