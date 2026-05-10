@@ -78,7 +78,7 @@ async def fetch_and_convert(url: str, output_file: str):
         page = await browser.new_page()
 
         # Go to URL and wait for network idle to ensure JS loads
-        with console.status(f"[info]Loading page and waiting for network idle...[/info]", spinner="bouncingBar"):
+        with console.status("[info]Loading page and waiting for network idle...[/info]", spinner="bouncingBar"):
             try:
                 await page.goto(url, wait_until="networkidle", timeout=60000)  # 60s timeout
                 console.print("[success]✅ Page loaded successfully.[/success]")
