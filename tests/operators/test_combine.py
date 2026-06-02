@@ -98,13 +98,22 @@ def test_combine_with_union():
     assert result == {"roles": frozenset(["admin", "editor"])}
 
 
-def test_combine_with_coalesce():
+def test_combine_with_coalesce_first():
     # first is truthy, it should win
-    assert combine({"a": "john"}, {"a": ""}, op=Resolver.COALESCE) == {"a": "john"}
+    assert combine({"a": "john"}, {"a": ""}, op=Resolver.COALESCE_FIRST) == {"a": "john"}
     # first is falsy, last should win
-    assert combine({"a": ""}, {"a": "john"}, op=Resolver.COALESCE) == {"a": "john"}
+    assert combine({"a": ""}, {"a": "john"}, op=Resolver.COALESCE_FIRST) == {"a": "john"}
     # both are falsy, last should win
-    assert combine({"a": None}, {"a": 0}, op=Resolver.COALESCE) == {"a": 0}
+    assert combine({"a": None}, {"a": 0}, op=Resolver.COALESCE_FIRST) == {"a": 0}
+
+
+def test_combine_with_coalesce_last():
+    # last is truthy, it should win
+    assert combine({"a": ""}, {"a": "john"}, op=Resolver.COALESCE_LAST) == {"a": "john"}
+    # last is falsy, first should win
+    assert combine({"a": "john"}, {"a": ""}, op=Resolver.COALESCE_LAST) == {"a": "john"}
+    # both are falsy, first should win
+    assert combine({"a": None}, {"a": 0}, op=Resolver.COALESCE_LAST) == {"a": None}
 
 
 def test_combine_with_logical_and():

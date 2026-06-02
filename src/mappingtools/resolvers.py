@@ -27,9 +27,14 @@ def _all_resolver(first: Any, last: Any) -> Any:
     return first_tuple + last_tuple
 
 
-def _coalesce_resolver(first: Any, last: Any) -> Any:
+def _coalesce_first_resolver(first: Any, last: Any) -> Any:
     """Return the first truthy value."""
     return first if first else last
+
+
+def _coalesce_last_resolver(first: Any, last: Any) -> Any:
+    """Return the last truthy value."""
+    return last if last else first
 
 
 def _fail_resolver(first: Any, last: Any) -> Any:
@@ -89,8 +94,11 @@ class Resolver(Enum):
     ALL = member(_all_resolver)
     """Combine both values into a flat tuple."""
 
-    COALESCE = member(_coalesce_resolver)
+    COALESCE_FIRST = member(_coalesce_first_resolver)
     """Return the first truthy value. If both are falsy, return the last one."""
+
+    COALESCE_LAST = member(_coalesce_last_resolver)
+    """Return the last truthy value. If both are falsy, return the first one."""
 
     FAIL = member(_fail_resolver)
     """Raise a ValueError blindly on any intersection, enforcing that the trees are structurally mutually exclusive."""
