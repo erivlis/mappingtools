@@ -1,3 +1,10 @@
+## v0.14.0 (2026-06-02)
+
+### Feat
+
+- Adds COALESCE_LAST resolver and renames COALESCE to COALESCE_FIRST.
+- Add benchmarking script for comparing `merge` and `combine` performance
+
 ## v0.13.1 (2026-05-10)
 
 ### Refactor
