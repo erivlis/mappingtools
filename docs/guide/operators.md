@@ -18,6 +18,15 @@ list).
 You can pass a custom callable `(old, new) -> resolved` or use one of the pre-built strategies from the resolver enums:
 `Resolver` (structural), `LogicalResolver` (bitwise/sets), or `NumericResolver` (math).
 
+Some of the most common resolvers from the `Resolver` enum include:
+
+*   `Resolver.FIRST`: Keeps the original value (`tree1`).
+*   `Resolver.LAST`: Overwrites with the new value (`tree2`).
+*   `Resolver.COALESCE_FIRST`: Returns the first *truthy* value, otherwise the last value.
+*   `Resolver.COALESCE_LAST`: Returns the last *truthy* value, otherwise the first value.
+*   `Resolver.ALL`: Combines both values into a tuple.
+*   `Resolver.FAIL`: Raises a `ValueError` on any conflict.
+
 If you just need the standard "last-wins" behavior, you can use the simpler `merge` operator, which is essentially
 `combine(tree1, tree2, op=Resolver.LAST)`, barring the difference in handling list vs. scalars conflicts.
 
@@ -41,6 +50,12 @@ If you just need the standard "last-wins" behavior, you can use the simpler `mer
     first_wins = combine(tree1, tree2, op=Resolver.FIRST)
     print(first_wins)
     # output: {'a': 1, 'b': {'c': 10}, 'd': 5}
+
+    # 3. Coalesce falsy values
+    tree3 = {"a": 0, "b": {"c": None}}
+    coalesced = combine(tree3, tree2, op=Resolver.COALESCE_LAST)
+    print(coalesced)
+    # output: {'a': 2, 'b': {'c': 20}, 'd': 5}
     ```
 
 ## distinct

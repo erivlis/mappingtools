@@ -29,12 +29,12 @@ def _all_resolver(first: Any, last: Any) -> Any:
 
 def _coalesce_first_resolver(first: Any, last: Any) -> Any:
     """Return the first truthy value."""
-    return first if first else last
+    return first or last
 
 
 def _coalesce_last_resolver(first: Any, last: Any) -> Any:
     """Return the last truthy value."""
-    return last if last else first
+    return last or first
 
 
 def _fail_resolver(first: Any, last: Any) -> Any:

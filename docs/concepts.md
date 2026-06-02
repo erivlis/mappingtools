@@ -47,13 +47,14 @@ structure changes, but you are only dealing with one source of truth at a time.
 
 - **Tools to use:**
     - **`Transformer` class and operations (`minify`, `strictify`, `simplify`, etc.)**
-      
-        These lift a set of scalar rules ("make all datetimes into ISO strings") and apply them recursively across the entire tree.
-  
+
+      These lift a set of scalar rules ("make all datetimes into ISO strings") and apply them recursively across the
+      entire tree.
+
     - **Optics (`Lens`):**
-      
-        For precise, surgical strikes on a specific, deeply nested node within a single tree, without mutating the
-        original structure.
+
+      For precise, surgical strikes on a specific, deeply nested node within a single tree, without mutating the
+      original structure.
 
 ### Binary Operations: Fusing Two Trees
 
@@ -65,15 +66,16 @@ is no issue. Where they differ, you have a **conflict** that must be resolved.
 
 - **Tools to use:**
     - **`combine`:**
-    
-        This is the engine of binary combination. You provide it with two trees and an `op` (a `Resolver` rule
-        for handling conflicts at the leaf level, like `SUM`, `FIRST`, or `FAIL`). The `combine` operator walks the two trees
-        simultaneously and invokes your rule whenever a structural conflict occurs.
-  
+
+      This is the engine of binary combination. You provide it with two trees and an `op` (a `Resolver` rule
+      for handling conflicts at the leaf level, like `SUM`, `FIRST`, or `FAIL`). The `combine` operator walks the two
+      trees
+      simultaneously and invokes your rule whenever a structural conflict occurs.
+
     - **`merge`:**
-      
-        This is simply a specialized alias for `combine(tree1, tree2, op=Resolver.LAST)`. It is the classic "
-        right-side wins" overlay.
+
+      This is simply a specialized alias for `combine(tree1, tree2, op=Resolver.LAST)`. It is the classic "
+      right-side wins" overlay.
 
 ### N-ary Operations: Processing a Sequence of Trees
 
@@ -85,16 +87,16 @@ passes through all of them.
 
 - **Tools to use:**
     - **`functools.reduce` + `combine`:**
-      
-        Because our binary operations (like `merge` or `combine` with `NumericResolver.SUM`) are mathematically
-        designed as *Monoids*, they can be chained indefinitely. You can take a list of 1,000 partial JSON
-        payloads and `reduce` them into a single, structurally sound object.
-  
+
+      Because our binary operations (like `merge` or `combine` with `NumericResolver.SUM`) are mathematically
+      designed as *Monoids*, they can be chained indefinitely. You can take a list of 1,000 partial JSON
+      payloads and `reduce` them into a single, structurally sound object.
+
     - **Collectors (`MappingCollector`, `CategoryCollector`):**
-  
-        If your stream of objects is flat (like a database cursor) and you need to *build* the tree
-        structure while aggregating collisions, you use a Collector with a specified `Aggregation`
-        mode (`COUNT`, `EMA`, `ALL`).
+
+      If your stream of objects is flat (like a database cursor) and you need to *build* the tree
+      structure while aggregating collisions, you use a Collector with a specified `Aggregation`
+      mode (`COUNT`, `EMA`, `ALL`).
 
 ---
 
@@ -109,15 +111,15 @@ Just like `tensor.flatten()` and `tensor.reshape()` in PyTorch or NumPy, you can
 trees without losing data.
 
 - **`flatten` (Dimensionality Reduction):**
-  
-    It takes an N-dimensional tree and projects it down into a **1-Dimensional
-    vector space**. The "coordinates" of that space are the tuple paths (e.g., `("user", "address", "zip")`). This is
-    crucial for tasks like deep diffing, as it's much easier to compare two 1D vectors than two 3D trees.
+
+  It takes an N-dimensional tree and projects it down into a **1-Dimensional
+  vector space**. The "coordinates" of that space are the tuple paths (e.g., `("user", "address", "zip")`). This is
+  crucial for tasks like deep diffing, as it's much easier to compare two 1D vectors than two 3D trees.
 
 - **`reshape` (Dimensionality Expansion):**
 
-    It takes a flat 1D stream of records (like a database cursor) and "inflates" it back into an N-dimensional tree.
-    It allows you to define the "axes" of your new tensor using `keys=["country", "state", "city"]`.
+  It takes a flat 1D stream of records (like a database cursor) and "inflates" it back into an N-dimensional tree.
+  It allows you to define the "axes" of your new tensor using `keys=["country", "state", "city"]`.
 
 ### The Inverse Mapping (The Preimage)
 
