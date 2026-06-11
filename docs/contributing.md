@@ -30,6 +30,13 @@ ruff check tests
 
 ### Test
 
+#### Standard Terminal Coverage Report
+
+```shell
+python -m pytest tests --cov=src --cov-branch --doctest-modules --cov-report=term --cov-report=term-missing
+
+```
+
 #### Standard (cobertura) XML Coverage Report
 
 ```shell
