@@ -39,6 +39,11 @@ You can find the executable code for all of these recipes in the
   Combine `reshape` and `Aggregation.ALL` to group a flat stream of transactional records into an N-dimensional
   analytical tensor without losing any underlying individual records.
 
+- **[Cleaning Up API Payloads - Recipe #29](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_29_payload_cleanup.py):**
+
+  Use `modify` to apply multiple cleaning functions to a deeply nested data structure in a single pass. This recipe shows how to normalize keys and trim whitespace from all string values.
+
+
 ### Configuration & State Management
 
 - **[Configuration Management - Recipe #3](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_03_config_management.py):**

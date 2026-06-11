@@ -67,6 +67,33 @@ them more efficient for storage or transmission.
     # [{'A': 'John', 'B': 'Doe', 'C': 30, 'D': {'E': '123 Main St', 'F': 'New York', 'G': 'CA'}}, {'A': 'Jane', 'B': 'Smith', 'C': 25, 'D': {'E': '456 Rodeo Dr', 'F': 'Los Angeles', 'G': 'CA'}}]
     ```
 
+## modify
+
+Recursively traverses a data structure and applies handler functions to keys and leaf values, preserving the original structure. This function is ideal for updating values or keys without altering the shape of the data.
+
+Unlike `strictify`, `modify` treats class instances as atomic "leaf" nodes and does not traverse into them.
+
+!!! Example
+
+    <!-- name: test_modify -->
+
+    ```python linenums="1"
+    from mappingtools.transformers import modify
+
+    def key_handler(key):
+        return key.upper()
+
+    def value_handler(value):
+        if isinstance(value, int):
+            return value * 100
+        return value
+
+    data = {'a': 1, 'b': {'c': 2}}
+    result = modify(data, key_handler=key_handler, value_handler=value_handler)
+    print(result)
+    # output: {'A': 100, 'B': {'C': 200}}
+    ```
+
 ## simplify
 
 Converts objects to strictly structured dictionaries.
