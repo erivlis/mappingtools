@@ -1,9 +1,9 @@
 from mappingtools.transformers import strictify
 
 
-def test_strictify_with_value_converter():
+def test_strictify_with_value_handler():
     # Arrange
-    def value_converter(value):
+    def value_handler(value):
         if isinstance(value, int):
             return value * 2
         return value
@@ -23,7 +23,24 @@ def test_strictify_with_value_converter():
     }
 
     # Act
-    result = strictify(data, value_converter=value_converter)
+    result = strictify(data, value_handler=value_handler)
+
+    # Assert
+    assert result == expected
+
+
+def test_strictify_with_string_iterable_and_value_handler():
+    # Arrange
+    def uppercase_handler(value):
+        if isinstance(value, str):
+            return value.upper()
+        return value
+
+    data = ["hello", "world", 123]
+    expected = ["HELLO", "WORLD", 123]
+
+    # Act
+    result = strictify(data, value_handler=uppercase_handler)
 
     # Assert
     assert result == expected

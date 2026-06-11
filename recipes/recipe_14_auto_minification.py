@@ -42,7 +42,7 @@ def main():
     key_minifier = AutoMapper()
 
     # 3. Create a Key Transformer Function
-    def minify_keys(key):
+    def key_handler(key):
         # We only minify strings to protect integer indices or tuple keys.
         if isinstance(key, str):
             return key_minifier[key]
@@ -50,8 +50,8 @@ def main():
 
     # 4. Create a Value Transformer Function
     # strictify normally leaves non-standard primitives alone, which breaks json.dumps.
-    # We define a custom value converter to handle datetime objects and sets!
-    def serialize_values(value):
+    # We define a custom value handler to handle datetime objects and sets!
+    def value_handler(value):
         if isinstance(value, datetime):
             return value.isoformat()
         if isinstance(value, set):
@@ -59,8 +59,8 @@ def main():
         return value
 
     # 5. Strictify the entire payload.
-    # We use `strictify` directly and pass our custom key and value converters.
-    minified_payload = strictify(payload, key_converter=minify_keys, value_converter=serialize_values)
+    # We use `strictify` directly and pass our custom key and value handlers.
+    minified_payload = strictify(payload, key_handler=key_handler, value_handler=value_handler)
 
     print("--- Original Payload Size (Estimated) ---")
     import json

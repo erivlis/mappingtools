@@ -13,4 +13,4 @@ def simplify(obj: Tree[Any]) -> Tree[Any]:
     Returns:
         The simplified object.
     """
-    return strictify(obj, key_converter=str)
+    return strictify(obj, key_handler=str)

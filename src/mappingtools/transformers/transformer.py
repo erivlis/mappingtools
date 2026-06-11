@@ -25,11 +25,11 @@ class Transformer:
 
         Args:
             mapping_handler (Optional[Callable]): Handler for mapping objects.
-            Iterable_handler (Optional[Callable]): Handler for iterable objects.
-            Class_handler (Optional[Callable]): Handler for class instances.
-            Default_handler (Optional[Callable]): Default handler for other objects.
+            iterable_handler (Optional[Callable]): Handler for iterable objects.
+            class_handler (Optional[Callable]): Handler for class instances.
+            default_handler (Optional[Callable]): Default handler for other objects.
             *args: Additional positional arguments for handlers.
-            **kwargs: Additional keyword arguments for handlers.
+            **kwargs: Additional keyword arguments for handlers (e.g., `key_handler`).
         """
 
         self.mapping_handler = mapping_handler

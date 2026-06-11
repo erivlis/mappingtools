@@ -6,7 +6,7 @@ dataclasses, datetime objects, and custom class instances) into
 pure, JSON-serializable dictionaries using `strictify`.
 
 Instead of writing custom `to_dict` methods or configuring standard
-library `json.dumps(default=...)`, a simple value converter solves it.
+library `json.dumps(default=...)`, a simple value handler solves it.
 """
 
 import json
@@ -35,16 +35,16 @@ def main():
 
     # 3. Create a Value Transformer Function
     # strictify normally leaves non-standard primitives alone, which breaks json.dumps.
-    # We define a custom value converter to handle datetime objects.
+    # We define a custom value handler to handle datetime objects.
     # (Sets are automatically converted to lists by strictify).
-    def serialize_values(value):
+    def value_handler(value):
         if isinstance(value, datetime):
             return value.isoformat()
         return value
 
     # 4. Strictify the object into standard python primitives
     # Dataclasses become dicts, datetimes become strings (ISO), sets become lists
-    simplified_data = strictify(user, key_converter=str, value_converter=serialize_values)
+    simplified_data = strictify(user, key_handler=str, value_handler=value_handler)
 
     print("--- Simplified Data (JSON ready) ---")
     print(type(simplified_data))  # It's just a dict!

@@ -122,7 +122,7 @@ Converts objects to strictly structured dictionaries.
 
 ## strictify
 
-Applies a strict structural conversion to an object using optional converters for keys and values.
+Applies a strict structural conversion to an object using optional handlers for keys and values. `strictify` traverses into all objects, including class instances, converting them into dictionaries.
 
 !!! Example
 
@@ -141,7 +141,7 @@ Applies a strict structural conversion to an object using optional converters fo
     
     
     data = {'a': 1, 'b': 2}
-    result = strictify(data, key_converter=uppercase_key, value_converter=double_value)
+    result = strictify(data, key_handler=uppercase_key, value_handler=double_value)
     print(result)
     # output: {'A': 2, 'B': 4}
     ```
@@ -175,11 +175,11 @@ Applies a strict structural conversion to an object using optional converters fo
     ]
     
     
-    def key_converter(key):
+    def key_handler(key):
         return key.replace('_', ' ').title().replace(' ', '')
     
     
-    result = strictify(data, key_converter=key_converter)
+    result = strictify(data, key_handler=key_handler)
     print(result)
     # output: 
     # [

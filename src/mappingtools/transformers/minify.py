@@ -19,4 +19,4 @@ def minify(obj: Tree[Any], alphabet=string.ascii_uppercase) -> Tree[Any]:
 
     minifying_mapper = AutoMapper(alphabet)
 
-    return strictify(obj, key_converter=minifying_mapper.get)
+    return strictify(obj, key_handler=minifying_mapper.get)
