@@ -101,52 +101,45 @@ Below is a brief description of the main namespaces within the library:
 
 ## Comparison with Other Libraries
 
-`mappingtools` occupies a unique niche in the Python ecosystem. Here is how it compares to other well-known libraries.
+`mappingtools` occupies a unique niche in the Python ecosystem.
 
-### 1. GraphBLAS (`python-graphblas`)
+Here is how it compares to other mapping and dictionary utility libraries.
 
-- **Domain:** High-Performance Sparse Linear Algebra.
-- **Backend:** C (SuiteSparse).
-- **Keys:** Integer indices only ($0 \dots N-1$).
+### 1. Glom (`glom`)
+
+- **Domain:** Declarative data restructuring and deep nested queries.
 - **Comparison:**
-    - **GraphBLAS** is the "F1 Car." It is optimized for massive scale (billions of edges) and raw speed on integer
-      matrices.
-    - **MappingTools** is the "All-Terrain Vehicle." It works with **Symbolic Keys** (strings, tuples, objects)
-      directly, without needing to map them to integers first. It is pure Python and zero-dependency.
-- **Verdict:** Use GraphBLAS for massive numerical graphs. Use MappingTools for NLP, Knowledge Graphs, and symbolic
-  prototyping.
+    - **Glom** uses a custom query language/specification to query and restructure dicts.
+    - **MappingTools** provides [Lens](guide/optics.md) for type-safe path optics and pure operators
+      like [reshape](guide/operators.md) to pivot data shapes, maintaining native Python types and callbacks.
+- **Verdict:** Use _Glom_ for complex query specs. Use _MappingTools_ for type-safe, composable path lenses and tensor-like
+  reshaping.
 
-### 2. NumPy (`numpy`)
+### 2. Python Box (`python-box`)
 
-- **Domain:** Dense Linear Algebra.
-- **Backend:** C/Fortran.
+- **Domain:** Transparent dictionary key-to-attribute access.
 - **Comparison:**
-    - **NumPy** stores matrices as dense arrays. It is unbeatable for dense data (density > 50%).
-    - **MappingTools** stores matrices as sparse dictionaries. It is orders of magnitude faster for very sparse data (
-      density < 1%).
-- **Verdict:** Use NumPy for images and dense tensors. Use MappingTools for sparse feature vectors and graphs.
+    - **Box** wraps standard dicts to allow dot-notation access to keys (e.g., `box.key` instead of `box['key']`).
+    - **MappingTools** provides [Dictifier](guide/structures), which acts as a functor/broadcaster to proxy method
+      calls and attribute accesses to the *contained objects* (e.g., broadcasting `users.greet()` across a dict of
+      `User` instances).
+- **Verdict:** Use _Python Box_ for simple dot-notation dictionary lookups. Use _MappingTools_ for broadcasting method calls over
+  object collections.
 
-### 3. SciPy Sparse (`scipy.sparse`)
+### 3. Toolz / Funcy (`toolz`, `funcy`)
 
-- **Domain:** Numerical Sparse Linear Algebra.
-- **Backend:** C/C++.
-- **Keys:** Integer indices only.
+- **Domain:** Functional utility functions for iterables and mappings.
 - **Comparison:**
-    - **SciPy** is the industry standard for numerical sparse matrices. However, it is limited to standard
-      arithmetic ($+, \times$).
-    - **MappingTools** supports **Generalized Semirings** (Tropical, Boolean, Expectation), allowing you to solve
-      Shortest Path, Reachability, and Viterbi Decoding using the same "matrix multiplication" code.
-- **Verdict:** Use SciPy for standard numerical solvers (eigenvalues, linear systems). Use MappingTools for generalized
-  algebraic problems.
+    - **Toolz/Funcy** provide flat, stateless helpers for dictionaries (e.g., `merge`, `valmap`).
+    - **MappingTools** goes deeper with custom conflict-resolving [combine](guide/operators) operators, stateful
+      collectors (like [MeteredDict](guide/collectors)), and structural transformers
+      (see [transformers](guide/transformers)).
+- **Verdict:** Use _Toolz_ for general functional programming primitives. Use _MappingTools_ for deep structural merging,
+  modification, and telemetry collection.
 
-### 4. NetworkX (`networkx`)
+!!! note "What about AlgebraX?"
 
-- **Domain:** Graph Algorithms.
-- **Backend:** Pure Python.
-- **Comparison:**
-    - **NetworkX** is object-oriented. You manipulate `Graph` objects, add nodes, and run algorithms like
-      `shortest_path`.
-    - **MappingTools** is algebraic. You represent the graph as a sparse matrix and run `dot` (matrix multiplication) to
-      find paths.
-- **Verdict:** Use NetworkX for complex graph algorithms (clustering, community detection) and visualization. Use
-  MappingTools when you want to express graph problems as linear algebra equations.
+    For advanced algebraic operations on mappings (such as Semirings, Sparse Matrix multiplication, and Graph
+    pathfinding), please refer to the dedicated **[AlgebraX](https://github.com/erivlis/algebrax)** project,
+    which was spun out from the early prototype stages of this library.
+
