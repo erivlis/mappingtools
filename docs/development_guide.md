@@ -25,7 +25,8 @@ If a feature feels "off," "asymmetrical," or "too magical," stop immediately. Do
 We prefer explicit, predictable behavior over implicit, "magical" behavior that might crash at runtime.
 
 - **Action**: Isolate "magic" (like type inference) into separate classes or optional modes. Default to strictness.
-- **Example**: `Dictifier` is strict by default. Auto-inference is only enabled via the explicit `Dictifier.auto()` factory.
+- **Example**: `Dictifier` is strict by default. Auto-inference is only enabled via the explicit `Dictifier.auto()`
+  factory.
 
 ### 3. The "Devil's Advocate" Testing
 
@@ -66,19 +67,21 @@ When contributing to this project, follow this mental loop:
 ## Architectural Patterns
 
 - **Mode vs. Type**: If you have two classes that differ only by a small behavior (like inference),
-    consider merging them into one class with a mode flag or factory method.
+  consider merging them into one class with a mode flag or factory method.
   **Factory Method Pattern**: If a decorator creates a specialized subclass, consider moving that
-    logic into a `classmethod` on the base class (e.g., `Dictifier.of()`). It improves cohesion.
+  logic into a `classmethod` on the base class (e.g., `Dictifier.of()`). It improves cohesion.
 
 ## Coding Standards
 
 ### Code Organization
+
 - **Regions**: Use `# region Region Name` and `# endregion` comments to group related functions
-    or classes within a file. This improves navigability in large files.
+  or classes within a file. This improves navigability in large files.
 
 ### Testing
+
 - **AAA Pattern**: Structure tests using the **Arrange-Act-Assert** pattern.
-    Use comments to explicitly delimit these sections.
+  Use comments to explicitly delimit these sections.
 
     ```python
     def test_example():
@@ -95,9 +98,10 @@ When contributing to this project, follow this mental loop:
 ## Collaborating with AI
 
 - **The Meta-Cognitive Loop**: For AI agents, explicitly asking for "Thought Traces," "Design Reviews"
-    or "SWOT Analyses" yields better results than just asking for code.
+  or "SWOT Analyses" yields better results than just asking for code.
 - **Trust the Instinct**: When you feel "asymmetry" or a "code smell," communicate that feeling to the AI.
-    It's a valuable signal that can trigger a productive refactoring path.
+  It's a valuable signal that can trigger a productive refactoring path.
 
 ---
+
 *This philosophy was distilled from the development session of the `structures` namespace.*

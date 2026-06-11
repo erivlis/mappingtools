@@ -20,12 +20,12 @@ You can pass a custom callable `(old, new) -> resolved` or use one of the pre-bu
 
 Some of the most common resolvers from the `Resolver` enum include:
 
-*   `Resolver.FIRST`: Keeps the original value (`tree1`).
-*   `Resolver.LAST`: Overwrites with the new value (`tree2`).
-*   `Resolver.COALESCE_FIRST`: Returns the first *truthy* value, otherwise the last value.
-*   `Resolver.COALESCE_LAST`: Returns the last *truthy* value, otherwise the first value.
-*   `Resolver.ALL`: Combines both values into a tuple.
-*   `Resolver.FAIL`: Raises a `ValueError` on any conflict.
+* `Resolver.FIRST`: Keeps the original value (`tree1`).
+* `Resolver.LAST`: Overwrites with the new value (`tree2`).
+* `Resolver.COALESCE_FIRST`: Returns the first *truthy* value, otherwise the last value.
+* `Resolver.COALESCE_LAST`: Returns the last *truthy* value, otherwise the first value.
+* `Resolver.ALL`: Combines both values into a tuple.
+* `Resolver.FAIL`: Raises a `ValueError` on any conflict.
 
 If you just need the standard "last-wins" behavior, you can use the simpler `merge` operator, which is essentially
 `combine(tree1, tree2, op=Resolver.LAST)`, barring the difference in handling list vs. scalars conflicts.
