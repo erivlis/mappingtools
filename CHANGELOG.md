@@ -1,3 +1,9 @@
+## v0.14.2 (2026-06-11)
+
+### Refactor
+
+- Refactors `strictify` to use handlers and adds a new `modify` transformer.
+
 ## v0.14.1 (2026-06-02)
 
 ### Refactor
