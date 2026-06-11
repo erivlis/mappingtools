@@ -17,9 +17,9 @@ def _modify_iterable(obj, processor, **kwargs):
 
 
 def modify(
-    obj: Tree[Any],
-    key_handler: Callable[[Any], str] | None = None,
-    value_handler: Callable[[Any], Any] | None = None,
+        obj: Tree[Any],
+        key_handler: Callable[[Any], str] | None = None,
+        value_handler: Callable[[Any], Any] | None = None,
 ) -> Tree[Any]:
     """Recursively traverses a data structure, applying handler functions to keys and leaves.
 
@@ -41,12 +41,12 @@ def modify(
         creates a new object.
 
     Args:
-        obj: The object to be traversed and modified.
-        key_handler: A function to apply to each mapping key (optional).
-        value_handler: A function to apply to each leaf value (optional).
+        obj: Tree[Any] - The object to be traversed and modified.
+        key_handler: Callable[[Any], str] | None - A function to apply to each mapping key (optional).
+        value_handler: Callable[[Any], Any] | None - A function to apply to each leaf value (optional).
 
     Returns:
-        A new object with keys and/or leaves transformed.
+        A new object, with keys and/or leaves transformed.
     """
     processor = Transformer(
         mapping_handler=_modify_mapping,
