@@ -1,3 +1,5 @@
+import pytest
+
 from mappingtools.transformers.transformer import Transformer
 
 
@@ -49,3 +51,39 @@ def test_transformer_returns_none_after_three_calls():
     assert second == first
     # third call should return None (objects_counter > 2 path)
     assert third is None
+
+
+def test_transformer_leaf_handler():
+    # Arrange
+    transformer = Transformer(leaf_handler=lambda obj: f"leaf:{obj}")
+
+    # Act
+    result = transformer(7)
+
+    # Assert
+    assert result == "leaf:7"
+
+
+def test_transformer_leaf_handler_takes_precedence_over_default_handler_for_leaf_mode():
+    # Arrange
+    transformer = Transformer(
+        leaf_handler=lambda obj: f"leaf:{obj}",
+        default_handler=lambda obj: f"default:{obj}",
+    )
+
+    # Act
+    result = transformer(7)
+
+    # Assert
+    assert result == "leaf:7"
+
+
+def test_transformer_default_handler_is_fallback_for_unhandled_modes():
+    # Arrange
+    transformer = Transformer(default_handler=lambda obj: f"default:{obj}")
+
+    # Act
+    result = transformer({'a': 1})
+
+    # Assert
+    assert result == "default:{'a': 1}"
