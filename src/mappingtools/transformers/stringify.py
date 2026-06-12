@@ -1,8 +1,9 @@
 from collections.abc import Iterable, Mapping
 from typing import Any
 
-from mappingtools.transformers.strictify import _class_generator
+from mappingtools.transformers._handlers import _class_generator
 from mappingtools.transformers.transformer import Transformer
+from mappingtools.traversal import TraversalModeRegistry
 from mappingtools.typing import Tree
 
 
@@ -29,13 +30,19 @@ def _stringify_class(obj, processor, kv_delimiter, item_delimiter, *args, **kwar
     return _stringify_kv_stream(_class_generator(obj), processor, kv_delimiter, item_delimiter, *args, **kwargs)
 
 
-def stringify(obj: Tree[Any], kv_delimiter: str = '=', item_delimiter: str = ', ') -> str:
+def stringify(
+    obj: Tree[Any],
+    kv_delimiter: str = '=',
+    item_delimiter: str = ', ',
+    traversal_registry: TraversalModeRegistry | None = None,
+) -> str:
     """Stringify recursively the given object.
 
     Args:
         obj (Tree[Any]): The object to be stringified.
         kv_delimiter (str): The key-value delimiter. Defaults to '='.
         item_delimiter (str): The item delimiter. Defaults to ', '.
+        traversal_registry: Optional type registry for traversal mode overrides.
 
     Returns:
         str: The stringified object.
@@ -44,7 +51,8 @@ def stringify(obj: Tree[Any], kv_delimiter: str = '=', item_delimiter: str = ', 
     transformer: Transformer = Transformer(mapping_handler=_stringify_mapping,
                                            iterable_handler=_stringify_iterable,
                                            class_handler=_stringify_class,
-                                           default_handler=str,
+                                           leaf_handler=str,
+                                           traversal_registry=traversal_registry,
                                            kv_delimiter=kv_delimiter,
                                            item_delimiter=item_delimiter,
                                            key_converter=str)

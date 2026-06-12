@@ -1,25 +1,20 @@
 from collections.abc import Callable
 from typing import Any
 
+from mappingtools.transformers._handlers import (
+    _iterable_to_list,
+    _mapping_with_key_handler,
+)
 from mappingtools.transformers.transformer import Transformer
+from mappingtools.traversal import TraversalModeRegistry
 from mappingtools.typing import Tree
 
 
-def _modify_mapping(obj, processor, key_handler=None, **kwargs):
-    return {
-        (key_handler(k) if callable(key_handler) else k): processor(v)
-        for k, v in obj.items()
-    }
-
-
-def _modify_iterable(obj, processor, **kwargs):
-    return [processor(v) for v in obj]
-
-
 def modify(
-        obj: Tree[Any],
-        key_handler: Callable[[Any], str] | None = None,
-        value_handler: Callable[[Any], Any] | None = None,
+    obj: Tree[Any],
+    key_handler: Callable[[Any], str] | None = None,
+    value_handler: Callable[[Any], Any] | None = None,
+    traversal_registry: TraversalModeRegistry | None = None,
 ) -> Tree[Any]:
     """Recursively traverses a data structure, applying handler functions to keys and leaves.
 
@@ -44,17 +39,20 @@ def modify(
         obj: Tree[Any] - The object to be traversed and modified.
         key_handler: Callable[[Any], str] | None - A function to apply to each mapping key (optional).
         value_handler: Callable[[Any], Any] | None - A function to apply to each leaf value (optional).
+        traversal_registry: Optional type registry for traversal mode overrides.
 
     Returns:
         A new object, with keys and/or leaves transformed.
     """
     processor = Transformer(
-        mapping_handler=_modify_mapping,
-        iterable_handler=_modify_iterable,
-        # By not setting a class_handler, the Transformer will use the default_handler
-        # for class instances, which is the correct behavior for treating them as leaves.
+        mapping_handler=_mapping_with_key_handler,
+        iterable_handler=_iterable_to_list,
+        # By not setting a class_handler, class instances fall through to default_handler.
+        # We also set leaf_handler explicitly for terminal scalar handling.
+        leaf_handler=value_handler,
         default_handler=value_handler,
         key_handler=key_handler,
+        traversal_registry=traversal_registry,
     )
 
     return processor(obj)

@@ -1,8 +1,11 @@
 from collections import Counter
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from typing import Any
 
-from mappingtools._tools import _is_class_instance, _is_strict_iterable
+from mappingtools.traversal import (
+    TraversalMode,
+    TraversalModeRegistry,
+)
 from mappingtools.typing import Tree
 
 CIRCULAR_REFERENCE = '...'
@@ -17,7 +20,9 @@ class Transformer:
                  mapping_handler: Callable | None = None,
                  iterable_handler: Callable | None = None,
                  class_handler: Callable | None = None,
+                 leaf_handler: Callable | None = None,
                  default_handler: Callable | None = None,
+                 traversal_registry: TraversalModeRegistry | None = None,
                  *args,
                  **kwargs):
         """
@@ -27,15 +32,17 @@ class Transformer:
             mapping_handler (Optional[Callable]): Handler for mapping objects.
             iterable_handler (Optional[Callable]): Handler for iterable objects.
             class_handler (Optional[Callable]): Handler for class instances.
-            default_handler (Optional[Callable]): Default handler for other objects.
+            leaf_handler (Optional[Callable]): Handler for leaf (non-container) objects.
+            default_handler (Optional[Callable]): Generic fallback for any unhandled mode.
             *args: Additional positional arguments for handlers.
             **kwargs: Additional keyword arguments for handlers (e.g., `key_handler`).
         """
-
         self.mapping_handler = mapping_handler
         self.iterable_handler = iterable_handler
         self.class_handler = class_handler
+        self.leaf_handler = leaf_handler
         self.default_handler = default_handler
+        self.traversal_registry = traversal_registry
         self.args = args
         self.kwargs = kwargs
 
@@ -63,15 +70,25 @@ class Transformer:
         return None
 
     def _transform(self, obj: Any):
-        if callable(self.mapping_handler) and isinstance(obj, Mapping):
-            return self.mapping_handler(obj, self, *self.args, **self.kwargs)
-        elif callable(self.iterable_handler) and _is_strict_iterable(obj):
-            return self.iterable_handler(obj, self, *self.args, **self.kwargs)
-        elif callable(self.class_handler) and _is_class_instance(obj):
-            return self.class_handler(obj, self, *self.args, **self.kwargs)
-        elif callable(self.default_handler):
-            self.objects_counter.pop(id(obj))
-            return self.default_handler(obj)
-        else:
-            self.objects_counter.pop(id(obj))
-            return obj
+        mode = TraversalMode.of(
+            obj,
+            registry=self.traversal_registry,
+            include_class_detection=True,
+        )
+
+        match mode:
+            case TraversalMode.MAPPING if callable(self.mapping_handler):
+                return self.mapping_handler(obj, self, *self.args, **self.kwargs)
+            case TraversalMode.ITERABLE if callable(self.iterable_handler):
+                return self.iterable_handler(obj, self, *self.args, **self.kwargs)
+            case TraversalMode.CLASS if callable(self.class_handler):
+                return self.class_handler(obj, self, *self.args, **self.kwargs)
+            case TraversalMode.LEAF if callable(self.leaf_handler):
+                self.objects_counter.pop(id(obj))
+                return self.leaf_handler(obj)
+            case _ if callable(self.default_handler):
+                self.objects_counter.pop(id(obj))
+                return self.default_handler(obj)
+            case _:
+                self.objects_counter.pop(id(obj))
+                return obj
