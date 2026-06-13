@@ -73,17 +73,17 @@ Below is a brief description of the main namespaces within the library:
 
     This namespace includes functions that reshape objects while maintaining the consistency of their structure.
 
-    | Class           | Description                                                       |
-    |-----------------|-------------------------------------------------------------------|
-    | **Transformer** | A base class for creating reusable, composable data transformers. |
+    | Class           | Description                                                                                                             |
+    |-----------------|-------------------------------------------------------------------------------------------------------------------------|
+    | **Transformer** | A base class for creating reusable, composable data transformers with mode-based dispatch (`mapping/iterable/class/leaf`). |
     
-    | Function      | Description                                                                                        |
-    |---------------|----------------------------------------------------------------------------------------------------|
-    | **listify**   | Transforms complex objects into a list of dictionaries with key and value pairs.                   |
-    | **minify**    | The minify function is used to shorten the keys of an object using a specified alphabet.           |
-    | **simplify**  | Converts objects to strictly structured dictionaries.                                              |
-    | **strictify** | Applies a strict structural conversion to an object using optional converters for keys and values. |
-    | **stringify** | Converts an object into a string representation by recursively processing it based on its type.    |
+    | Function      | Description                                                                                                                  |
+    |---------------|------------------------------------------------------------------------------------------------------------------------------|
+    | **listify**   | Transforms complex objects into a list of dictionaries with key/value pairs. Supports `traversal_registry`.               |
+    | **minify**    | Shortens keys using a specified alphabet. Supports `traversal_registry`.                                                   |
+    | **simplify**  | Converts objects to strictly structured dictionaries via `strictify`. Supports `traversal_registry`.                      |
+    | **strictify** | Applies strict structural conversion using optional key/value converters. Supports `traversal_registry`.                  |
+    | **stringify** | Converts an object into a string representation by recursively processing it by type. Supports `traversal_registry`.      |
 
 === ":lucide-square-star: Typing"
 

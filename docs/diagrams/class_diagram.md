@@ -68,7 +68,9 @@ classDiagram
         +mapping_handler Callable
         +iterable_handler Callable
         +class_handler Callable
+        +leaf_handler Callable
         +default_handler Callable
+        +traversal_registry TraversalModeRegistry
         +__call__(obj)
     }
 

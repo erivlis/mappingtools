@@ -7,9 +7,20 @@ icon: lucide/square-arrow-right
 !!! Abstract
     Transformers are functions that reshape an object, while maintaining the consistency of the structure.
 
+Most transformer helpers accept an optional `traversal_registry` argument. This lets you override traversal behavior
+for specific types via `TraversalModeRegistry`, without changing handler logic.
+
+```python
+from mappingtools.traversal import TraversalMode, TraversalModeRegistry
+
+registry = TraversalModeRegistry()
+registry.register(bytes, TraversalMode.ITERABLE)
+```
+
 ## listify
 
 Transforms complex objects into a list of dictionaries with key and value pairs.
+Signature: `listify(obj, key_name='key', value_name='value', traversal_registry=None)`
 
 !!! Example
 
@@ -29,6 +40,7 @@ Transforms complex objects into a list of dictionaries with key and value pairs.
 The minify function is used to shorten the keys of an object using a specified alphabet.
 This function can be particularly useful for reducing the size of data structures, making
 them more efficient for storage or transmission.
+Signature: `minify(obj, alphabet=string.ascii_uppercase, traversal_registry=None)`
 
 !!! Example
 
@@ -72,6 +84,7 @@ them more efficient for storage or transmission.
 Recursively traverses a data structure and applies handler functions to keys and leaf values, preserving the original structure. This function is ideal for updating values or keys without altering the shape of the data.
 
 Unlike `strictify`, `modify` treats class instances as atomic "leaf" nodes and does not traverse into them.
+Signature: `modify(obj, key_handler=None, value_handler=None, traversal_registry=None)`
 
 !!! Example
 
@@ -97,6 +110,7 @@ Unlike `strictify`, `modify` treats class instances as atomic "leaf" nodes and d
 ## simplify
 
 Converts objects to strictly structured dictionaries.
+Signature: `simplify(obj, traversal_registry=None)`
 
 !!! Example
 
@@ -150,6 +164,7 @@ Converts objects to strictly structured dictionaries.
 ## strictify
 
 Applies a strict structural conversion to an object using optional handlers for keys and values. `strictify` traverses into all objects, including class instances, converting them into dictionaries.
+Signature: `strictify(obj, key_handler=None, value_handler=None, traversal_registry=None)`
 
 !!! Example
 
@@ -236,6 +251,7 @@ Applies a strict structural conversion to an object using optional handlers for 
 ## stringify
 
 Converts an object into a string representation by recursively processing it based on its type.
+Signature: `stringify(obj, kv_delimiter='=', item_delimiter=', ', traversal_registry=None)`
 
 !!! Example
 
@@ -256,3 +272,19 @@ Converts an object into a string representation by recursively processing it bas
     print(result)
     # output: "[1, 2, 3]"
     ```
+
+## Traversal Overrides
+
+Use `TraversalModeRegistry` to force traversal mode for specific types.
+
+```python
+from mappingtools.transformers import stringify
+from mappingtools.traversal import TraversalMode, TraversalModeRegistry
+
+registry = TraversalModeRegistry()
+registry.register(bytes, TraversalMode.ITERABLE)
+
+result = stringify(b'ab', traversal_registry=registry)
+print(result)
+# output: "[97, 98]"
+```

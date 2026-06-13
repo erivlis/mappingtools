@@ -2,11 +2,11 @@
 graph TD
     A[src/mappingtools] --> B[__init__.py]
     A --> C[operators.py]
-    A --> CA[aggregation.py]
-    A --> CB[enums.py]
+    A --> CA[aggregations.py]
     A --> D[typing.py]
     A --> E[_compat.py]
     A --> F[_tools.py]
+    A --> I[traversal.py]
     A --> G[collectors]
     A --> H[transformers]
 
@@ -22,4 +22,5 @@ graph TD
     H --> H5[strictify.py]
     H --> H6[stringify.py]
     H --> H7[transformer.py]
+    H --> H8[_handlers.py]
 ```
