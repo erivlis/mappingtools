@@ -1,50 +1,12 @@
-import dataclasses
 import math
 
 import pytest
 
 from mappingtools._tools import (
     StringArrangements,
-    _is_class_instance,
-    _is_strict_iterable,
     probabilities,
     shannon_entropy,
 )
-
-
-def test_is_strict_iterable_and_bytes_handling():
-    # Arrange
-    seq = [1, 2, 3]
-    gen = (x for x in [1])
-    s = "abc"
-    b = b"abc"
-    ba = bytearray(b"abc")
-
-    # Act / Assert
-    assert _is_strict_iterable(seq) is True
-    assert _is_strict_iterable(gen) is True
-    assert _is_strict_iterable(s) is False
-    assert _is_strict_iterable(b) is False
-    assert _is_strict_iterable(ba) is False
-
-
-def test_is_class_instance_dataclass_and_object():
-    # Arrange
-    @dataclasses.dataclass
-    class DC:
-        x: int
-
-    class C:
-        def __init__(self):
-            self.y = 1
-
-    # Act / Assert
-    assert _is_class_instance(DC(1)) is True
-    assert _is_class_instance(C()) is True
-    # The implementation treats dataclass *classes* as having a __dict__,
-    # so this returns True (matches current behavior).
-    assert _is_class_instance(DC) is True
-    assert _is_class_instance(123) is False
 
 
 def test_string_arrangements_of_and_count_and_of_invalid_length():

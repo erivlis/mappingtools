@@ -4,9 +4,9 @@ from collections.abc import Callable, Generator, Iterable, Mapping, Sequence
 from itertools import chain
 from typing import Any
 
-from mappingtools._tools import _is_strict_iterable
 from mappingtools.aggregations import Aggregation
 from mappingtools.resolvers import LogicalResolver, NumericResolver, Resolver, ResolverType
+from mappingtools.traversal import _is_traversal_iterable
 from mappingtools.typing import MISSING, Combine, K, Missing, T, Tree
 
 __all__ = [
@@ -120,10 +120,10 @@ def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tu
                     path.append(k)
                     _recurse(v)
                     path.pop()
-                elif _is_strict_iterable(k):
+                elif _is_traversal_iterable(k):
                     # k is a tuple/list/iterable, extend path
                     # We need to convert to list to know length for backtracking if it's a generator
-                    # But _is_strict_iterable allows generators.
+                    # But _is_traversal_iterable allows generators.
                     # If k is a generator, extending path consumes it.
                     # We can't easily know how many items were added without counting.
                     # So we convert to tuple/list first.

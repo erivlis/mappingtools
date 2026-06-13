@@ -1,3 +1,4 @@
+import dataclasses
 from collections.abc import Mapping
 
 import pytest
@@ -7,6 +8,10 @@ from mappingtools.transformers.transformer import Transformer
 from mappingtools.traversal import (
     TraversalMode,
     TraversalModeRegistry,
+    _is_traversal_class_instance,
+    _is_traversal_iterable,
+    _is_traversal_mapping,
+    traversal_mode,
 )
 from mappingtools.visitors.operators import safe_merge
 
@@ -30,7 +35,7 @@ def _class_handler(obj, processor, *args, **kwargs):
 def test_traversal_registry_supports_decorator_registration():
     registry = TraversalModeRegistry()
 
-    @registry.register(mode=TraversalMode.LEAF)
+    @traversal_mode(TraversalMode.LEAF, registry=registry)
     class IterableLeaf:
         def __iter__(self):
             return iter([1, 2, 3])
@@ -46,7 +51,7 @@ def test_traversal_registry_supports_decorator_registration():
 def test_traversal_registry_can_force_iterable_class_to_class_mode():
     registry = TraversalModeRegistry()
 
-    @registry.register(mode=TraversalMode.CLASS)
+    @traversal_mode(TraversalMode.CLASS, registry=registry)
     class IterableClass:
         def __iter__(self):
             return iter([1, 2, 3])
@@ -130,6 +135,56 @@ def test_traversal_registry_override_precedes_protocol_detection():
 
     mode = TraversalMode.of(IterableNode(), registry=registry)
     assert mode is TraversalMode.LEAF
+
+
+def test_is_traversal_iterable_and_bytes_handling():
+    seq = [1, 2, 3]
+    gen = (x for x in [1])
+    s = "abc"
+    b = b"abc"
+    ba = bytearray(b"abc")
+
+    assert _is_traversal_iterable(seq) is True
+    assert _is_traversal_iterable(gen) is True
+    assert _is_traversal_iterable(s) is False
+    assert _is_traversal_iterable(b) is False
+    assert _is_traversal_iterable(ba) is False
+
+
+def test_is_traversal_mapping_detection():
+    class MappingNode(Mapping):
+        def __init__(self):
+            self._data = {'k': 1}
+
+        def __getitem__(self, key):
+            return self._data[key]
+
+        def __iter__(self):
+            return iter(self._data)
+
+        def __len__(self):
+            return len(self._data)
+
+    assert _is_traversal_mapping({'a': 1}) is True
+    assert _is_traversal_mapping(MappingNode()) is True
+    assert _is_traversal_mapping([1, 2, 3]) is False
+    assert _is_traversal_mapping('abc') is False
+
+
+def test_is_traversal_class_instance_dataclass_and_object():
+    @dataclasses.dataclass
+    class DC:
+        x: int
+
+    class C:
+        def __init__(self):
+            self.y = 1
+
+    assert _is_traversal_class_instance(DC(1)) is True
+    assert _is_traversal_class_instance(C()) is True
+    # Dataclass classes have __dict__, so this stays True by current contract.
+    assert _is_traversal_class_instance(DC) is True
+    assert _is_traversal_class_instance(123) is False
 
 
 def test_bytes_are_not_iterable_by_default():
@@ -218,10 +273,16 @@ def test_traversal_mode_of_detects_class_instance_without_registry():
     assert TraversalMode.of(PlainObject()) is TraversalMode.CLASS
 
 
-def test_traversal_registry_register_requires_mode_for_decorator():
+def test_traversal_registry_register_requires_mode():
     registry = TraversalModeRegistry()
-    with pytest.raises(ValueError, match=r"'mode' is required for decorator registration\."):
+    with pytest.raises(ValueError, match=r"'mode' is required for type registration\."):
         registry.register()
+
+
+def test_traversal_registry_register_requires_obj_type():
+    registry = TraversalModeRegistry()
+    with pytest.raises(ValueError, match=r"'obj_type' is required for type registration\."):
+        registry.register(mode=TraversalMode.LEAF)
 
 
 def test_traversal_registry_register_requires_mode_for_type():
@@ -230,9 +291,119 @@ def test_traversal_registry_register_requires_mode_for_type():
         registry.register(dict)
 
 
+def test_traversal_mode_decorator_rejects_function():
+    registry = TraversalModeRegistry()
+
+    def regular_func():
+        return 1
+
+    with pytest.raises(TypeError, match=r"accepts classes/types only"):
+        traversal_mode(TraversalMode.LEAF, registry=registry)(regular_func)
+
+
+def test_traversal_mode_decorator_rejects_async_function():
+    registry = TraversalModeRegistry()
+
+    async def async_func():
+        return 1
+
+    with pytest.raises(TypeError, match=r"accepts classes/types only"):
+        traversal_mode(TraversalMode.LEAF, registry=registry)(async_func)
+
+
+def test_traversal_mode_decorator_rejects_generator_function():
+    registry = TraversalModeRegistry()
+
+    def generator_func():
+        yield 1
+
+    with pytest.raises(TypeError, match=r"accepts classes/types only"):
+        traversal_mode(TraversalMode.LEAF, registry=registry)(generator_func)
+
+
+def test_traversal_mode_requires_mode():
+    registry = TraversalModeRegistry()
+    with pytest.raises(ValueError, match=r"'mode' is required for traversal_mode registration\."):
+        traversal_mode(None, registry=registry)  # type: ignore[arg-type]
+
+
 def test_traversal_registry_clear_removes_registered_modes():
     registry = TraversalModeRegistry()
     registry.register(dict, TraversalMode.LEAF)
     assert registry.resolve({}) is TraversalMode.LEAF
     registry.clear()
     assert registry.resolve({}) is None
+
+
+def test_traversal_mode_of_detects_slots_class_instance_without_registry():
+    class SlotObject:
+        __slots__ = ('value',)
+        def __init__(self):
+            self.value = 1
+
+    assert TraversalMode.of(SlotObject()) is TraversalMode.CLASS
+
+
+def test_traversal_registry_thread_safety_concurrent_access():
+    import threading
+    import time
+
+    registry = TraversalModeRegistry()
+    classes = [type(f"Class_{i}", (), {}) for i in range(100)]
+
+    stop_event = threading.Event()
+
+    def writer():
+        i = 0
+        while not stop_event.is_set():
+            cls = classes[i % len(classes)]
+            if i % 2 == 0:
+                registry.register(cls, TraversalMode.LEAF)
+            else:
+                registry.clear()
+            i += 1
+            time.sleep(0.001)
+
+    def reader():
+        while not stop_event.is_set():
+            for cls in classes:
+                registry.resolve(cls)
+
+    threads = []
+    for _ in range(2):
+        threads.append(threading.Thread(target=writer))
+    for _ in range(4):
+        threads.append(threading.Thread(target=reader))
+
+    for t in threads:
+        t.start()
+
+    time.sleep(0.1)
+    stop_event.set()
+
+    for t in threads:
+        t.join()
+
+
+def test_traversal_registry_double_checked_lock_branch_coverage():
+    registry = TraversalModeRegistry()
+
+    class DictWithRace(dict):
+        def __init__(self):
+            super().__init__()
+            self.first_check = True
+
+        def __contains__(self, item):
+            contained = super().__contains__(item)
+            if not contained and self.first_check:
+                self.first_check = False
+                self[item] = TraversalMode.LEAF
+            return contained
+
+    registry._cache = DictWithRace()
+
+    # This will hit the first check (false), populate the cache in contains,
+    # enter the lock, hit the second check (true), and return from the second check.
+    res = registry.resolve(int)
+    assert res is TraversalMode.LEAF
+
