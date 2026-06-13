@@ -1,3 +1,13 @@
+## v0.16.0 (2026-06-13)
+
+### Feat
+
+- **transformers**: Introduces traversal mode registry for object dispatch.
+
+### Refactor
+
+- Refactors traversal mode helpers and adds thread-safe registry.
+
 ## v0.15.0 (2026-06-11)
 
 ### Feat
