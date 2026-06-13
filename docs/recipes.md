@@ -14,7 +14,8 @@ You can find the executable code for all of these recipes in the
 
 !!! note "Organization"
 
-    Recipes are grouped by domain to help you find solutions relevant to your work. Within each domain, the recipes are ordered progressively—starting from foundational concepts and building up to more advanced architectural patterns.
+    Recipes are grouped by domain to help you find solutions relevant to your work. Within each domain, the recipes are
+    ordered progressively—starting from foundational concepts and building up to more advanced architectural patterns.
 
 ---
 
@@ -41,7 +42,14 @@ You can find the executable code for all of these recipes in the
 
 - **[Cleaning Up API Payloads - Recipe #29](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_29_payload_cleanup.py):**
 
-  Use `modify` to apply multiple cleaning functions to a deeply nested data structure in a single pass. This recipe shows how to normalize keys and trim whitespace from all string values.
+  Use `modify` to apply multiple cleaning functions to a deeply nested data structure in a single pass. This recipe
+  shows how to normalize keys and trim whitespace from all string values.
+
+- **[Traversal Mode Overrides - Recipe #30](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_30_traversal_mode_overrides.py):**
+
+  Use `TraversalModeRegistry` and `traversal_mode` to override protocol-based traversal classifications, allowing
+  type-specific handling (like treating binary signatures as iterables and domain wrappers as leaf nodes) during
+  `modify` and `merge`.
 
 
 ### Configuration & State Management
@@ -80,6 +88,12 @@ You can find the executable code for all of these recipes in the
 
   Combine native dictionary comprehensions, `rename`, and `Lens` optics to strip internal metadata, reshape schemas, and
   cryptographically mask sensitive fields before sending a database record to an external API client.
+
+- **[Event Sanitization and Metadata Enrichment - Recipe #31](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_31_event_sanitization_and_enrichment.py):**
+
+  Combine `TraversalModeRegistry`, `strictify`, and `merge` to recursively traverse class instances, sanitize sensitive
+  fields (tokens, emails), and enrich every metadata node found in a complex event tree in a single pipeline.
+
 
 ### Architecture & Microservices
 

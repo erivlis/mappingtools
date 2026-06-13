@@ -70,3 +70,11 @@ In accordance with **The Council Framework** (Symmetry, Clarity, Functional Prim
   Combine `flatten`, `Lens`, `patch`, and `merge` to derive a public API contract from a canonical internal JSON Schema by pruning internal/read-only fields and overlaying partner-specific constraints.
 * [27. JSON Schema Review Envelopes](recipe_27_json_schema_review_envelopes.py):
   Combine `flatten`, `Lens`, `patch`, and `merge` to preserve a JSON Schema's object shape while replacing each primitive field, scalar array item, direct `$ref`, and direct union/composition schema (`oneOf`, `anyOf`, `allOf`) with a `oneOf` wrapper representing either an override value or an approval decision. If the root schema has a `$id`, the recipe appends a suffix so the derived schema gets a distinct identity.
+* [28. Conflict Resolution](recipe_28_conflict_resolution.py):
+  Use `combine` with resolver strategies (`Resolver`, `NumericResolver`, `LogicalResolver`) or a custom callable to control leaf conflict behavior instead of default merge semantics.
+* [29. Payload Cleanup](recipe_29_payload_cleanup.py):
+  Use `modify` with key/value handlers to normalize nested payload keys and trim string values in a single traversal pass.
+* [30. Traversal Mode Overrides](recipe_30_traversal_mode_overrides.py):
+  Use `TraversalModeRegistry` and `traversal_mode(...)` to explicitly override traversal classification for protocol edge cases (e.g., forcing bytes as iterable, forcing custom iterables to leaf, or declaring class mode via decorator).
+* [31. Event Sanitization and Metadata Enrichment](recipe_31_event_sanitization_and_enrichment.py):
+  Use `TraversalModeRegistry` with `strictify` to sanitize nested class instances across multiple tree locations, then apply `merge`-based metadata enrichment (`trace_id`, `updated_at`, `updated_by`) to every `metadata` node.
