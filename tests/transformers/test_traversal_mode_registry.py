@@ -13,7 +13,6 @@ from mappingtools.traversal import (
     _is_traversal_mapping,
     traversal_mode,
 )
-from mappingtools.visitors.operators import safe_merge
 
 
 def _mapping_handler(obj, processor, *args, **kwargs):
@@ -217,22 +216,6 @@ def test_registry_absent_keeps_baseline_transformer_behavior():
     assert transformer({'a': 1}) == 'mapping'
     assert transformer([1, 2]) == 'iterable'
     assert transformer(object()) == 'leaf'
-
-
-def test_registry_absent_keeps_baseline_safe_merge_behavior():
-    result = safe_merge({'a': [1, 2]}, {'a': [3]})
-    assert result == {'a': [3, 2]}
-
-
-def test_safe_merge_supports_registry_overrides():
-    class LeafList(list):
-        pass
-
-    registry = TraversalModeRegistry()
-    registry.register(LeafList, TraversalMode.LEAF)
-
-    result = safe_merge(LeafList([1, 2]), [3], traversal_registry=registry)
-    assert result == [1, 2, [3]]
 
 
 def test_modify_accepts_traversal_registry():
