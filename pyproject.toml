@@ -60,8 +60,7 @@ test = [
     "pytest-asyncio",
     "pytest-cov",
     "pytest-randomly",
-    "pytest-xdist",
-    "markdown-pytest"
+    "pytest-xdist"
 ]
 
 
