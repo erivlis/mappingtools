@@ -38,7 +38,7 @@ jobs:
       - name: Test with pytest
         run: |
           python -m pip install . --group test
-          pytest tests README.md --cov=src --cov-branch --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
+          pytest tests recipes --cov=src --cov-branch --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v6
         with:
