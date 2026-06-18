@@ -331,5 +331,8 @@ During implementation, the design was refined to solve specific type safety, API
       exact index offsets across accumulator, binary, and target output trees, allowing consistent traversal and
       reduction.
 3. **No Traversal Registry Integration**:
-    - As proposed and confirmed, `combine_with_metrics` operates on dictionaries and lists natively without utilizing
+    - As proposed and confirmed, `combine` operates on dictionaries and lists natively without utilizing
       `TraversalModeRegistry` to preserve performance and avoid experimental dependencies.
+4. **API Unification (`combine_with_metrics` merged into `combine`)**:
+    - *Proposal*: Introduce a separate function `combine_with_metrics`.
+    - *Implementation*: Merged `combine_with_metrics` directly into the standard `combine` operator to avoid duplicate traversal engines and prevent code/implementation drift. By default, `combine` returns only the resolved tree. If `decision_metrics` (a list of metrics) is passed, Python `@overload` signatures ensure type-safety, and `combine` returns a 2-tuple of `(combined_tree, metrics_dict)`.
