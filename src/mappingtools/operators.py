@@ -3,7 +3,7 @@ from collections import defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping, Sequence
 from copy import deepcopy
 from itertools import chain
-from typing import Any
+from typing import Any, overload
 
 from mappingtools.aggregations import Aggregation
 from mappingtools.resolvers import DecisionMetric, LogicalResolver, NumericResolver, Resolver, ResolverType
@@ -12,7 +12,6 @@ from mappingtools.typing import MISSING, Combine, K, Missing, T, Tree
 
 __all__ = [
     'combine',
-    'combine_with_metrics',
     'distinct',
     'flatten',
     'inverse',
@@ -24,80 +23,44 @@ __all__ = [
 ]
 
 
+@overload
 def combine(
         tree1: Tree[T] | Missing = MISSING,
         tree2: Tree[T] | Missing = MISSING,
         op: Combine | ResolverType = Resolver.LAST,
+        decision_metrics: None = None,
 ) -> Tree[T] | Any:
-    """
-    Combines two trees using a binary operator `op` that resolves conflicts at the leaf nodes.
-
-    This is a powerful generalization of `merge`. It recursively walks two tree
-    structures and applies the `op` only when it encounters a conflict at the
-    leaf nodes (e.g., two scalars at the same path, or a structural mismatch).
-
-    Args:
-        tree1 (Tree[T] | Missing): The first tree structure.
-        tree2 (Tree[T] | Missing): The second tree structure.
-        op: A callable or a Resolver enum strategy (Resolver, LogicalResolver, NumericResolver)
-            to resolve collisions. Defaults to `Resolver.LAST`.
-
-    Returns:
-        Tree[T] | Any: The combined tree structure.
-    """
-    if isinstance(op, (Resolver, LogicalResolver, NumericResolver)):
-        op = op.value
-
-    def _combine(t1: Any, t2: Any) -> Any:
-        # 1) If one side is MISSING, the other side wins unconditionally.
-        if t1 is MISSING:
-            return t2
-        if t2 is MISSING:
-            return t1
-
-        # 2) If both are dicts, recursively combine the op over their values.
-        if isinstance(t1, dict) and isinstance(t2, dict):
-            combined = dict(t1)
-            for k, v in t2.items():
-                val = _combine(combined.get(k, MISSING), v)
-                if val is MISSING:
-                    combined.pop(k, None)
-                else:
-                    combined[k] = val
-
-            # Also need to clean up keys that became MISSING during dict comprehension
-            # if they were already in t1 but not in t2
-            return {k: v for k, v in combined.items() if v is not MISSING}
-
-        # 3) If both are lists, recursively combine the op over their items by position.
-        if isinstance(t1, list) and isinstance(t2, list):
-            zipped = itertools.zip_longest(t1, t2, fillvalue=MISSING)
-            return [_combine(i1, i2) for i1, i2 in zipped]
-
-        # 4) Otherwise, the structures are in conflict. Apply the operator.
-        return op(t1, t2)
-
-    return _combine(tree1, tree2)
+    ...
 
 
-def combine_with_metrics(  # noqa: C901
+@overload
+def combine(
+        tree1: Tree[T] | Missing = MISSING,
+        tree2: Tree[T] | Missing = MISSING,
+        op: Combine | ResolverType = Resolver.LAST,
+        decision_metrics: list[DecisionMetric | Callable[[Any, Any, Any], Any]] = ...,
+) -> tuple[Tree[T] | Any, dict[str, Tree[Any] | Any]]:
+    ...
+
+
+def combine(
         tree1: Tree[T] | Missing = MISSING,
         tree2: Tree[T] | Missing = MISSING,
         op: Combine | ResolverType = Resolver.LAST,
         decision_metrics: list[DecisionMetric | Callable[[Any, Any, Any], Any]] | None = None,
-) -> tuple[Tree[T] | Any, dict[str, Tree[Any] | Any]]:
+) -> Any:
     """
-    Combines two trees using a binary operator `op` and extracts decision metrics
-    of the combination process in a single recursive pass.
+    Combines two trees using a binary operator `op` that resolves conflicts at the leaf nodes.
+    Optionally extracts decision metrics of the combination process in a single recursive pass.
 
     Args:
         tree1: The first tree structure.
         tree2: The second tree structure.
         op: A resolver strategy or custom callable to handle conflicts. Defaults to Resolver.LAST.
-        decision_metrics: A single DecisionMetric, callable, or an iterable of them.
+        decision_metrics: An optional list of DecisionMetric enums or custom callable metrics.
 
     Returns:
-        A 2-tuple containing:
+        The combined tree structure if decision_metrics is None, otherwise a 2-tuple containing:
         1. The combined tree structure.
         2. A dictionary mapping each metric's name to its corresponding metric tree.
     """
@@ -111,68 +74,82 @@ def combine_with_metrics(  # noqa: C901
             for v in decision_metrics
         )
 
-    def _combine_with_metrics(t1: Any, t2: Any) -> tuple[Any, dict[str, Any]]:  # noqa: C901
-        def metric_results(t: Any, side: int) -> dict[str, Any]:
-            result = {k: DecisionMetric.calculate(t, side, v) for k, v in metric_ops.items()}
-            return result
+    collect = decision_metrics is not None
+    return _combine_impl(tree1, tree2, op, metric_ops, collect)
 
-        def nullified_result(t: Any) -> dict[str, Any]:
-            none_tree = DecisionMetric.nullify(t)
-            return {k: deepcopy(none_tree) for k in metric_ops}
 
-        # 1) If one side is MISSING, the other wins unconditionally.
-        if t1 is MISSING:
-            return t2, metric_results(t2, 1)
-        if t2 is MISSING:
-            return t1, metric_results(t1, 0)
+def _combine_impl(  # noqa: C901
+        t1: Any,
+        t2: Any,
+        op: Any,
+        metric_ops: dict[str, Any] | None = None,
+        collect: bool = False,
+) -> Any:
+    def metric_results(t: Any, side: int) -> dict[str, Any]:
+        return {k: DecisionMetric.calculate(t, side, v) for k, v in metric_ops.items()}
 
-        # 2) If both are dicts, recursively combine.
-        if isinstance(t1, dict) and isinstance(t2, dict):
-            combined = {}
-            metrics = {name: {} for name in metric_ops}
-            all_keys = set(t1.keys()) | set(t2.keys())
-            for k in all_keys:
-                val, m_dict = _combine_with_metrics(t1.get(k, MISSING), t2.get(k, MISSING))
-                if val is not MISSING:
-                    combined[k] = val
+    def nullified_result(t: Any) -> dict[str, Any]:
+        none_tree = DecisionMetric.nullify(t)
+        return {k: deepcopy(none_tree) for k in metric_ops}
+
+    # 1) If one side is MISSING, the other wins unconditionally.
+    if t1 is MISSING:
+        return (t2, metric_results(t2, 1)) if collect else t2
+    if t2 is MISSING:
+        return (t1, metric_results(t1, 0)) if collect else t1
+
+    # 2) If both are dicts, recursively combine.
+    if isinstance(t1, dict) and isinstance(t2, dict):
+        combined = {}
+        metrics = {name: {} for name in metric_ops} if collect else None
+        all_keys = set(t1.keys()) | set(t2.keys())
+        for k in all_keys:
+            res = _combine_impl(t1.get(k, MISSING), t2.get(k, MISSING), op, metric_ops, collect)
+            val = res[0] if collect else res
+            if val is not MISSING:
+                combined[k] = val
+                if collect:
+                    m_dict = res[1]
                     for metric_name in metric_ops:
                         metrics[metric_name][k] = m_dict[metric_name]
-            return combined, metrics
+        return (combined, metrics) if collect else combined
 
-        # 3) If both are lists, recursively combine by position.
-        if isinstance(t1, list) and isinstance(t2, list):
-            combined = []
-            metrics = {name: [] for name in metric_ops}
-            zipped = itertools.zip_longest(t1, t2, fillvalue=MISSING)
-            for i1, i2 in zipped:
-                val, m_dict = _combine_with_metrics(i1, i2)
-                combined.append(val)
+    # 3) If both are lists, recursively combine by position.
+    if isinstance(t1, list) and isinstance(t2, list):
+        combined = []
+        metrics = {name: [] for name in metric_ops} if collect else None
+        zipped = itertools.zip_longest(t1, t2, fillvalue=MISSING)
+        for i1, i2 in zipped:
+            res = _combine_impl(i1, i2, op, metric_ops, collect)
+            val = res[0] if collect else res
+            combined.append(val)
+            if collect:
+                m_dict = res[1]
                 for metric_name in metric_ops:
                     metrics[metric_name].append(m_dict[metric_name])
-            return combined, metrics
+        return (combined, metrics) if collect else combined
 
-        # 4) Otherwise, there is a conflict. Resolve it.
-        resolved = op(t1, t2)
-        if resolved is MISSING:
-            return MISSING, dict.fromkeys(metric_ops, MISSING)
+    # 4) Otherwise, there is a conflict. Resolve it.
+    resolved = op(t1, t2)
+    if resolved is MISSING:
+        return (MISSING, dict.fromkeys(metric_ops, MISSING)) if collect else MISSING
 
-        # Check resolved container shape to prevent shape divergence
-        if isinstance(resolved, (dict, list)):
-            if resolved is t1 or resolved == t1:
-                return resolved, metric_results(resolved, 0)
-            elif resolved is t2 or resolved == t2:
-                return resolved, metric_results(resolved, 1)
-            else:
-                return resolved, nullified_result(resolved)
+    # Check resolved container shape to prevent shape divergence
+    if isinstance(resolved, (dict, list)):
+        if resolved is t1 or resolved == t1:
+            return (resolved, metric_results(resolved, 0)) if collect else resolved
+        elif resolved is t2 or resolved == t2:
+            return (resolved, metric_results(resolved, 1)) if collect else resolved
+        else:
+            return (resolved, nullified_result(resolved)) if collect else resolved
 
+    if collect:
         res_metrics = {}
         for metric_name, metric_op in metric_ops.items():
             res_metrics[metric_name] = metric_op(t1, t2, resolved)
-
         return resolved, res_metrics
 
-    combined_res, metrics_res = _combine_with_metrics(tree1, tree2)
-    return combined_res, metrics_res
+    return resolved
 
 
 def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:

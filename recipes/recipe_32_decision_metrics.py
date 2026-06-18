@@ -8,7 +8,7 @@ These metrics allow tracking conflict resolution decisions (Provenance, Auditing
 and Changelogs) in a single high-performance recursive pass without altering
 the schema or data types of the output tree.
 """
-from mappingtools.operators import combine, combine_with_metrics
+from mappingtools.operators import combine
 from mappingtools.resolvers import DecisionMetric, NumericResolver, Resolver
 
 
@@ -26,7 +26,7 @@ def main():
     }
 
     print("--- 1. Single Metric: Provenance (LAST wins) ---")
-    combined, metrics = combine_with_metrics(
+    combined, metrics = combine(
         tree1, tree2, Resolver.LAST, [DecisionMetric.PROVENANCE]
     )
     prov = metrics["PROVENANCE"]
@@ -38,7 +38,7 @@ def main():
     assert prov["d"] == [1, 0]
 
     print("\n--- 2. Single Metric: Audit Mismatches ---")
-    combined, metrics = combine_with_metrics(
+    combined, metrics = combine(
         tree1, tree2, Resolver.LAST, [DecisionMetric.AUDIT]
     )
     audit = metrics["AUDIT"]
@@ -48,7 +48,7 @@ def main():
     assert audit["b"]["e"] == "clean"
 
     print("\n--- 3. Multiple Metrics in a Single Pass ---")
-    combined, metrics = combine_with_metrics(
+    combined, metrics = combine(
         tree1,
         tree2,
         NumericResolver.SUM,
@@ -89,7 +89,7 @@ def main():
     acc_prov = {"a": 0, "b": 0}
 
     for i in range(1, len(trees)):
-        combined, metrics = combine_with_metrics(
+        combined, metrics = combine(
             acc_tree, trees[i], Resolver.LAST, [DecisionMetric.PROVENANCE]
         )
         mapped_prov = map_provenance(metrics["PROVENANCE"], i)
