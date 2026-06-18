@@ -1,16 +1,18 @@
 import itertools
 from collections import defaultdict
 from collections.abc import Callable, Generator, Iterable, Mapping, Sequence
+from copy import deepcopy
 from itertools import chain
 from typing import Any
 
 from mappingtools.aggregations import Aggregation
-from mappingtools.resolvers import LogicalResolver, NumericResolver, Resolver, ResolverType
+from mappingtools.resolvers import DecisionMetric, LogicalResolver, NumericResolver, Resolver, ResolverType
 from mappingtools.traversal import _is_traversal_iterable
 from mappingtools.typing import MISSING, Combine, K, Missing, T, Tree
 
 __all__ = [
     'combine',
+    'combine_with_metrics',
     'distinct',
     'flatten',
     'inverse',
@@ -76,6 +78,101 @@ def combine(
         return op(t1, t2)
 
     return _combine(tree1, tree2)
+
+
+def combine_with_metrics(  # noqa: C901
+        tree1: Tree[T] | Missing = MISSING,
+        tree2: Tree[T] | Missing = MISSING,
+        op: Combine | ResolverType = Resolver.LAST,
+        decision_metrics: list[DecisionMetric | Callable[[Any, Any, Any], Any]] | None = None,
+) -> tuple[Tree[T] | Any, dict[str, Tree[Any] | Any]]:
+    """
+    Combines two trees using a binary operator `op` and extracts decision metrics
+    of the combination process in a single recursive pass.
+
+    Args:
+        tree1: The first tree structure.
+        tree2: The second tree structure.
+        op: A resolver strategy or custom callable to handle conflicts. Defaults to Resolver.LAST.
+        decision_metrics: A single DecisionMetric, callable, or an iterable of them.
+
+    Returns:
+        A 2-tuple containing:
+        1. The combined tree structure.
+        2. A dictionary mapping each metric's name to its corresponding metric tree.
+    """
+    if isinstance(op, (Resolver, LogicalResolver, NumericResolver)):
+        op = op.value
+
+    metric_ops = {}
+    if decision_metrics is not None and isinstance(decision_metrics, list):
+        metric_ops = dict(
+            (v.name, v.value) if isinstance(v, DecisionMetric) else (getattr(v, "__name__", str(v)), v)
+            for v in decision_metrics
+        )
+
+    def _combine_with_metrics(t1: Any, t2: Any) -> tuple[Any, dict[str, Any]]:  # noqa: C901
+        def metric_results(t: Any, side: int) -> dict[str, Any]:
+            result = {k: DecisionMetric.calculate(t, side, v) for k, v in metric_ops.items()}
+            return result
+
+        def nullified_result(t: Any) -> dict[str, Any]:
+            none_tree = DecisionMetric.nullify(t)
+            return {k: deepcopy(none_tree) for k in metric_ops}
+
+        # 1) If one side is MISSING, the other wins unconditionally.
+        if t1 is MISSING:
+            return t2, metric_results(t2, 1)
+        if t2 is MISSING:
+            return t1, metric_results(t1, 0)
+
+        # 2) If both are dicts, recursively combine.
+        if isinstance(t1, dict) and isinstance(t2, dict):
+            combined = {}
+            metrics = {name: {} for name in metric_ops}
+            all_keys = set(t1.keys()) | set(t2.keys())
+            for k in all_keys:
+                val, m_dict = _combine_with_metrics(t1.get(k, MISSING), t2.get(k, MISSING))
+                if val is not MISSING:
+                    combined[k] = val
+                    for metric_name in metric_ops:
+                        metrics[metric_name][k] = m_dict[metric_name]
+            return combined, metrics
+
+        # 3) If both are lists, recursively combine by position.
+        if isinstance(t1, list) and isinstance(t2, list):
+            combined = []
+            metrics = {name: [] for name in metric_ops}
+            zipped = itertools.zip_longest(t1, t2, fillvalue=MISSING)
+            for i1, i2 in zipped:
+                val, m_dict = _combine_with_metrics(i1, i2)
+                combined.append(val)
+                for metric_name in metric_ops:
+                    metrics[metric_name].append(m_dict[metric_name])
+            return combined, metrics
+
+        # 4) Otherwise, there is a conflict. Resolve it.
+        resolved = op(t1, t2)
+        if resolved is MISSING:
+            return MISSING, dict.fromkeys(metric_ops, MISSING)
+
+        # Check resolved container shape to prevent shape divergence
+        if isinstance(resolved, (dict, list)):
+            if resolved is t1 or resolved == t1:
+                return resolved, metric_results(resolved, 0)
+            elif resolved is t2 or resolved == t2:
+                return resolved, metric_results(resolved, 1)
+            else:
+                return resolved, nullified_result(resolved)
+
+        res_metrics = {}
+        for metric_name, metric_op in metric_ops.items():
+            res_metrics[metric_name] = metric_op(t1, t2, resolved)
+
+        return resolved, res_metrics
+
+    combined_res, metrics_res = _combine_with_metrics(tree1, tree2)
+    return combined_res, metrics_res
 
 
 def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:
