@@ -58,6 +58,53 @@ If you just need the standard "last-wins" behavior, you can use the simpler `mer
     # output: {'a': 2, 'b': {'c': 20}, 'd': 5}
     ```
 
+### Decision Metrics
+
+You can optionally extract side-channel metadata companion trees about **how** the combination occurred (e.g., tracking
+provenance, conflict audits, or mutation changelogs) in a single high-performance recursive traversal pass.
+
+To do this, pass a list of strategies (`DecisionMetric`) or custom callbacks to the `decision_metrics` parameter. When
+passed, `combine` will return a 2-tuple: `(combined_tree, metrics_dict)`.
+
+Built-in metric strategies include:
+
+* `DecisionMetric.AUDIT`: Produces conflict log descriptions (e.g., `"conflict: 10 vs 20 -> 20"` or `"clean"`).
+* `DecisionMetric.CHANGELOG`: Tracks mutation status relative to `tree1` (`"added"`, `"updated"`, `"unchanged"`).
+* `DecisionMetric.PROVENANCE`: Tracks which tree (0: `tree1`, 1: `tree2`, `None`: composite/aggregative conflict) each
+  leaf came from.
+ 
+!!! Example "Extracting decision metrics in a single pass"
+
+    <!-- name: test_combine_with_metrics -->
+
+    ```python linenums="1"
+    from mappingtools.operators import combine
+    from mappingtools.resolvers import DecisionMetric, NumericResolver
+    
+    tree1 = {"a": 10, "b": {"c": 100}, "d": [1, 2]}
+    tree2 = {"a": 20, "b": {"c": 200, "e": 300}, "d": [3]}
+    
+    # Extract multiple metadata trees simultaneously
+    combined, metrics = combine(
+        tree1, 
+        tree2, 
+        NumericResolver.SUM, 
+        [DecisionMetric.PROVENANCE, DecisionMetric.AUDIT, DecisionMetric.CHANGELOG]
+    )
+    
+    print(combined)
+    # output: {'a': 30, 'b': {'c': 300, 'e': 300}, 'd': [4, 2]}
+    
+    print(metrics["PROVENANCE"])
+    # output: {'a': None, 'b': {'c': None, 'e': 1}, 'd': [None, 0]}
+    
+    print(metrics["AUDIT"])
+    # output: {'a': 'conflict: 10 vs 20 -> 30', 'b': {'c': 'conflict: 100 vs 200 -> 300', 'e': 'clean'}, 'd': ['conflict: 1 vs 3 -> 4', 'clean']}
+    
+    print(metrics["CHANGELOG"])
+    # output: {'a': 'updated', 'b': {'c': 'updated', 'e': 'added'}, 'd': ['updated', 'unchanged']}
+    ```
+
 ## distinct
 
 Yields distinct values for a specified key across multiple mappings.

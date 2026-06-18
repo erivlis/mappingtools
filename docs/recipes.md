@@ -166,7 +166,7 @@ You can find the executable code for all of these recipes in the
 
 - **[Decision Metrics - Recipe #32](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_32_decision_metrics.py):**
 
-  Combine two trees using `combine_with_metrics` to retrieve both the merged tree and metadata companion trees
+  Combine two trees using the `combine` operator with `decision_metrics` to retrieve both the merged tree and metadata companion trees
   (Provenance, Audit conflict descriptions, and Changelogs) in a single high-performance traversal pass.
 
 ### Algorithmic Explorations
