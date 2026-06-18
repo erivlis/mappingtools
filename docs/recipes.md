@@ -164,6 +164,11 @@ You can find the executable code for all of these recipes in the
   Use `MappingCollector` with `Aggregation.EMA` to maintain a memory-efficient baseline of a noisy time-series and
   instantly flag incoming data points that deviate beyond a set threshold.
 
+- **[Decision Metrics - Recipe #32](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_32_decision_metrics.py):**
+
+  Combine two trees using `combine_with_metrics` to retrieve both the merged tree and metadata companion trees
+  (Provenance, Audit conflict descriptions, and Changelogs) in a single high-performance traversal pass.
+
 ### Algorithmic Explorations
 
 - **[Algorithmic Music Transposition - Recipe #21](https://github.com/erivlis/mappingtools/blob/main/recipes/recipe_21_algorithmic_music_transposition.py):**

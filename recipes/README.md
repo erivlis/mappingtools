@@ -78,3 +78,6 @@ In accordance with **The Council Framework** (Symmetry, Clarity, Functional Prim
   Use `TraversalModeRegistry` and `traversal_mode(...)` to explicitly override traversal classification for protocol edge cases (e.g., forcing bytes as iterable, forcing custom iterables to leaf, or declaring class mode via decorator).
 * [31. Event Sanitization and Metadata Enrichment](recipe_31_event_sanitization_and_enrichment.py):
   Use `TraversalModeRegistry` with `strictify` to sanitize nested class instances across multiple tree locations, then apply `merge`-based metadata enrichment (`trace_id`, `updated_at`, `updated_by`) to every `metadata` node.
+* [32. Decision Metrics](recipe_32_decision_metrics.py):
+  Use `combine_with_metrics` with standard decision metric strategies (`DecisionMetric.PROVENANCE`, `DecisionMetric.AUDIT`, `DecisionMetric.CHANGELOG`) or a custom callable to deeply combine two trees while extracting metadata metrics in a single recursive pass.
+
