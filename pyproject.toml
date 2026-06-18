@@ -46,7 +46,10 @@ dependencies = [
 [dependency-groups]
 dev = [
     "commitizen",
+    "library-skills",
+    "pip",
     "pipdeptree",
+    "pyrefly",
     "ruff",
     "ty",
     "uv"
