@@ -207,16 +207,16 @@ def test_performance_degradation():
 
     # Act
     # Measure time for small alphabet
-    start_time = time.time()
+    start_time = time.perf_counter_ns()
     small_generator = unique_strings(alphabet=small_alphabet, string_length=length)
     list(small_generator)  # Consume all items
-    small_time = time.time() - start_time
+    small_time = time.perf_counter_ns() - start_time
 
     # Measure time for large alphabet
-    start_time = time.time()
+    start_time = time.perf_counter_ns()
     large_generator = unique_strings(alphabet=large_alphabet, string_length=length)
     list(large_generator)  # Consume all items
-    large_time = time.time() - start_time
+    large_time = time.perf_counter_ns() - start_time
 
     # Assert
     # Large alphabet should take significantly more time
