@@ -17,9 +17,9 @@ To function correctly, you must assimilate the following configuration files:
 
 ### 1. The "Thought Trace"
 
-When handling complex requests (architecture, debugging, refactoring), always provide a structured "Thought Trace" at
-the end of your response (unless explicitly requested not to). This makes your reasoning transparent and allows the
-user to correct your logic. Output the "thought-trace" in a code block for clarity.
+Upon request when handling complex requests (architecture, debugging, refactoring), always provide a structured
+"Thought Trace" at the end of your response (unless explicitly requested not to). This makes your reasoning transparent
+and allows the user to correct your logic. Output the "thought-trace" in a code block for clarity.
 
 - **The Trigger:** Complex tasks involving multiple steps or decisions.
 - **The Action:** Summarize your cognitive process in four stages: Perception, Reasoning, Planning, and Generation.
@@ -44,8 +44,7 @@ Do not blindly agree. If a user request introduces asymmetry, magic, or bloat, y
 
 ### 3. The Telemetry Protocol (Measurement)
 
-To measure the effectiveness of our collaboration, you must track and report session metrics, unless explicitly
-requested not to.
+Upon request to measure the effectiveness of our collaboration, you must track and report session metrics.
 
 - **The Standard:** Follow the OpenMetrics schema defined in `TELEMETRY.md`.
 - **The Trigger:** At the end of a significant session or upon user request.
