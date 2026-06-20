@@ -75,10 +75,10 @@ def combine(
         )
 
     collect = decision_metrics is not None
-    return _combine_impl(tree1, tree2, op, metric_ops, collect)
+    return _combine(tree1, tree2, op, metric_ops, collect=collect)
 
 
-def _combine_impl(  # noqa: C901
+def _combine(  # noqa: C901
         t1: Any,
         t2: Any,
         op: Any,
@@ -104,7 +104,7 @@ def _combine_impl(  # noqa: C901
         metrics = {name: {} for name in metric_ops} if collect else None
         all_keys = set(t1.keys()) | set(t2.keys())
         for k in all_keys:
-            res = _combine_impl(t1.get(k, MISSING), t2.get(k, MISSING), op, metric_ops, collect)
+            res = _combine(t1.get(k, MISSING), t2.get(k, MISSING), op, metric_ops, collect)
             val = res[0] if collect else res
             if val is not MISSING:
                 combined[k] = val
@@ -120,7 +120,7 @@ def _combine_impl(  # noqa: C901
         metrics = {name: [] for name in metric_ops} if collect else None
         zipped = itertools.zip_longest(t1, t2, fillvalue=MISSING)
         for i1, i2 in zipped:
-            res = _combine_impl(i1, i2, op, metric_ops, collect)
+            res = _combine(i1, i2, op, metric_ops, collect)
             val = res[0] if collect else res
             combined.append(val)
             if collect:
@@ -136,12 +136,15 @@ def _combine_impl(  # noqa: C901
 
     # Check resolved container shape to prevent shape divergence
     if isinstance(resolved, (dict, list)):
-        if resolved is t1 or resolved == t1:
-            return (resolved, metric_results(resolved, 0)) if collect else resolved
-        elif resolved is t2 or resolved == t2:
-            return (resolved, metric_results(resolved, 1)) if collect else resolved
+        if collect:
+            if resolved is t1 or resolved == t1:
+                return resolved, metric_results(resolved, 0)
+            elif resolved is t2 or resolved == t2:
+                return resolved, metric_results(resolved, 1)
+            else:
+                return resolved, nullified_result(resolved)
         else:
-            return (resolved, nullified_result(resolved)) if collect else resolved
+            return resolved
 
     if collect:
         res_metrics = {}
