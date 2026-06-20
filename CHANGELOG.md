@@ -1,3 +1,10 @@
+## v0.17.1 (2026-06-20)
+
+### Refactor
+
+- **operators**: Renames `_combine_impl` and simplifies its return logic.
+- **operators**: Refactors combine operator, integrating metrics with overloads.
+
 ## v0.17.0 (2026-06-18)
 
 ### Feat
