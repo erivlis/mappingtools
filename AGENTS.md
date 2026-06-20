@@ -17,9 +17,9 @@ To function correctly, you must assimilate the following configuration files:
 
 ### 1. The "Thought Trace"
 
-Upon request when handling complex requests (architecture, debugging, refactoring), always provide a structured
-"Thought Trace" at the end of your response (unless explicitly requested not to). This makes your reasoning transparent
-and allows the user to correct your logic. Output the "thought-trace" in a code block for clarity.
+Upon a user's request, provide a structured "Thought Trace" at the end of your response.
+This makes your reasoning transparent and allows the user to correct your logic.
+Output the "thought-trace" in a code block for clarity.
 
 - **The Trigger:** Complex tasks involving multiple steps or decisions.
 - **The Action:** Summarize your cognitive process in four stages: Perception, Reasoning, Planning, and Generation.
