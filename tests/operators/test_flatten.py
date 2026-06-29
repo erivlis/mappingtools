@@ -223,10 +223,27 @@ def test_key_formats_coverage():
     }
 
     # Private helper unit tests for full branch/line coverage
-    from mappingtools.operators import _tuple_to_json_path, _tuple_to_json_pointer
-    assert _tuple_to_json_pointer(()) == ''
-    assert _tuple_to_json_pointer(('a/b',)) == '/a~1b'
-    assert _tuple_to_json_pointer(('a~b',)) == '/a~0b'
+    from mappingtools.operators import (
+        _flatten_step_javascript,
+        _flatten_step_jsonpath,
+        _flatten_step_pointer,
+        _flatten_step_str,
+    )
+    assert _flatten_step_pointer('', 'a/b') == '/a~1b'
+    assert _flatten_step_pointer('', 'a~b') == '/a~0b'
+    assert _flatten_step_pointer('/a', 'b') == '/a/b'
 
-    with pytest.raises(ValueError):
-        _tuple_to_json_path(('a',), dialect='invalid')
+    assert _flatten_step_jsonpath('$', 'normal') == '$.normal'
+    assert _flatten_step_jsonpath('$', 123) == '$[123]'
+    assert _flatten_step_jsonpath('$', 'special-key') == '$["special-key"]'
+
+    assert _flatten_step_javascript('', 'normal') == 'normal'
+    assert _flatten_step_javascript('', 123) == '[123]'
+    assert _flatten_step_javascript('', 'special-key') == '["special-key"]'
+    assert _flatten_step_javascript('a', 'normal') == 'a.normal'
+    assert _flatten_step_javascript('a', 123) == 'a[123]'
+    assert _flatten_step_javascript('a', 'special-key') == 'a["special-key"]'
+
+    assert _flatten_step_str('', 'a') == '"a"'
+    assert _flatten_step_str('', 123) == '123'
+    assert _flatten_step_str('a', 'b') == 'a,"b"'

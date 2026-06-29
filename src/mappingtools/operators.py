@@ -1,11 +1,10 @@
 import itertools
 from collections import defaultdict
-from collections.abc import Callable, Generator, Hashable, Iterable, Mapping, Sequence
+from collections.abc import Callable, Generator, Iterable, Mapping, Sequence
 from copy import deepcopy
 from enum import Enum, member
-from functools import lru_cache, partial
 from itertools import chain
-from typing import Any, Literal, overload
+from typing import Any, overload
 
 from mappingtools.aggregations import Aggregation
 from mappingtools.resolvers import DecisionMetric, LogicalResolver, NumericResolver, Resolver, ResolverType
@@ -178,47 +177,54 @@ def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:
             yield value
 
 
-@lru_cache
-def _tuple_to_str(path: tuple[str | int, ...]) -> str:
-    return ",".join(f'"{p}"' if isinstance(p, str) else str(p) for p in path)
+def _flatten_step_tuple(path: tuple, part: Any) -> tuple:
+    return *path, part
 
 
-@lru_cache
-def _tuple_to_json_path(path: tuple[str | int, ...], dialect: Literal['RFC_9535', 'Javascript']) -> str:
-    result = ''.join(
-        f".{p}" if isinstance(p, str) and p and p.replace('_', '').isalnum() and not p.isdigit() and not p[0].isdigit()
-        else (f"[{p}]" if isinstance(p, int) else f'["{p}"]')
-        for p in path
-    )
-
-    match dialect:
-        case 'RFC_9535':
-            return '$' + result
-        case 'Javascript':
-            return result.lstrip('.') if result.startswith('.') else result
-        case _:
-            raise ValueError(f"Unsupported dialect: {dialect}")
+def _flatten_step_str(path: str, part: Any) -> str:
+    formatted_part = f'"{part}"' if isinstance(part, str) else str(part)
+    return f"{path},{formatted_part}" if path else formatted_part
 
 
-@lru_cache
-def _tuple_to_json_pointer(path: tuple[str | int, ...]) -> str:
-    match path:
-        case ():
-            return ''
-        case _:
-            return '/' + '/'.join(
-                str(p).replace('~', '~0').replace('/', '~1')
-                if isinstance(p, str) else str(p)
-                for p in path
-            )
+def _flatten_step_pointer(path: str, part: Any) -> str:
+    formatted_part = str(part).replace("~", "~0").replace("/", "~1") if isinstance(part, str) else str(part)
+    return f"{path}/{formatted_part}"
+
+
+def _flatten_step_jsonpath(path: str, part: Any) -> str:
+    if (isinstance(part, str)
+            and part
+            and part.replace('_', '').isalnum()
+            and not part.isdigit()
+            and not part[0].isdigit()
+    ):
+        return f"{path}.{part}"
+    elif isinstance(part, int):
+        return f"{path}[{part}]"
+    else:
+        return f'{path}["{part}"]'
+
+
+def _flatten_step_javascript(path: str, part: Any) -> str:
+    if (isinstance(part, str)
+            and part
+            and part.replace('_', '').isalnum()
+            and not part.isdigit()
+            and not part[0].isdigit()
+    ):
+        return f"{path}.{part}" if path else part
+    elif isinstance(part, int):
+        return f"{path}[{part}]" if path else f"[{part}]"
+    else:
+        return f'{path}["{part}"]' if path else f'["{part}"]'
 
 
 class KeyFormat(Enum):
-    TUPLE = member(None)
-    STR = member(_tuple_to_str)
-    JAVASCRIPT = member(partial(_tuple_to_json_path, dialect='Javascript'))
-    JSONPATH = member(partial(_tuple_to_json_path, dialect='RFC_9535'))
-    JSONPOINTER = member(_tuple_to_json_pointer)
+    TUPLE = member(((), _flatten_step_tuple))
+    STR = member(('', _flatten_step_str))
+    JAVASCRIPT = member(('', _flatten_step_javascript))
+    JSONPATH = member(('$', _flatten_step_jsonpath))
+    JSONPOINTER = member(('', _flatten_step_pointer))
 
 
 def flatten(data: Tree[Any], key_format: KeyFormat = KeyFormat.TUPLE) -> Tree[Any]:
@@ -233,48 +239,32 @@ def flatten(data: Tree[Any], key_format: KeyFormat = KeyFormat.TUPLE) -> Tree[An
         Tree[Any]: The flattened dictionary.
     """
     result = {}
-    path = []
+    initial, step = key_format.value
 
-    def _recurse(value: Any):
+    def _recurse(value: Any, current_path: Any):
         if isinstance(value, dict):
             for k, v in value.items():
                 # Fast path for common atomic keys (str, int)
                 if isinstance(k, (str, int)):  # NOSONAR
-                    path.append(k)
-                    _recurse(v)
-                    path.pop()
+                    _recurse(v, step(current_path, k))
                 elif _is_traversal_iterable(k):
                     # k is a tuple/list/iterable, extend path
-                    # We need to convert to list to know length for backtracking if it's a generator
-                    # But _is_traversal_iterable allows generators.
-                    # If k is a generator, extending path consumes it.
-                    # We can't easily know how many items were added without counting.
-                    # So we convert to tuple/list first.
+                    # We need to convert to tuple first to know length or iterate safely if it's a generator.
                     k_seq = tuple(k)
-                    path.extend(k_seq)
-                    _recurse(v)
-                    # Backtrack
-                    del path[-len(k_seq):]
+                    next_path = current_path
+                    for part in k_seq:
+                        next_path = step(next_path, part)
+                    _recurse(v, next_path)
                 else:
-                    path.append(k)
-                    _recurse(v)
-                    path.pop()
+                    _recurse(v, step(current_path, k))
         elif isinstance(value, list):
             for i, v in enumerate(value):
-                path.append(i)
-                _recurse(v)
-                path.pop()
+                _recurse(v, step(current_path, i))
         else:
-            result[tuple(path)] = value
+            result[current_path] = value
 
-    _recurse(data)
-
-    formatter: Callable[[tuple[str | int, ...]], Hashable] | None = key_format.value
-
-    if not formatter:
-        return result
-
-    return {formatter(k): v for k, v in result.items()}
+    _recurse(data, initial)
+    return result
 
 
 def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
