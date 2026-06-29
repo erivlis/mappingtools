@@ -128,23 +128,35 @@ Yields distinct values for a specified key across multiple mappings.
 
 ## flatten
 
-The flatten function takes a nested mapping structure and converts it into a single-level dictionary by flattening the
-keys into tuples.
+The `flatten` function takes a nested tree structure (dicts and lists) and converts it into a single-level dictionary. The key path formatting can be customized using the `key_format` parameter with the `KeyFormat` enum:
+
+* `KeyFormat.TUPLE`: Keys are path tuples of `(key, index, ...)`. (Default)
+* `KeyFormat.STR`: Keys are string-joined path parts (e.g. `'"a","b","c"'`).
+* `KeyFormat.JAVASCRIPT`: Keys are Javascript-style dot/bracket paths (e.g. `a[0].b`).
+* `KeyFormat.JSONPATH`: Keys are RFC 9535 JSONPath strings (e.g. `$.a[0].b`).
+* `KeyFormat.JSONPOINTER`: Keys are RFC 6901 JSON Pointer strings (e.g. `/a/0/b`).
 
 !!! Example
 
     <!-- name: test_flattened -->
     
     ```python linenums="1"
-    from mappingtools.operators import flatten
+    from mappingtools.operators import KeyFormat, flatten
     
     nested_dict = {
         'a': {'b': 1, 'c': {'d': 2}},
         'e': 3
     }
+    
+    # 1. Default (Tuple keys)
     flat_dict = flatten(nested_dict)
     print(flat_dict)
     # output: {('a', 'b'): 1, ('a', 'c', 'd'): 2, ('e',): 3}
+
+    # 2. JSONPath keys
+    jsonpath_dict = flatten(nested_dict, key_format=KeyFormat.JSONPATH)
+    print(jsonpath_dict)
+    # output: {'$.a.b': 1, '$.a.c.d': 2, '$.e': 3}
     ```
 
 ## inverse

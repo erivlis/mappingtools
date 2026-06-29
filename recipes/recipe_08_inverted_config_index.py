@@ -13,7 +13,7 @@ into an inverted mapping of (value -> [paths]), we instantly reveal configuratio
 
 from mappingtools.aggregations import Aggregation
 from mappingtools.collectors import MappingCollector
-from mappingtools.operators import flatten
+from mappingtools.operators import KeyFormat, flatten
 
 
 def main():
@@ -33,9 +33,8 @@ def main():
     }
 
     # 2. Flatten the 3D tree into a 1D mapping
-    # We pass a delimiter so that the paths are automatically formatted
-    # as dot-notation strings (e.g., 'database.primary.host' instead of a tuple).
-    flat_config = flatten(system_config, delimiter=".")
+    # We pass KeyFormat.STR so that the paths are formatted.
+    flat_config = flatten(system_config, key_format=KeyFormat.STR)
 
     # 3. Create the Inverted Index
     # We use a MappingCollector with Aggregation.ALL (List Monoid).
