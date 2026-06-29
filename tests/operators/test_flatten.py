@@ -3,11 +3,11 @@ import random
 
 import pytest
 
-from mappingtools.operators import flatten
+from mappingtools.operators import KeyFormat, flatten
 
 flatten_cases = [
     ({}, {}, {}),
-    ({'a': {'b': {'c': 1}, 'd': 2}}, {('a', 'b', 'c'): 1, ('a', 'd'): 2}, {'a.b.c': 1, 'a.d': 2})
+    ({'a': {'b': {'c': 1}, 'd': 2}}, {('a', 'b', 'c'): 1, ('a', 'd'): 2}, {'"a","b","c"': 1, '"a","d"': 2})
 ]
 
 
@@ -16,7 +16,7 @@ flatten_cases = [
 def test_flatten_nested_dict(nested_dict, expected_tuple_keys, expected_str_keys):
     # Act
     actual_tuple_keys = flatten(nested_dict)
-    actual_str_keys = flatten(nested_dict, '.')
+    actual_str_keys = flatten(nested_dict, KeyFormat.STR)
 
     # Assert
     assert actual_tuple_keys == expected_tuple_keys
@@ -90,7 +90,7 @@ def test_circular_references():
 def test_mixed_data_types():
     # Arrange
     nested_dict = {'a': {'b': 1, 'c': [2, 3], 'd': None}}
-    expected = {('a', 'b'): 1, ('a', 'c'): [2, 3], ('a', 'd'): None}
+    expected = {('a', 'b'): 1, ('a', 'c', 0): 2, ('a', 'c', 1): 3, ('a', 'd'): None}
 
     # Act
     result = flatten(nested_dict)
@@ -187,3 +187,46 @@ def test_misc_keys():
     }
     result = flatten(nested_dict)
     assert result == expected
+
+
+def test_key_formats_coverage():
+    nested_dict = {
+        'a': {
+            'b': 1,
+            0: 2,
+            'c-d': 3
+        }
+    }
+
+    # JSONPATH
+    res_jsonpath = flatten(nested_dict, KeyFormat.JSONPATH)
+    assert res_jsonpath == {
+        '$.a.b': 1,
+        '$.a[0]': 2,
+        '$.a["c-d"]': 3
+    }
+
+    # JAVASCRIPT
+    res_js = flatten(nested_dict, KeyFormat.JAVASCRIPT)
+    assert res_js == {
+        'a.b': 1,
+        'a[0]': 2,
+        'a["c-d"]': 3
+    }
+
+    # JSONPOINTER
+    res_pointer = flatten(nested_dict, KeyFormat.JSONPOINTER)
+    assert res_pointer == {
+        '/a/b': 1,
+        '/a/0': 2,
+        '/a/c-d': 3
+    }
+
+    # Private helper unit tests for full branch/line coverage
+    from mappingtools.operators import _tuple_to_json_path, _tuple_to_json_pointer
+    assert _tuple_to_json_pointer(()) == ''
+    assert _tuple_to_json_pointer(('a/b',)) == '/a~1b'
+    assert _tuple_to_json_pointer(('a~b',)) == '/a~0b'
+
+    with pytest.raises(ValueError):
+        _tuple_to_json_path(('a',), dialect='invalid')

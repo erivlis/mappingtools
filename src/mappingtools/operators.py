@@ -1,9 +1,11 @@
 import itertools
 from collections import defaultdict
-from collections.abc import Callable, Generator, Iterable, Mapping, Sequence
+from collections.abc import Callable, Generator, Hashable, Iterable, Mapping, Sequence
 from copy import deepcopy
+from enum import Enum, member
+from functools import lru_cache, partial
 from itertools import chain
-from typing import Any, overload
+from typing import Any, Literal, overload
 
 from mappingtools.aggregations import Aggregation
 from mappingtools.resolvers import DecisionMetric, LogicalResolver, NumericResolver, Resolver, ResolverType
@@ -11,6 +13,7 @@ from mappingtools.traversal import _is_traversal_iterable
 from mappingtools.typing import MISSING, Combine, K, Missing, T, Tree
 
 __all__ = [
+    'KeyFormat',
     'combine',
     'distinct',
     'flatten',
@@ -175,22 +178,65 @@ def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:
             yield value
 
 
-def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tuple | str, Any]:
+@lru_cache
+def _tuple_to_str(path: tuple[str | int, ...]) -> str:
+    return ",".join(f'"{p}"' if isinstance(p, str) else str(p) for p in path)
+
+
+@lru_cache
+def _tuple_to_json_path(path: tuple[str | int, ...], dialect: Literal['RFC_9535', 'Javascript']) -> str:
+    result = ''.join(
+        f".{p}" if isinstance(p, str) and p and p.replace('_', '').isalnum() and not p.isdigit() and not p[0].isdigit()
+        else (f"[{p}]" if isinstance(p, int) else f'["{p}"]')
+        for p in path
+    )
+
+    match dialect:
+        case 'RFC_9535':
+            return '$' + result
+        case 'Javascript':
+            return result.lstrip('.') if result.startswith('.') else result
+        case _:
+            raise ValueError(f"Unsupported dialect: {dialect}")
+
+
+@lru_cache
+def _tuple_to_json_pointer(path: tuple[str | int, ...]) -> str:
+    match path:
+        case ():
+            return ''
+        case _:
+            return '/' + '/'.join(
+                str(p).replace('~', '~0').replace('/', '~1')
+                if isinstance(p, str) else str(p)
+                for p in path
+            )
+
+
+class KeyFormat(Enum):
+    TUPLE = member(None)
+    STR = member(_tuple_to_str)
+    JAVASCRIPT = member(partial(_tuple_to_json_path, dialect='Javascript'))
+    JSONPATH = member(partial(_tuple_to_json_path, dialect='RFC_9535'))
+    JSONPOINTER = member(_tuple_to_json_pointer)
+
+
+def flatten(data: Tree[Any], key_format: KeyFormat = KeyFormat.TUPLE) -> Tree[Any]:
     """
-    Flatten a nested mapping structure into a single-level dictionary.
+    Flatten a nested tree structure (dicts and lists) into a single-level dictionary.
 
     Args:
-        mapping (Mapping[Any, Any]): The nested mapping to flatten.
-        delimiter (str | None): Uses this delimiter to join the path parts. If None then return path tuple.
+        data (Tree[Any]): The nested mapping or list to flatten.
+        key_format (KeyFormat): The format for keys. Defaults to KeyFormat.TUPLE.
 
     Returns:
-        dict
+        Tree[Any]: The flattened dictionary.
     """
     result = {}
     path = []
 
     def _recurse(value: Any):
-        if isinstance(value, Mapping):
+        if isinstance(value, dict):
             for k, v in value.items():
                 # Fast path for common atomic keys (str, int)
                 if isinstance(k, (str, int)):  # NOSONAR
@@ -213,15 +259,22 @@ def flatten(mapping: Mapping[Any, Any], delimiter: str | None = None) -> dict[tu
                     path.append(k)
                     _recurse(v)
                     path.pop()
+        elif isinstance(value, list):
+            for i, v in enumerate(value):
+                path.append(i)
+                _recurse(v)
+                path.pop()
         else:
             result[tuple(path)] = value
 
-    _recurse(mapping)
+    _recurse(data)
 
-    if delimiter is not None:
-        return {delimiter.join(map(str, k)): v for k, v in result.items()}
+    formatter: Callable[[tuple[str | int, ...]], Hashable] | None = key_format.value
 
-    return result
+    if not formatter:
+        return result
+
+    return {formatter(k): v for k, v in result.items()}
 
 
 def inverse(mapping: Mapping[Any, set]) -> Mapping[Any, set]:
