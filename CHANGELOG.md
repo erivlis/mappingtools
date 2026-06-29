@@ -1,3 +1,14 @@
+## v0.18.0 (2026-06-30)
+
+### Feat
+
+- **flatten**: Expands to flatten lists and adds key format options.
+
+### Refactor
+
+- **flatten**: Refactors flatten key formatting for improved performance.
+- Refines unique strings perf test with `perf_counter_ns`.
+
 ## v0.17.1 (2026-06-20)
 
 ### Refactor
