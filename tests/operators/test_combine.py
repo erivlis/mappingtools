@@ -99,21 +99,43 @@ def test_combine_with_union():
 
 
 def test_combine_with_coalesce_first():
-    # first is truthy, it should win
+    # first is not None, it should win (even if falsy like empty string)
     assert combine({"a": "john"}, {"a": ""}, op=Resolver.COALESCE_FIRST) == {"a": "john"}
-    # first is falsy, last should win
-    assert combine({"a": ""}, {"a": "john"}, op=Resolver.COALESCE_FIRST) == {"a": "john"}
-    # both are falsy, last should win
+    assert combine({"a": ""}, {"a": "john"}, op=Resolver.COALESCE_FIRST) == {"a": ""}
+    # first is None, last should win
     assert combine({"a": None}, {"a": 0}, op=Resolver.COALESCE_FIRST) == {"a": 0}
 
 
 def test_combine_with_coalesce_last():
-    # last is truthy, it should win
+    # last is not None, it should win (even if falsy like empty string)
     assert combine({"a": ""}, {"a": "john"}, op=Resolver.COALESCE_LAST) == {"a": "john"}
+    assert combine({"a": "john"}, {"a": ""}, op=Resolver.COALESCE_LAST) == {"a": ""}
+    # last is None, first should win
+    assert combine({"a": 0}, {"a": None}, op=Resolver.COALESCE_LAST) == {"a": 0}
+
+
+def test_combine_with_prefer_first():
+    # first is truthy, it should win
+    assert combine({"a": "john"}, {"a": ""}, op=Resolver.PREFER_FIRST) == {"a": "john"}
+    # first is falsy, last should win
+    assert combine({"a": ""}, {"a": "john"}, op=Resolver.PREFER_FIRST) == {"a": "john"}
+    # both are falsy, last should win
+    assert combine({"a": None}, {"a": 0}, op=Resolver.PREFER_FIRST) == {"a": 0}
+    # boolean special case: prefer first boolean regardless of value
+    assert combine({"a": True}, {"a": False}, op=Resolver.PREFER_FIRST) == {"a": True}
+    assert combine({"a": False}, {"a": True}, op=Resolver.PREFER_FIRST) == {"a": False}
+
+
+def test_combine_with_prefer_last():
+    # last is truthy, it should win
+    assert combine({"a": ""}, {"a": "john"}, op=Resolver.PREFER_LAST) == {"a": "john"}
     # last is falsy, first should win
-    assert combine({"a": "john"}, {"a": ""}, op=Resolver.COALESCE_LAST) == {"a": "john"}
-    # both are falsy, first should win
-    assert combine({"a": None}, {"a": 0}, op=Resolver.COALESCE_LAST) == {"a": None}
+    assert combine({"a": "john"}, {"a": ""}, op=Resolver.PREFER_LAST) == {"a": "john"}
+    # both are falsy
+    assert combine({"a": None}, {"a": 0}, op=Resolver.PREFER_LAST) == {"a": None}
+    # boolean special case: prefer last boolean regardless of value
+    assert combine({"a": True}, {"a": False}, op=Resolver.PREFER_LAST) == {"a": False}
+    assert combine({"a": False}, {"a": True}, op=Resolver.PREFER_LAST) == {"a": True}
 
 
 def test_combine_with_logical_and():
