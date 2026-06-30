@@ -1,3 +1,9 @@
+## v0.18.1 (2026-06-30)
+
+### Refactor
+
+- **resolvers**: Introduces prefer resolvers; refines coalesce to check None.
+
 ## v0.18.0 (2026-06-30)
 
 ### Feat
