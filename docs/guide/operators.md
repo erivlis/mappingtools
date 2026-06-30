@@ -22,8 +22,10 @@ Some of the most common resolvers from the `Resolver` enum include:
 
 * `Resolver.FIRST`: Keeps the original value (`tree1`).
 * `Resolver.LAST`: Overwrites with the new value (`tree2`).
-* `Resolver.COALESCE_FIRST`: Returns the first *truthy* value, otherwise the last value.
-* `Resolver.COALESCE_LAST`: Returns the last *truthy* value, otherwise the first value.
+* `Resolver.COALESCE_FIRST`: Returns the first value if it is not `None`, otherwise the last value.
+* `Resolver.COALESCE_LAST`: Returns the last value if it is not `None`, otherwise the first value.
+* `Resolver.PREFER_FIRST`: Returns the first truthy value, otherwise the last value.
+* `Resolver.PREFER_LAST`: Returns the last truthy value, otherwise the first value.
 * `Resolver.ALL`: Combines both values into a tuple.
 * `Resolver.FAIL`: Raises a `ValueError` on any conflict.
 
@@ -51,7 +53,7 @@ If you just need the standard "last-wins" behavior, you can use the simpler `mer
     print(first_wins)
     # output: {'a': 1, 'b': {'c': 10}, 'd': 5}
 
-    # 3. Coalesce falsy values
+    # 3. Coalesce None values
     tree3 = {"a": 0, "b": {"c": None}}
     coalesced = combine(tree3, tree2, op=Resolver.COALESCE_LAST)
     print(coalesced)
