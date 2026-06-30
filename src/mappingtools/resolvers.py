@@ -29,13 +29,13 @@ def _all_resolver(first: Any, last: Any) -> Any:
 
 
 def _coalesce_first_resolver(first: Any, last: Any) -> Any:
-    """Return the first truthy value."""
-    return first or last
+    """Return the first if it is not None otherwise return the last value."""
+    return last if first is None else first
 
 
 def _coalesce_last_resolver(first: Any, last: Any) -> Any:
-    """Return the last truthy value."""
-    return last or first
+    """Return the last if it is not None otherwise return the first value."""
+    return first if last is None else last
 
 
 def _fail_resolver(first: Any, last: Any) -> Any:
@@ -59,6 +59,26 @@ def _mark_resolver(first: Any, last: Any) -> dict[str, Any]:
 def _null_resolver(_: Any, __: Any) -> Any:
     """Always return None on a conflict."""
     return None
+
+
+def _prefer_first_resolver(first: Any, last: Any) -> Any:
+    """Return the first if it is a truthy value, otherwise return the last value."""
+
+    if isinstance(first, bool) and isinstance(last, bool):
+        # Special case for booleans: prefer True over False
+        return first
+
+    return first or last
+
+
+def _prefer_last_resolver(first: Any, last: Any) -> Any:
+    """Return the last if it is a truthy value, otherwise return the first value."""
+
+    if isinstance(first, bool) and isinstance(last, bool):
+        # Special case for booleans: prefer True over False
+        return last
+
+    return last or first
 
 
 def _strict_resolver(first: Any, last: Any) -> Any:
@@ -96,10 +116,10 @@ class Resolver(Enum):
     """Combine both values into a flat tuple."""
 
     COALESCE_FIRST = member(_coalesce_first_resolver)
-    """Return the first truthy value. If both are falsy, return the last one."""
+    """Return the first value if it is not None, otherwise return the last value."""
 
     COALESCE_LAST = member(_coalesce_last_resolver)
-    """Return the last truthy value. If both are falsy, return the first one."""
+    """Return the last value if it is not None, otherwise return the first value."""
 
     FAIL = member(_fail_resolver)
     """Raise a ValueError blindly on any intersection, enforcing that the trees are structurally mutually exclusive."""
@@ -115,6 +135,12 @@ class Resolver(Enum):
 
     NULL = member(_null_resolver)
     """Always return None on a conflict."""
+
+    PREFER_FIRST = member(_prefer_first_resolver)
+    """Return the first if it is a truthy value, otherwise return the last value."""
+
+    PREFER_LAST = member(_prefer_last_resolver)
+    """Return the last if it is a truthy value, otherwise return the first value."""
 
     STRICT = member(_strict_resolver)
     """Return the value if both are identical, otherwise raise a ValueError."""
