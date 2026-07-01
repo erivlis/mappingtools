@@ -1,7 +1,7 @@
 import operator
 from collections.abc import Callable
 from enum import Enum
-from typing import Any
+from typing import Any, cast
 
 from mappingtools.typing import MISSING, T, Tree
 
@@ -196,10 +196,11 @@ def _audit_metric(t1: Any, t2: Any, resolved: Any) -> str:
         return "clean"
     if t1 == t2:
         return "clean"
-    return f"conflict: {t1} vs {t2} -> {resolved}"
+    return f"conflict: `{t1}` vs `{t2}` -> `{resolved}`"
 
 
 def _change_metric(t1: Any, t2: Any, resolved: Any) -> str:
+    """Determine the change status of the resolved value."""
     if t1 is MISSING:
         return "added"
     if t2 is MISSING:
@@ -210,14 +211,13 @@ def _change_metric(t1: Any, t2: Any, resolved: Any) -> str:
 
 
 def _provenance_metric(t1: Any, t2: Any, resolved: Any) -> int | None:
+    """
+    Determine the provenance of the resolved value based on its origin.
+    """
     if t1 is MISSING:
         return 1
     if t2 is MISSING:
         return 0
-    if resolved is t1:
-        return 0
-    if resolved is t2:
-        return 1
     if type(resolved) is type(t1) and resolved == t1:
         return 0
     if type(resolved) is type(t2) and resolved == t2:
@@ -225,11 +225,12 @@ def _provenance_metric(t1: Any, t2: Any, resolved: Any) -> int | None:
     return None
 
 
-def _algebraic_expression_metric(t1: Any, t2: Any, resolved: Any) -> str:
-    """"""
-
-
 class DecisionMetric(Enum):
+    """
+    Decision metrics are used to evaluate the outcome of a merge operation,
+    providing insights into the nature of the resolution.
+    """
+
     AUDIT = member(_audit_metric)
     """Produces 'clean' or a conflict description string at conflict leaves."""
 
@@ -239,28 +240,29 @@ class DecisionMetric(Enum):
     PROVENANCE = member(_provenance_metric)
     """Produces 0 (tree1 wins), 1 (tree2 wins), or None (aggregative/composite) at conflict leaves."""
 
-    @staticmethod
-    def _calculate(x: Any, side: int, decision_op: Callable[[Any, Any, Any], Any] | None) -> Any:
+    @classmethod
+    def _calculate(cls, x: Any, side: int, decision_op: Callable[[Any, Any, Any], Any] | None) -> Any:
         if isinstance(x, dict):
-            return {k: (MISSING if v is MISSING else DecisionMetric._calculate(v, side, decision_op)) for k, v in
+            return {k: (MISSING if v is MISSING else cls._calculate(v, side, decision_op)) for k, v in
                     x.items()}
         elif isinstance(x, list):
-            return [(MISSING if v is MISSING else DecisionMetric._calculate(v, side, decision_op)) for v in x]
+            return [(MISSING if v is MISSING else cls._calculate(v, side, decision_op)) for v in x]
         else:
             if callable(decision_op):
                 return decision_op(x, MISSING, x) if side == 0 else decision_op(MISSING, x, x)
             return None
 
-    @staticmethod
+    @classmethod
     def calculate(
+            cls,
             combined_tree: Tree[Any],
             side: int,
             decision_op: Callable[[Any, Any, Any], Any] | None = None
     ) -> Tree[Any]:
-        return DecisionMetric._calculate(combined_tree, side=side, decision_op=decision_op)
+        return cls._calculate(combined_tree, side=side, decision_op=decision_op)
 
     def of(self, combined_tree: Tree[T], side: int) -> Tree[Any]:
-        op: Callable[[Any, Any, Any], Any] = self.value
+        op: Callable[[Any, Any, Any], Any] = cast(self.value)
         return self.calculate(combined_tree, side, op)
 
     @classmethod

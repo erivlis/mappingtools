@@ -24,61 +24,7 @@ __all__ = [
     'reshape',
 ]
 
-
-@overload
-def combine(
-        tree1: Tree[T] | Missing = MISSING,
-        tree2: Tree[T] | Missing = MISSING,
-        op: Combine | ResolverType = Resolver.LAST,
-        decision_metrics: None = None,
-) -> Tree[T] | Any:
-    ...
-
-
-@overload
-def combine(
-        tree1: Tree[T] | Missing = MISSING,
-        tree2: Tree[T] | Missing = MISSING,
-        op: Combine | ResolverType = Resolver.LAST,
-        decision_metrics: list[DecisionMetric | Callable[[Any, Any, Any], Any]] = ...,
-) -> tuple[Tree[T] | Any, dict[str, Tree[Any] | Any]]:
-    ...
-
-
-def combine(
-        tree1: Tree[T] | Missing = MISSING,
-        tree2: Tree[T] | Missing = MISSING,
-        op: Combine | ResolverType = Resolver.LAST,
-        decision_metrics: list[DecisionMetric | Callable[[Any, Any, Any], Any]] | None = None,
-) -> Any:
-    """
-    Combines two trees using a binary operator `op` that resolves conflicts at the leaf nodes.
-    Optionally extracts decision metrics of the combination process in a single recursive pass.
-
-    Args:
-        tree1: The first tree structure.
-        tree2: The second tree structure.
-        op: A resolver strategy or custom callable to handle conflicts. Defaults to Resolver.LAST.
-        decision_metrics: An optional list of DecisionMetric enums or custom callable metrics.
-
-    Returns:
-        The combined tree structure if decision_metrics is None, otherwise a 2-tuple containing:
-        1. The combined tree structure.
-        2. A dictionary mapping each metric's name to its corresponding metric tree.
-    """
-    if isinstance(op, (Resolver, LogicalResolver, NumericResolver)):
-        op = op.value
-
-    metric_ops = {}
-    if decision_metrics is not None and isinstance(decision_metrics, list):
-        metric_ops = dict(
-            (v.name, v.value) if isinstance(v, DecisionMetric) else (getattr(v, "__name__", str(v)), v)
-            for v in decision_metrics
-        )
-
-    collect = decision_metrics is not None
-    return _combine(tree1, tree2, op, metric_ops, collect=collect)
-
+# region combine
 
 def _combine(  # noqa: C901
         t1: Any,
@@ -156,6 +102,63 @@ def _combine(  # noqa: C901
 
     return resolved
 
+
+
+@overload
+def combine(
+        tree1: Tree[T] | Missing = MISSING,
+        tree2: Tree[T] | Missing = MISSING,
+        op: Combine | ResolverType = Resolver.LAST,
+        decision_metrics: None = None,
+) -> Tree[T] | Any:
+    ...
+
+
+@overload
+def combine(
+        tree1: Tree[T] | Missing = MISSING,
+        tree2: Tree[T] | Missing = MISSING,
+        op: Combine | ResolverType = Resolver.LAST,
+        decision_metrics: list[DecisionMetric | Callable[[Any, Any, Any], Any]] = ...,
+) -> tuple[Tree[T] | Any, dict[str, Tree[Any] | Any]]:
+    ...
+
+
+def combine(
+        tree1: Tree[T] | Missing = MISSING,
+        tree2: Tree[T] | Missing = MISSING,
+        op: Combine | ResolverType = Resolver.LAST,
+        decision_metrics: list[DecisionMetric | Callable[[Any, Any, Any], Any]] | None = None,
+) -> Any:
+    """
+    Combines two trees using a binary operator `op` that resolves conflicts at the leaf nodes.
+    Optionally extracts decision metrics of the combination process in a single recursive pass.
+
+    Args:
+        tree1: The first tree structure.
+        tree2: The second tree structure.
+        op: A resolver strategy or custom callable to handle conflicts. Defaults to Resolver.LAST.
+        decision_metrics: An optional list of DecisionMetric enums or custom callable metrics.
+
+    Returns:
+        The combined tree structure if decision_metrics is None, otherwise a 2-tuple containing:
+        1. The combined tree structure.
+        2. A dictionary mapping each metric's name to its corresponding metric tree.
+    """
+    if isinstance(op, (Resolver, LogicalResolver, NumericResolver)):
+        op = op.value
+
+    metric_ops = {}
+    if decision_metrics is not None and isinstance(decision_metrics, list):
+        metric_ops = dict(
+            (v.name, v.value) if isinstance(v, DecisionMetric) else (getattr(v, "__name__", str(v)), v)
+            for v in decision_metrics
+        )
+
+    collect = decision_metrics is not None
+    return _combine(tree1, tree2, op, metric_ops, collect=collect)
+
+# endregion combine
 
 def distinct(key: K, *mappings: Mapping[K, Any]) -> Generator[Any, Any, None]:
     """
