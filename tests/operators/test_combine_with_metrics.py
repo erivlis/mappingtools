@@ -26,7 +26,7 @@ def test_combine_with_audit_metric():
 
     combined, metrics = combine(t1, t2, Resolver.LAST, [DecisionMetric.AUDIT])
     assert combined == {"a": 99, "b": 2}
-    assert metrics["AUDIT"] == {"a": "conflict: 1 vs 99 -> 99", "b": "clean"}
+    assert metrics["AUDIT"] == {"a": "conflict: `1` vs `99` -> `99`", "b": "clean"}
 
 
 def test_combine_with_changelog_metric():
@@ -49,7 +49,7 @@ def test_combine_with_multiple_metrics_dict():
     assert combined == {"a": 99, "b": 2}
     assert isinstance(metrics, dict)
     assert metrics["PROVENANCE"] == {"a": 1, "b": 0}
-    assert metrics["AUDIT"] == {"a": "conflict: 1 vs 99 -> 99", "b": "clean"}
+    assert metrics["AUDIT"] == {"a": "conflict: `1` vs `99` -> `99`", "b": "clean"}
 
 
 def test_combine_with_custom_callback():

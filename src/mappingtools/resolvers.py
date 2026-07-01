@@ -1,7 +1,6 @@
 import operator
-from collections.abc import Callable
 from enum import Enum
-from typing import Any, cast
+from typing import Any, cast, Protocol
 
 from mappingtools.typing import MISSING, T, Tree
 
@@ -19,6 +18,8 @@ except ImportError:  # pragma: no cover
         def __call__(self, *args, **kwargs):
             return self.value(*args, **kwargs)
 
+
+# region Resolvers
 
 def _all_resolver(first: Any, last: Any) -> Any:
     """Keep both values as a tuple in a conflict.
@@ -191,6 +192,16 @@ class NumericResolver(Enum):
 ResolverType = Resolver | LogicalResolver | NumericResolver
 
 
+# endregion Resolvers
+
+# region Decision Metrics
+
+class DecisionMetricOperator(Protocol):
+
+    def __call__(self, t1: Any, t2: Any, resolved: Any) -> Any:
+        ...
+
+
 def _audit_metric(t1: Any, t2: Any, resolved: Any) -> str:
     if t1 is MISSING or t2 is MISSING:
         return "clean"
@@ -241,15 +252,15 @@ class DecisionMetric(Enum):
     """Produces 0 (tree1 wins), 1 (tree2 wins), or None (aggregative/composite) at conflict leaves."""
 
     @classmethod
-    def _calculate(cls, x: Any, side: int, decision_op: Callable[[Any, Any, Any], Any] | None) -> Any:
+    def _calculate(cls, x: Any, side: int, decision_operator: DecisionMetricOperator | None) -> Any:
         if isinstance(x, dict):
-            return {k: (MISSING if v is MISSING else cls._calculate(v, side, decision_op)) for k, v in
+            return {k: (MISSING if v is MISSING else cls._calculate(v, side, decision_operator)) for k, v in
                     x.items()}
         elif isinstance(x, list):
-            return [(MISSING if v is MISSING else cls._calculate(v, side, decision_op)) for v in x]
+            return [(MISSING if v is MISSING else cls._calculate(v, side, decision_operator)) for v in x]
         else:
-            if callable(decision_op):
-                return decision_op(x, MISSING, x) if side == 0 else decision_op(MISSING, x, x)
+            if callable(decision_operator):
+                return decision_operator(x, MISSING, x) if side == 0 else decision_operator(MISSING, x, x)
             return None
 
     @classmethod
@@ -257,14 +268,16 @@ class DecisionMetric(Enum):
             cls,
             combined_tree: Tree[Any],
             side: int,
-            decision_op: Callable[[Any, Any, Any], Any] | None = None
+            decision_op: DecisionMetricOperator | None = None
     ) -> Tree[Any]:
-        return cls._calculate(combined_tree, side=side, decision_op=decision_op)
+        return cls._calculate(combined_tree, side=side, decision_operator=decision_op)
 
     def of(self, combined_tree: Tree[T], side: int) -> Tree[Any]:
-        op: Callable[[Any, Any, Any], Any] = cast(self.value)
-        return self.calculate(combined_tree, side, op)
+        decision_op: DecisionMetricOperator = cast(DecisionMetricOperator, self.value)
+        return self.calculate(combined_tree, side, decision_op)
 
     @classmethod
     def nullify(cls, combined_tree: Tree[T]) -> Tree[Any]:
         return cls.calculate(combined_tree, side=0)
+
+# endregion Decision Metrics
