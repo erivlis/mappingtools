@@ -1,6 +1,6 @@
 import operator
 from enum import Enum
-from typing import Any, cast, Protocol
+from typing import Any, Protocol, cast
 
 from mappingtools.typing import MISSING, T, Tree
 

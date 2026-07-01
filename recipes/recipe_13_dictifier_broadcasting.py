@@ -27,6 +27,7 @@ class Sensor:
         self._temp += offset
         return self
 
+
 def main():
     # 1. A dictionary of standard Python objects
     sensors = {
@@ -44,7 +45,7 @@ def main():
     # and returns a new Dictifier containing the results.
     names = fleet.name
     print("--- Sensor Names ---")
-    print(names) # Output: {'engine_bay': 'Engine', 'cabin': 'Cabin', 'exhaust': 'Exhaust'}
+    print(names)  # Output: {'engine_bay': 'Engine', 'cabin': 'Cabin', 'exhaust': 'Exhaust'}
 
     # 4. Broadcast a method call (.read_temperature())
     # This calls the method on every sensor and collects the return values

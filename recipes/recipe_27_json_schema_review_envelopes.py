@@ -214,8 +214,9 @@ def test_deeply_nested_schema_wraps_scalar_properties_and_scalar_items_only():
                'value'] == {'type': 'string'}
     assert review_schema['properties']['addresses']['items']['properties']['country_codes']['type'] == 'array'
     assert \
-    review_schema['properties']['addresses']['items']['properties']['country_codes']['items']['oneOf'][0]['properties'][
-        'value'] == {'type': 'string'}
+        review_schema['properties']['addresses']['items']['properties']['country_codes']['items']['oneOf'][0][
+            'properties'][
+            'value'] == {'type': 'string'}
 
     assert review_schema['properties']['matrix']['type'] == 'array'
     assert review_schema['properties']['matrix']['items']['type'] == 'array'
@@ -462,8 +463,10 @@ def main():
     print('\n--- 4. Derived Review Schema ---')
     print(json.dumps(review_schema, indent=2))
 
+
 def test_main():
     main()
+
 
 if __name__ == '__main__':
     main()

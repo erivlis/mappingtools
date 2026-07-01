@@ -163,8 +163,10 @@ def main():
     print('\n--- 3. Derived Public Schema ---')
     print(json.dumps(public_schema, indent=2))
 
+
 def test_main():
     main()
+
 
 if __name__ == '__main__':
     main()
