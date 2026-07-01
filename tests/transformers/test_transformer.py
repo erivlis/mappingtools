@@ -1,5 +1,3 @@
-import pytest
-
 from mappingtools.transformers.transformer import Transformer
 
 
