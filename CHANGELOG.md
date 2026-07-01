@@ -1,3 +1,9 @@
+## v0.18.2 (2026-07-01)
+
+### Refactor
+
+- Organizes `combine` function and refines decision metric logic.
+
 ## v0.18.1 (2026-06-30)
 
 ### Refactor
