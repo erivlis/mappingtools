@@ -21,9 +21,9 @@ def main():
     # 1. The Raw Payload (Legacy or malformed data from a client)
     raw_payload = {
         "user": {
-            "id": "1042",               # Schema expects an integer!
-            "first_name": "Alice",      # Schema evolved: deprecated, use 'given_name'
-            "last_name": "Smith",       # Schema evolved: deprecated, use 'family_name'
+            "id": "1042",  # Schema expects an integer!
+            "first_name": "Alice",  # Schema evolved: deprecated, use 'given_name'
+            "last_name": "Smith",  # Schema evolved: deprecated, use 'family_name'
         },
         "settings": {
             "theme": "dark"
@@ -67,7 +67,7 @@ def main():
         target_type = schema_spec["type_casts"][path]
         lens = Lens.path(*path)
         # Safely cast the value
-        return lens.modify(state, lambda val: target_type(val))
+        return lens.modify(state, target_type)
 
     casted_payload = reduce(apply_cast, paths_to_cast, raw_payload)
 
@@ -84,7 +84,7 @@ def main():
             val = old_lens.get(state)
             return new_lens.set(state, val)
         except KeyError:
-            return state # Old path wasn't in the payload, skip
+            return state  # Old path wasn't in the payload, skip
 
     migrated_payload = reduce(apply_migration, schema_spec["migrations"].keys(), casted_payload)
 
