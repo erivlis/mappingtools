@@ -46,6 +46,7 @@ modifying their inputs.
 - **Reasoning:** This indicates a commitment to creating a maintainable, production-ready library. The high test
   coverage and clear docstrings serve as a foundation for future development.
 
+
 ---
 
 ## Namespace-Specific Decisions
@@ -74,6 +75,14 @@ modifying their inputs.
 - **Specific Example (`stream`):** The inclusion of generator-based functions indicates a focus on memory efficiency for
   large datasets, allowing for lazy processing pipelines.
 
+### `structures`
+
+- **Decision:** Create a new category for advanced, specialized data structures.
+- **Reasoning:** This namespace is for classes that extend the capabilities of standard Python data structures (like
+  `dict` or `list`) with significant new behaviors. While the initial focus is on proxying (`Dictifier`), the namespace
+  is designed to hold any complex data container that doesn't fit the "stateless operator" or "simple collector"
+  paradigms.
+
 ### `transformers`
 
 - **Decision:** Provide pure functions that recursively process complex, nested objects.
@@ -87,70 +96,58 @@ modifying their inputs.
   This decision supports use cases where a flat, list-based representation is required (e.g., for certain UI components
   or data exports).
 
-### `structures`
-
-- **Decision:** Create a new category for advanced, specialized data structures.
-- **Reasoning:** This namespace is for classes that extend the capabilities of standard Python data structures (like
-  `dict` or `list`) with significant new behaviors. While the initial focus is on proxying (`Dictifier`), the namespace
-  is designed to hold any complex data container that doesn't fit the "stateless operator" or "simple collector"
-  paradigms.
 
 ---
 
-## The `structures` Namespace (Detailed)
+## Detailed Implementation Decisions
+
+### `Dictifier`
 
 This section details the specific decisions made during the implementation of the `Dictifier` family of classes.
 
-### 1. Unified `Dictifier` with Strict and Auto Modes
+1. Unified `Dictifier` with Strict and Auto Modes
 
-**Decision:** We unified `Dictifier` and `AutoDictifier` into a single class with two modes.
+    - **Decision:** We unified `Dictifier` and `AutoDictifier` into a single class with two modes.
+    - **Context:** We initially had two separate classes.
+    - **Reasoning:** "Auto-inference" is a behavior, not a fundamental type. A single, more powerful `Dictifier` class
+      is a cleaner API. Strict mode is the default for safety, and auto-inference is explicitly enabled via the
+      `Dictifier.auto()` factory method.
 
-- **Context:** We initially had two separate classes.
-- **Reasoning:** "Auto-inference" is a behavior, not a fundamental type. A single, more powerful `Dictifier` class is a
-  cleaner API. Strict mode is the default for safety, and auto-inference is explicitly enabled via the
-  `Dictifier.auto()` factory method.
+2. Intelligent Chaining (The Hybrid Approach)
 
-### 2. Intelligent Chaining (The Hybrid Approach)
+    - **Decision:** Method proxies return a strict `Dictifier` if a return type hint is found, but fall back to a
+      `Dictifier` in auto-inference mode if not.
+    - **Context:** Python's dynamic nature makes it hard to know the return type of a proxied method at runtime without
+      hints.
+    - **Reasoning:** This hybrid approach offers the best of both worlds. Well-typed code gets full type safety deep
+      into the chain. Untyped code (or built-ins) doesn't crash; it just degrades gracefully to inference-based
+      chaining.
 
-**Decision:** Method proxies return a strict `Dictifier` if a return type hint is found, but fall back to a `Dictifier`
-in auto-inference mode if not.
+3. Deep Proxying via Type Hints
 
-- **Context:** Python's dynamic nature makes it hard to know the return type of a proxied method at runtime without
-  hints.
-- **Reasoning:** This hybrid approach offers the best of both worlds. Well-typed code gets full type safety deep into
-  the chain. Untyped code (or built-ins) doesn't crash; it just degrades gracefully to inference-based chaining.
+    - **Decision:** Field access (`users.address`) recursively wraps the result in a `Dictifier` *only* if the field has
+      a class type hint.
+    - **Context:** We wanted to support navigation like `users.address.city`.
+    - **Reasoning:** Recursively wrapping everything is slow and confusing (wrapping primitives). Using type hints as
+      the trigger makes the behavior predictable and aligns with the user's intent defined in their data model.
 
-### 3. Deep Proxying via Type Hints
+4. "Compile-Time" Optimization via Factory Method
+    - **Decision:** The logic for pre-compiling proxies was moved from a standalone `@dictify` decorator into a
+      `Dictifier.of()` class method.
+    - **Context:** The generic `Dictifier` relies on `__getattr__`, which is slow. The decorator was a performance
+      optimization.
+    - **Reasoning:** Moving the optimization logic into the class itself improves cohesion (the class knows how to
+      specialize itself). The `@dictify` decorator is kept as a convenient alias for `@Dictifier.of`.
 
-**Decision:** Field access (`users.address`) recursively wraps the result in a `Dictifier` *only* if the field has a
-class type hint.
+5. LazyDictifier as a Separate Entity
 
-- **Context:** We wanted to support navigation like `users.address.city`.
-- **Reasoning:** Recursively wrapping everything is slow and confusing (wrapping primitives). Using type hints as the
-  trigger makes the behavior predictable and aligns with the user's intent defined in their data model.
+    - **Decision:** `LazyDictifier` is a distinct class, not a mode of `Dictifier`.
+    - **Context:** We considered merging them (`Dictifier(lazy=True)`).
+    - **Reasoning:** The two have fundamentally different semantics. `Dictifier` is a **Mutable Snapshot** (you can
+      add/remove items). `LazyDictifier` is an **Immutable View** (a computation pipeline). Merging them would create a
+      confusing API with conflicting behaviors.
 
-### 4. "Compile-Time" Optimization via Factory Method
-
-**Decision:** The logic for pre-compiling proxies was moved from a standalone `@dictify` decorator into a
-`Dictifier.of()` class method.
-
-- **Context:** The generic `Dictifier` relies on `__getattr__`, which is slow. The decorator was a performance
-  optimization.
-- **Reasoning:** Moving the optimization logic into the class itself improves cohesion (the class knows how to
-  specialize itself). The `@dictify` decorator is kept as a convenient alias for `@Dictifier.of`.
-
-### 5. LazyDictifier as a Separate Entity
-
-**Decision:** `LazyDictifier` is a distinct class, not a mode of `Dictifier`.
-
-- **Context:** We considered merging them (`Dictifier(lazy=True)`).
-- **Reasoning:** The two have fundamentally different semantics. `Dictifier` is a **Mutable Snapshot** (you can
-  add/remove items). `LazyDictifier` is an **Immutable View** (a computation pipeline). Merging them would create a
-  confusing API with conflicting behaviors.
-
-### 6. Async Support
-
-**Decision:** `Dictifier` detects `async def` methods and returns an async proxy that uses `asyncio.gather`.
-
-- **Reasoning:** Modern Python relies heavily on async. Broadcasting an async call concurrently across a collection is a
-  high-value feature that fits naturally with the "Batch Processing" mental model of the library.
+6. Async Support
+    - **Decision:** `Dictifier` detects `async def` methods and returns an async proxy that uses `asyncio.gather`.
+    - **Reasoning:** Modern Python relies heavily on async. Broadcasting an async call concurrently across a collection
+      is a high-value feature that fits naturally with the "Batch Processing" mental model of the library.
