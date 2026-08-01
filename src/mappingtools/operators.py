@@ -24,9 +24,10 @@ __all__ = [
     'reshape',
 ]
 
+
 # region combine
 
-def _combine(  # noqa: C901
+def _combine(  # NOSOANR
         t1: Any,
         t2: Any,
         op: Any,
@@ -101,7 +102,6 @@ def _combine(  # noqa: C901
         return resolved, res_metrics
 
     return resolved
-
 
 
 @overload

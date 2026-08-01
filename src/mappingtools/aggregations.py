@@ -35,8 +35,8 @@ def last_aggregator(mapping: MutableMapping, key: Any, values: Iterable[Any]):
         mapping[key] = values[-1]
     else:
         val = None
-        for val in values:
-            pass
+        for v in values:
+            val = v
         mapping[key] = val
 
 

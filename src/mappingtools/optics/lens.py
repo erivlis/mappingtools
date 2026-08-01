@@ -127,10 +127,10 @@ class Lens(Generic[T, U]):
             # Generic fallback for other mutable containers
             try:
                 new_s = copy.copy(s)
-            except Exception:
+            except Exception as e:
                  # If we can't copy, we might have to fail or mutate.
                  # For a library like this, failing on uncopyable types is safer than silent mutation.
-                 raise TypeError(f"Cannot set item immutably on {type(s)}")
+                 raise TypeError(f"Cannot set item immutably on {type(s)}") from e
             else:
                 new_s[k] = v
                 return new_s

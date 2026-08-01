@@ -53,7 +53,7 @@ def _create_async_method_proxy(method_name: str, return_type: type | None) -> Ca
             for key, value in self.items()
         }
         results_list = await asyncio.gather(*coros.values())
-        results = dict(zip(coros.keys(), results_list))
+        results = dict(zip(coros.keys(), results_list, strict=False))
         return _wrap_results(results, return_type)
 
     return proxy
