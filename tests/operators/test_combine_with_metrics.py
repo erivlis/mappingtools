@@ -219,3 +219,59 @@ def test_decision_metric_of_method():
     assert prov_tree == {"c": [MISSING, 1]}
     assert audit_tree == {"c": [MISSING, "clean"]}
     assert changelog_tree == {"c": [MISSING, "added"]}
+
+
+def test_combine_with_conflict_count_metric():
+    t1 = {"a": 1, "b": 2, "c": [10, 20]}
+    t2 = {"a": 99, "b": 2, "c": [30]}
+
+    combined, metrics = combine(t1, t2, Resolver.LAST, [DecisionMetric.CONFLICT_COUNT])
+    assert combined == {"a": 99, "b": 2, "c": [30, 20]}
+    # 'a' conflict (1 vs 99) -> 1
+    # 'b' no conflict (2 vs 2) -> 0
+    # c[0] conflict (10 vs 30) -> 1
+    # c[1] non-overlapping (present only in t1) -> 0
+    assert metrics["CONFLICT_COUNT"] == {"a": 1, "b": 0, "c": [1, 0]}
+
+
+def test_conflict_count_metric_of_method():
+    from mappingtools.typing import MISSING
+    combined = {"a": 99, "b": 2, "c": [30, MISSING]}
+    count_tree = DecisionMetric.CONFLICT_COUNT.of(combined, 1)
+    assert count_tree == {"a": 0, "b": 0, "c": [0, MISSING]}
+
+
+def test_combine_with_change_count_metric():
+    t1 = {"a": 1, "b": 2, "c": [10, 20]}
+    t2 = {"a": 99, "b": 2, "c": [30], "d": 4}
+
+    # Case Resolver.LAST:
+    # 'a': conflict (1 vs 99), resolved to 99 (updated) -> 1
+    # 'b': no conflict (2 vs 2), resolved to 2 (unchanged) -> 0
+    # 'c[0]': conflict (10 vs 30), resolved to 30 (updated) -> 1
+    # 'c[1]': non-overlapping in t1 (20), resolved to 20 (unchanged) -> 0
+    # 'd': non-overlapping in t2 (4), resolved to 4 (added) -> 1
+    combined, metrics = combine(t1, t2, Resolver.LAST, [DecisionMetric.CHANGE_COUNT])
+    assert combined == {"a": 99, "b": 2, "c": [30, 20], "d": 4}
+    assert metrics["CHANGE_COUNT"] == {"a": 1, "b": 0, "c": [1, 0], "d": 1}
+
+    # Case Resolver.FIRST:
+    # 'a': conflict (1 vs 99), resolved to 1 (unchanged) -> 0
+    # 'b': no conflict (2 vs 2), resolved to 2 (unchanged) -> 0
+    # 'c[0]': conflict (10 vs 30), resolved to 10 (unchanged) -> 0
+    # 'c[1]': non-overlapping in t1 (20), resolved to 20 (unchanged) -> 0
+    # 'd': non-overlapping in t2 (4), resolved to 4 (added) -> 1
+    combined, metrics = combine(t1, t2, Resolver.FIRST, [DecisionMetric.CHANGE_COUNT])
+    assert combined == {"a": 1, "b": 2, "c": [10, 20], "d": 4}
+    assert metrics["CHANGE_COUNT"] == {"a": 0, "b": 0, "c": [0, 0], "d": 1}
+
+
+def test_change_count_metric_of_method():
+    from mappingtools.typing import MISSING
+    combined = {"a": 99, "b": 2, "c": [30, MISSING]}
+    change_count_tree = DecisionMetric.CHANGE_COUNT.of(combined, 1)
+    assert change_count_tree == {"a": 1, "b": 1, "c": [1, MISSING]}
+
+    change_count_tree_side_0 = DecisionMetric.CHANGE_COUNT.of(combined, 0)
+    assert change_count_tree_side_0 == {"a": 0, "b": 0, "c": [0, MISSING]}
+

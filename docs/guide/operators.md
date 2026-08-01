@@ -72,9 +72,13 @@ Built-in metric strategies include:
 
 * `DecisionMetric.AUDIT`: Produces conflict log descriptions (e.g., `"conflict: 10 vs 20 -> 20"` or `"clean"`).
 * `DecisionMetric.CHANGELOG`: Tracks mutation status relative to `tree1` (`"added"`, `"updated"`, `"unchanged"`).
+* `DecisionMetric.CHANGE_COUNT`: Counts the number of value modifications or additions relative to `tree1` (`1` if
+  added/updated, `0` if unchanged).
+* `DecisionMetric.CONFLICT_COUNT`: Counts the number of actual leaf conflict resolutions (`1` if a conflict occurred,
+  `0` if clean).
 * `DecisionMetric.PROVENANCE`: Tracks which tree (0: `tree1`, 1: `tree2`, `None`: composite/aggregative conflict) each
   leaf came from.
- 
+
 !!! Example "Extracting decision metrics in a single pass"
 
     <!-- name: test_combine_with_metrics -->
@@ -130,7 +134,8 @@ Yields distinct values for a specified key across multiple mappings.
 
 ## flatten
 
-The `flatten` function takes a nested tree structure (dicts and lists) and converts it into a single-level dictionary. The key path formatting can be customized using the `key_format` parameter with the `KeyFormat` enum:
+The `flatten` function takes a nested tree structure (dicts and lists) and converts it into a single-level dictionary.
+The key path formatting can be customized using the `key_format` parameter with the `KeyFormat` enum:
 
 * `KeyFormat.TUPLE`: Keys are path tuples of `(key, index, ...)`. (Default)
 * `KeyFormat.STR`: Keys are string-joined path parts (e.g. `'"a","b","c"'`).
@@ -180,20 +185,18 @@ Swaps keys and values in a dictionary.
 
 ## merge
 
-A pure function (Monoid operation) to deeply merge two recursive tree structures.
-The merging strategy resolves conflicts by overwriting existing values with new ones (right-side precedence),
-unless the conflict is a list vs. scalar, in which case it concatenates (appends/prepends) the list.
+A pure function (Monoid operation) to deeply merge two recursive tree structures. The merging strategy resolves
+conflicts by overwriting existing values with new ones (right-side precedence), unless the conflict is a list vs.
+scalar, in which case it concatenates (appends/prepends) the list.
 
 Mathematically, this operation forms a composite Monoid:
 
-- Last Monoid (Scalar Fallback): When resolving conflicts between simple values, the right-hand
-  side (`tree2`) wins.
-- Pointwise Monoid (Dictionary Merge): If the values are dictionaries, they are merged by key,
-  recursively calling `merge` on the values.
-- Zip Monoid (List Merge): If both are lists, they are zipped and merged positionally,
-  substituting `MISSING` for missing indices.
-- Free Monoid (Mixed List/Scalar): If one is a list and the other is a scalar/dict,
-  it concatenates (appends/prepends).
+- Last Monoid (Scalar Fallback): When resolving conflicts between simple values, the right-hand side (`tree2`) wins.
+- Pointwise Monoid (Dictionary Merge): If the values are dictionaries, they are merged by key, recursively calling
+  `merge` on the values.
+- Zip Monoid (List Merge): If both are lists, they are zipped and merged positionally, substituting `MISSING` for
+  missing indices.
+- Free Monoid (Mixed List/Scalar): If one is a list and the other is a scalar/dict, it concatenates (appends/prepends).
 
 Because it forms a Monoid, this function can be used with `functools.reduce` to collect an iterable of trees into a
 single structure.
@@ -264,8 +267,8 @@ single structure.
 
 ## pivot
 
-Reshapes a list of mappings into a nested dictionary based on index and column keys.
-Supports different aggregation modes via `Aggregation`.
+Reshapes a list of mappings into a nested dictionary based on index and column keys. Supports different aggregation
+modes via `Aggregation`.
 
 !!! Example
 
@@ -295,8 +298,8 @@ Supports different aggregation modes via `Aggregation`.
 
 ## reshape
 
-A generalization of `pivot` that creates nested dictionaries (tensors) of arbitrary depth.
-While `pivot` is limited to 2 dimensions (Index, Columns), `reshape` accepts a sequence of keys to define the hierarchy.
+A generalization of `pivot` that creates nested dictionaries (tensors) of arbitrary depth. While `pivot` is limited to 2
+dimensions (Index, Columns), `reshape` accepts a sequence of keys to define the hierarchy.
 
 !!! Example
 
@@ -351,10 +354,9 @@ While `pivot` is limited to 2 dimensions (Index, Columns), `reshape` accepts a s
 
 ## rekey
 
-Transforms keys of a mapping based on a factory function of `(key, value)`.
-This allows "re-indexing" a mapping where the new key depends on the content
-of the value or a combination of the old key and value. Collisions are
-handled according to the specified aggregation.
+Transforms keys of a mapping based on a factory function of `(key, value)`. This allows "re-indexing" a mapping where
+the new key depends on the content of the value or a combination of the old key and value. Collisions are handled
+according to the specified aggregation.
 
 !!! Example
 
@@ -385,9 +387,8 @@ handled according to the specified aggregation.
 
 ## rename
 
-Renames keys in a mapping based on a mapper (Mapping or Callable).
-If a key is not present in the mapper, it remains unchanged. Collisions
-are handled according to the specified aggregation.
+Renames keys in a mapping based on a mapper (Mapping or Callable). If a key is not present in the mapper, it remains
+unchanged. Collisions are handled according to the specified aggregation.
 
 !!! Example
 

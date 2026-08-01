@@ -221,6 +221,19 @@ def _change_metric(t1: Any, t2: Any, resolved: Any) -> str:
     return "updated"
 
 
+def _conflict_count_metric(t1: Any, t2: Any, resolved: Any) -> int:
+    """Count the number of conflict leaves in the tree."""
+    if t1 is MISSING or t2 is MISSING:
+        return 0
+    return 0 if t1 == t2 else 1
+
+def _change_count_metric(t1: Any, t2: Any, resolved: Any) -> int:
+    """Count the number of changes of leaf values in the tree."""
+    if t1 is MISSING:
+        return 1
+    return 0 if resolved == t1 else 1
+
+
 def _provenance_metric(t1: Any, t2: Any, resolved: Any) -> int | None:
     """
     Determine the provenance of the resolved value based on its origin.
@@ -247,6 +260,12 @@ class DecisionMetric(Enum):
 
     CHANGELOG = member(_change_metric)
     """Produces 'added', 'updated', or 'unchanged' relative to tree1."""
+
+    CHANGE_COUNT = member(_change_count_metric)
+    """Counts the number of changes of leave values in the tree."""
+
+    CONFLICT_COUNT = member(_conflict_count_metric)
+    """Counts the number of conflict leaves in the tree."""
 
     PROVENANCE = member(_provenance_metric)
     """Produces 0 (tree1 wins), 1 (tree2 wins), or None (aggregative/composite) at conflict leaves."""
