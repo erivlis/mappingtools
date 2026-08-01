@@ -117,18 +117,20 @@ def test_large_data_size():
     # Arrange
     range_1 = random.randint(100, 200)
     range_2 = random.randint(100, 200)
+
+    first_item = (0, 0)
+    last_item = (range_1 - 1, range_2 - 1)
+
     large_dict = {i: {j: i * 10 + j for j in range(range_2)} for i in range(range_1)}
 
-    # Act & Assert (no exception should be raised)
-    try:
-        actual = flatten(large_dict)
-        assert actual is not None
-        assert len(actual) == range_2 * range_1
-        assert actual[(0, 0)] == 0
-        assert actual[(range_1 - 1, range_2 - 1)] == (range_1 - 1) * 10 + range_2 - 1
+    # Act
+    actual = flatten(large_dict)
 
-    except Exception:
-        pytest.fail("Function raised an exception on large data size")
+    # Assert
+    assert actual is not None
+    assert len(actual) == range_2 * range_1
+    assert actual[first_item] == 0
+    assert actual[last_item] == (range_1 - 1) * 10 + range_2 - 1
 
 
 # Handle dictionaries with deeply nested structures
