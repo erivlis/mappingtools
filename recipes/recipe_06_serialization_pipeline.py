@@ -11,7 +11,7 @@ library `json.dumps(default=...)`, a simple value handler solves it.
 
 import json
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from mappingtools.transformers import strictify
 
@@ -29,7 +29,7 @@ def main():
     user = User(
         id=42,
         name="Bob",
-        created_at=datetime(2025, 1, 1, tzinfo=timezone.utc),
+        created_at=datetime(2025, 1, 1, tzinfo=UTC),
         tags={"developer", "admin"}
     )
 

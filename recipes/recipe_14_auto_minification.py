@@ -14,7 +14,7 @@ to achieve BOTH deep minification AND deep serialization simultaneously, ensurin
 the output is 100% JSON-ready.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from mappingtools.collectors import AutoMapper
 from mappingtools.transformers import strictify
@@ -26,12 +26,12 @@ def main():
         "customer_profile_information": {
             "customer_identifier_uuid": "user_99182",
             "primary_contact_email_address": "alice@example.com",
-            "communication_preferences": {"email", "sms_marketing"} # This is a SET (Not JSON serializable!)
+            "communication_preferences": {"email", "sms_marketing"}  # This is a SET (Not JSON serializable!)
         },
         "transaction_history_records": [
             {
                 "transaction_identifier_uuid": "tx_001",
-                "transaction_timestamp_utc": datetime(2025, 10, 26, 12, 0, tzinfo=timezone.utc), # Datetime!
+                "transaction_timestamp_utc": datetime(2025, 10, 26, 12, 0, tzinfo=UTC),  # Datetime!
                 "transaction_amount_usd_cents": 15000
             }
         ]

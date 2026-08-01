@@ -369,6 +369,8 @@ def test_traversal_registry_thread_safety_concurrent_access():
 
 
 def test_traversal_registry_double_checked_lock_branch_coverage():
+
+    # Arrange
     registry = TraversalModeRegistry()
 
     class DictWithRace(dict):
@@ -383,10 +385,14 @@ def test_traversal_registry_double_checked_lock_branch_coverage():
                 self[item] = TraversalMode.LEAF
             return contained
 
+
     registry._cache = DictWithRace()
 
+    # Act
     # This will hit the first check (false), populate the cache in contains,
     # enter the lock, hit the second check (true), and return from the second check.
     res = registry.resolve(int)
+
+    # Assert
     assert res is TraversalMode.LEAF
 

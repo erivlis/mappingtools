@@ -14,7 +14,7 @@ Tree: TypeAlias = T | list['Tree[T]'] | dict[str, 'Tree[T]']
 """Tree is a recursive type representing a tree structure where each node can be of type T,
 a list of subtrees, or a dictionary mapping strings to subtrees."""
 
-JsonScalar: TypeAlias = None | bool | int | float | str
+JsonScalar: TypeAlias = bool | int | float | str | None
 """JsonScalar represents the basic scalar types found in JSON data."""
 
 JsonTree: TypeAlias = Tree[JsonScalar]

@@ -1,11 +1,10 @@
 import functools
 from collections import defaultdict, deque
 from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Flag, auto
 from typing import Any
 
-from mappingtools._compat import UTC
 from mappingtools.typing import KT, VT_co
 
 
@@ -116,7 +115,9 @@ class TimeSeries:
 
         effective_weights = weights[-len(self._durations):]
         total_weights = sum(effective_weights)
-        return sum(w * d.total_seconds() for w, d in zip(effective_weights, self._durations)) / total_weights
+        return sum(
+            w * d.total_seconds() for w, d in zip(effective_weights, self._durations, strict=False)
+        ) / total_weights
 
     def durations(self) -> list[timedelta]:
         return list(self._durations)

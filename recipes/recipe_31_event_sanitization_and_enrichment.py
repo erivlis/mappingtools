@@ -12,7 +12,7 @@ Solution:
 2) Use `merge` to enrich every `metadata` mapping found in the resulting tree.
 """
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from mappingtools.operators import merge
@@ -131,7 +131,7 @@ def main():
 
     metadata_patch = {
         "trace_id": "trc-2026-000042",
-        "updated_at": datetime(2026, 6, 13, 10, 30, tzinfo=timezone.utc).isoformat(),
+        "updated_at": datetime(2026, 6, 13, 10, 30, tzinfo=UTC).isoformat(),
         "updated_by": "pipeline:fim-enricher",
     }
     enriched = _enrich_metadata_nodes(normalized, metadata_patch)

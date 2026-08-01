@@ -79,7 +79,7 @@ def test_dictifier_attribute_error():
     assert "'Greeter' object has no attribute 'non_existent_method'" in str(excinfo.value)
 
     with pytest.raises(AttributeError) as excinfo:
-        greeters.non_existent_property
+        _ = greeters.non_existent_property
     assert "'Greeter' object has no attribute 'non_existent_property'" in str(excinfo.value)
 
 
