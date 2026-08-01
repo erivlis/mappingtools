@@ -129,22 +129,32 @@ quote-style = "single"
 
 [tool.ruff.lint]
 select = [
+    "B",
+    #    "D",
     "E",
     "F",
     "W",
-    "C90",
+    "C",
     "I",
     "N",
     "U",
+    "UP",
     "C4",
     "PIE",
     "PT",
+#    "S",
     "SIM",
     # "ERA",
     "TRY",
     "RUF",
 ]
-ignore = ["F401", "PT011", "RUF001", "TRY003"]
+ignore = [
+    "F401",
+    "PT011",
+    "RUF001",
+    "S101",
+    "TRY003"
+]
 # Exclude a variety of commonly ignored directories.
 exclude = [
     ".bzr",

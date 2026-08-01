@@ -50,14 +50,14 @@ class Transformer:
         self.objects = {}
 
     def __call__(self, obj: Tree[Any]) -> Tree[Any]:
-        """
-           Transform the given object using the appropriate handler.
+        """Transform the given object using the appropriate handler.
 
-           Args:
-               obj (Any): The object to transform.
+        Args:
+            obj (Any): The object to transform.
 
-           Returns:
-               Any: The transformed object.
+        Returns:
+            Any: The transformed object.
+
         """
         obj_id = id(obj)
         self.objects_counter[obj_id] += 1
