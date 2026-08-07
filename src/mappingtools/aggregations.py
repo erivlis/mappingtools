@@ -92,31 +92,37 @@ def ema_aggregator(mapping: MutableMapping, key: Any, values: Iterable[Any]):
 
 
 class Aggregation(Enum):
+    """Data aggregation modes."""
+
     @dataclass(frozen=True)
     class Item:
         collection_type: type | None
         func: Callable[[MutableMapping, Any, Iterable[Any]], None]
 
-    """
-    Define an enumeration class for data aggregation modes.
-    All aggregators now accept an iterable of values.
-    """
     ALL = Item(collection_type=list, func=all_aggregator)
     """Aggregate all values into a list."""
+
     COUNT = Item(collection_type=Counter, func=count_aggregator)
     """Count occurrences of each value."""
+
     DISTINCT = Item(collection_type=set, func=distinct_aggregator)
     """Aggregate distinct values into a set."""
+
     FIRST = Item(collection_type=None, func=first_aggregator)
     """Take the first value encountered."""
+
     LAST = Item(collection_type=None, func=last_aggregator)
     """Take the last value encountered."""
+
     SUM = Item(collection_type=float, func=sum_aggregator)
     """Sum all values."""
+
     MAX = Item(collection_type=float, func=max_aggregator)
     """Take the maximum value."""
+
     MIN = Item(collection_type=float, func=min_aggregator)
     """Take the minimum value."""
+
     EMA = Item(collection_type=float, func=ema_aggregator)
     """Calculate the exponential moving average of values."""
 
