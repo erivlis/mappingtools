@@ -45,9 +45,9 @@ and unwrapping complex objects.
     <td>
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/test.yml"><img alt="Test" src="https://github.com/erivlis/mappingtools/actions/workflows/test.yml/badge.svg"></a>
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/test-beta.yml"><img alt="Publish" src="https://github.com/erivlis/mappingtools/actions/workflows/test-beta.yml/badge.svg"></a>
+      <a href="https://github.com/erivlis/mappingtools/actions/workflows/codspeed.yml"><img alt="CodSpeed" src="https://github.com/erivlis/mappingtools/actions/workflows/codspeed.yml/badge.svg"></a>
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml"><img alt="Publish" src="https://github.com/erivlis/mappingtools/actions/workflows/publish.yml/badge.svg"></a>
       <a href="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yaml"><img alt="Publish Docs" src="https://github.com/erivlis/mappingtools/actions/workflows/publish-docs.yml/badge.svg"></a>
-      <a href="https://app.codspeed.io/erivlis/mappingtools?utm_source=badge"><img src="https://img.shields.io/endpoint?url=https://codspeed.io/badge.json" alt="CodSpeed"/></a>
     </td>
   </tr>
   <tr>
@@ -67,6 +67,7 @@ and unwrapping complex objects.
       <a href="https://app.deepsource.com/gh/erivlis/mappingtools/" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://app.deepsource.com/gh/erivlis/mappingtools.svg/?label=active+issues&show_trend=true&token=5hN3svCsdJtdULGTc68MngKa"/></a>
       <a href="https://app.deepsource.com/gh/erivlis/mappingtools/" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://app.deepsource.com/gh/erivlis/mappingtools.svg/?label=resolved+issues&show_trend=true&token=5hN3svCsdJtdULGTc68MngKa"/></a>
       <a href="https://snyk.io/test/github/erivlis/mappingtools"><img alt="Snyk" src="https://snyk.io/test/github/erivlis/mappingtools/badge.svg"></a>
+      <a href="https://app.codspeed.io/erivlis/mappingtools?utm_source=badge"><img src="https://img.shields.io/endpoint?url=https://codspeed.io/badge.json" alt="CodSpeed"/></a>
     </td>
   </tr>
 </table>
