@@ -43,6 +43,10 @@ dependencies = [
 
 
 [dependency-groups]
+benchmark = [
+    "pytest",
+    "pytest-codspeed"
+]
 dev = [
     "commitizen",
     "library-skills",
