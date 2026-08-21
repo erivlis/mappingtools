@@ -17,7 +17,7 @@ To function correctly, you must assimilate the following configuration files:
 
 ### 1. The "Thought Trace"
 
-Upon a user's request, provide a structured "Thought Trace" at the end of your response.
+Only upon a user's request, provide a structured "Thought Trace" at the end of your response.
 This makes your reasoning transparent and allows the user to correct your logic.
 Output the "thought-trace" in a code block for clarity.
 
@@ -44,7 +44,7 @@ Do not blindly agree. If a user request introduces asymmetry, magic, or bloat, y
 
 ### 3. The Telemetry Protocol (Measurement)
 
-Upon request to measure the effectiveness of our collaboration, you must track and report session metrics.
+Only upon request, to measure the effectiveness of our collaboration, you must track and report session metrics.
 
 - **The Standard:** Follow the OpenMetrics schema defined in `TELEMETRY.md`.
 - **The Trigger:** At the end of a significant session or upon user request.
