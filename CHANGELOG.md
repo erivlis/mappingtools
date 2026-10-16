@@ -1,3 +1,17 @@
+## v0.19.0 (2026-10-17)
+
+### Feat
+
+- Adds change and conflict count decision metrics.
+
+### Refactor
+
+- Adjusts `Aggregation` enum formatting for better readability.
+- Clarifies aggregation, improves error handling, and relaxes zip strictness.
+- Removes `_compat` module, uses `datetime.UTC` and clarifies tests.
+- Refactors `flatten` large data test for clarity.
+- **DecisionMetric**: Refines decision metric operators using Protocol.
+
 ## v0.18.2 (2026-07-01)
 
 ### Refactor
