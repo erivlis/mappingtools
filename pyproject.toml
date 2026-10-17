@@ -10,6 +10,8 @@ authors = [
     { name = "Eran Rivlis", email = "eran@rivlis.info" },
 ]
 description = "MappingTools. Do stuff with Mappings and more."
+license = "MIT"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
