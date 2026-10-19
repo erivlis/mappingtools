@@ -66,8 +66,9 @@ and unwrapping complex objects.
       <a href="https://www.codefactor.io/repository/github/erivlis/mappingtools/overview/main"><img src="https://www.codefactor.io/repository/github/erivlis/mappingtools/badge/main" alt="CodeFactor" /></a>
       <a href="https://app.deepsource.com/gh/erivlis/mappingtools/" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://app.deepsource.com/gh/erivlis/mappingtools.svg/?label=active+issues&show_trend=true&token=5hN3svCsdJtdULGTc68MngKa"/></a>
       <a href="https://app.deepsource.com/gh/erivlis/mappingtools/" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://app.deepsource.com/gh/erivlis/mappingtools.svg/?label=resolved+issues&show_trend=true&token=5hN3svCsdJtdULGTc68MngKa"/></a>
-      <a href="https://snyk.io/test/github/erivlis/mappingtools"><img alt="Snyk" src="https://snyk.io/test/github/erivlis/mappingtools/badge.svg"></a>
+      <a href="https://snyk.io/test/github/erivlis/mappingtools"><img alt="Snyk" src="https://snyk.io/test/github/erivlis/mappingtools/badge.svg"/></a>
       <a href="https://app.codspeed.io/erivlis/mappingtools?utm_source=badge"><img src="https://img.shields.io/endpoint?url=https://codspeed.io/badge.json" alt="CodSpeed"/></a>
+      <a href="https://badge.socket.dev/pypi/package/mappingtools/0.19.0?artifact_id=tar-gz"><img src="https://badge.socket.dev/pypi/package/mappingtools/0.19.0?artifact_id=tar-gz" alt="Socket Badge"/></a>
     </td>
   </tr>
   <tr>
